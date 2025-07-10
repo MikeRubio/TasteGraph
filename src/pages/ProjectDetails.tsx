@@ -757,6 +757,270 @@ const ContentCard = ({ suggestion, index }: { suggestion: any; index: number }) 
   );
 };
 
+// Taste Intersection Card Component
+const TasteIntersectionCard = ({ intersection, index }: { intersection: any; index: number }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className="p-6 bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded-lg border border-green-500/20">
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex-1">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xl font-semibold text-white flex items-center">
+              <GitMerge className="w-5 h-5 mr-2 text-green-400" />
+              {intersection.intersection_name || `Intersection ${index + 1}`}
+            </h3>
+            {intersection.overlap_percentage && (
+              <Badge variant="secondary" className="text-xs bg-green-500/20 text-green-300">
+                {intersection.overlap_percentage}% overlap
+              </Badge>
+            )}
+          </div>
+          <p className="text-slate-300 leading-relaxed">
+            {intersection.description || 'No description available'}
+          </p>
+        </div>
+      </div>
+
+      <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+        <CollapsibleTrigger asChild>
+          <Button variant="ghost" className="w-full justify-between text-slate-300 hover:text-white p-0 h-auto">
+            <span className="text-sm font-medium">
+              {isExpanded ? 'Hide Details' : 'Show Details'}
+            </span>
+            {isExpanded ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+          </Button>
+        </CollapsibleTrigger>
+        
+        <CollapsibleContent className="space-y-4 mt-4">
+          {/* Personas Involved */}
+          {intersection.personas_involved && intersection.personas_involved.length > 0 && (
+            <div className="p-4 bg-slate-800/50 rounded-lg">
+              <h4 className="text-sm font-medium text-slate-400 mb-2 flex items-center">
+                <Users className="w-4 h-4 mr-2" />
+                Personas Involved
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {intersection.personas_involved.map((persona: string, idx: number) => (
+                  <Badge key={idx} variant="outline" className="text-xs">
+                    {persona}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Shared Attributes */}
+          {intersection.shared_attributes && intersection.shared_attributes.length > 0 && (
+            <div className="p-4 bg-slate-800/50 rounded-lg">
+              <h4 className="text-sm font-medium text-slate-400 mb-2 flex items-center">
+                <Layers className="w-4 h-4 mr-2" />
+                Shared Attributes
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {intersection.shared_attributes.map((attribute: string, idx: number) => (
+                  <div key={idx} className="flex items-start p-2 bg-slate-700/30 rounded">
+                    <span className="w-2 h-2 bg-green-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <span className="text-sm text-slate-300">{attribute.replace('_', ' ')}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Common Interests & Brands */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {intersection.common_interests && intersection.common_interests.length > 0 && (
+              <div className="p-4 bg-slate-800/50 rounded-lg">
+                <h4 className="text-sm font-medium text-slate-400 mb-2">Common Interests</h4>
+                <div className="flex flex-wrap gap-1">
+                  {intersection.common_interests.map((interest: string, idx: number) => (
+                    <Badge key={idx} variant="secondary" className="text-xs">
+                      {interest.replace('_', ' ')}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {intersection.shared_brands && intersection.shared_brands.length > 0 && (
+              <div className="p-4 bg-slate-800/50 rounded-lg">
+                <h4 className="text-sm font-medium text-slate-400 mb-2">Shared Brands</h4>
+                <div className="flex flex-wrap gap-1">
+                  {intersection.shared_brands.map((brand: string, idx: number) => (
+                    <Badge key={idx} variant="outline" className="text-xs">
+                      {brand}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Marketing Opportunities */}
+          {intersection.marketing_opportunities && intersection.marketing_opportunities.length > 0 && (
+            <div className="p-4 bg-slate-800/50 rounded-lg border border-green-500/20">
+              <h4 className="text-sm font-medium text-slate-400 mb-3 flex items-center">
+                <Target className="w-4 h-4 mr-2" />
+                Marketing Opportunities
+              </h4>
+              <div className="space-y-2">
+                {intersection.marketing_opportunities.map((opportunity: string, idx: number) => (
+                  <div key={idx} className="flex items-start p-3 bg-green-500/10 rounded-lg">
+                    <ArrowRight className="w-4 h-4 mt-0.5 mr-3 text-green-400 flex-shrink-0" />
+                    <span className="text-sm text-slate-300">{opportunity}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </CollapsibleContent>
+      </Collapsible>
+    </div>
+  );
+};
+
+// Cross-Domain Recommendation Card Component
+const CrossDomainCard = ({ recommendation, index }: { recommendation: any; index: number }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty?.toLowerCase()) {
+      case 'low': return 'text-green-400 bg-green-500/20';
+      case 'medium': return 'text-yellow-400 bg-yellow-500/20';
+      case 'high': return 'text-red-400 bg-red-500/20';
+      default: return 'text-slate-400 bg-slate-500/20';
+    }
+  };
+
+  return (
+    <div className="p-6 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-lg border border-cyan-500/20">
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex-1">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xl font-semibold text-white flex items-center">
+              <Network className="w-5 h-5 mr-2 text-cyan-400" />
+              {recommendation.recommendation_title || `Recommendation ${index + 1}`}
+            </h3>
+            <div className="flex items-center space-x-2">
+              {recommendation.confidence_score && (
+                <Badge variant="secondary" className="text-xs">
+                  {recommendation.confidence_score}% confidence
+                </Badge>
+              )}
+              {recommendation.implementation_difficulty && (
+                <Badge className={`text-xs ${getDifficultyColor(recommendation.implementation_difficulty)}`}>
+                  {recommendation.implementation_difficulty} difficulty
+                </Badge>
+              )}
+            </div>
+          </div>
+          
+          {/* Source to Target Domain */}
+          <div className="flex items-center space-x-2 mb-3">
+            <Badge variant="outline" className="text-xs">
+              {recommendation.source_domain}
+            </Badge>
+            <ArrowRight className="w-4 h-4 text-slate-400" />
+            <Badge variant="outline" className="text-xs">
+              {recommendation.target_domain}
+            </Badge>
+          </div>
+          
+          <p className="text-slate-300 leading-relaxed">
+            {recommendation.description || 'No description available'}
+          </p>
+        </div>
+      </div>
+
+      <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+        <CollapsibleTrigger asChild>
+          <Button variant="ghost" className="w-full justify-between text-slate-300 hover:text-white p-0 h-auto">
+            <span className="text-sm font-medium">
+              {isExpanded ? 'Hide Details' : 'Show Details'}
+            </span>
+            {isExpanded ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+          </Button>
+        </CollapsibleTrigger>
+        
+        <CollapsibleContent className="space-y-4 mt-4">
+          {/* Audience Fit Score */}
+          {recommendation.audience_fit && (
+            <div className="p-4 bg-slate-800/50 rounded-lg">
+              <h4 className="text-sm font-medium text-slate-400 mb-2">Audience Fit</h4>
+              <div className="flex items-center space-x-3">
+                <div className="flex-1 h-3 bg-slate-600 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full transition-all duration-500"
+                    style={{ width: `${Math.round(recommendation.audience_fit * 100)}%` }}
+                  ></div>
+                </div>
+                <span className="text-sm font-bold text-white min-w-[3rem]">
+                  {Math.round(recommendation.audience_fit * 100)}%
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Related Entities */}
+          {recommendation.related_entities && recommendation.related_entities.length > 0 && (
+            <div className="p-4 bg-slate-800/50 rounded-lg">
+              <h4 className="text-sm font-medium text-slate-400 mb-2 flex items-center">
+                <Link2 className="w-4 h-4 mr-2" />
+                Related Entities
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {recommendation.related_entities.map((entity: string, idx: number) => (
+                  <Badge key={idx} variant="secondary" className="text-xs">
+                    {entity}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Expansion Opportunities */}
+          {recommendation.expansion_opportunities && recommendation.expansion_opportunities.length > 0 && (
+            <div className="p-4 bg-slate-800/50 rounded-lg border border-cyan-500/20">
+              <h4 className="text-sm font-medium text-slate-400 mb-3 flex items-center">
+                <TrendingUp className="w-4 h-4 mr-2" />
+                Expansion Opportunities
+              </h4>
+              <div className="space-y-2">
+                {recommendation.expansion_opportunities.map((opportunity: string, idx: number) => (
+                  <div key={idx} className="flex items-start p-3 bg-cyan-500/10 rounded-lg">
+                    <ArrowRight className="w-4 h-4 mt-0.5 mr-3 text-cyan-400 flex-shrink-0" />
+                    <span className="text-sm text-slate-300">{opportunity}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Potential Reach */}
+          {recommendation.potential_reach && (
+            <div className="p-4 bg-slate-800/50 rounded-lg">
+              <h4 className="text-sm font-medium text-slate-400 mb-2 flex items-center">
+                <Globe className="w-4 h-4 mr-2" />
+                Market Potential
+              </h4>
+              <p className="text-sm text-slate-300">{recommendation.potential_reach}</p>
+            </div>
+          )}
+        </CollapsibleContent>
+      </Collapsible>
+    </div>
+  );
+};
+
 // Empty State Component
 const EmptyState = ({ icon: Icon, title, description }: { 
   icon: any; 

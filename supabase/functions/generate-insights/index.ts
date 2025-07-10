@@ -218,8 +218,6 @@ serve(async (req: Request) => {
             audience_personas: fallbackInsights.audience_personas,
             cultural_trends: fallbackInsights.cultural_trends,
             content_suggestions: fallbackInsights.content_suggestions,
-            taste_intersections: fallbackInsights.taste_intersections,
-            cross_domain_recommendations: fallbackInsights.cross_domain_recommendations,
             qloo_data: qloo_data,
           },
         ])
@@ -259,8 +257,6 @@ serve(async (req: Request) => {
           audience_personas: insights.audience_personas,
           cultural_trends: insights.cultural_trends,
           content_suggestions: insights.content_suggestions,
-          taste_intersections: insights.taste_intersections,
-          cross_domain_recommendations: insights.cross_domain_recommendations,
           qloo_data: qloo_data,
         },
       ])
@@ -1142,71 +1138,105 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
     taste_intersections: [
       {
         intersection_name: "Tech-Wellness Convergence",
-        description: "The overlap between technology enthusiasts and wellness advocates",
-        shared_attributes: ["innovation", "self-improvement", "data-driven decisions", "premium quality"],
-        overlap_percentage: 68,
+        description: "The overlap between technology enthusiasts and wellness-conscious consumers, representing a growing segment that values digital solutions for health and mindfulness",
+        shared_attributes: ["innovation_seeking", "quality_focused", "community_oriented", "data_driven"],
+        overlap_percentage: 73,
         personas_involved: [`${industryName} Innovators`, "Conscious Consumers"],
-        common_interests: ["wearable tech", "health apps", "mindfulness", "productivity tools"],
-        shared_brands: ["Apple", "Fitbit", "Headspace", "Oura"],
-        behavioral_overlaps: ["early_adopter", "research_driven", "community_oriented"],
+        common_interests: ["wearable_technology", "meditation_apps", "fitness_tracking", "sustainable_tech", "biohacking"],
+        shared_brands: ["Apple", "Fitbit", "Headspace", "Calm", "Oura", "Peloton"],
+        behavioral_overlaps: ["early_adoption", "research_intensive", "community_sharing", "premium_willingness"],
         marketing_opportunities: [
-          "Tech products with wellness benefits",
-          "Data-driven wellness solutions",
-          "Community-based health challenges",
-          "Premium wellness tech accessories"
+          "Cross-promote wellness tech products",
+          "Create content bridging technology and health",
+          "Partner with wellness influencers in tech spaces",
+          "Develop integrated health-tech solutions"
         ]
       },
       {
-        intersection_name: "Creative-Conscious Alignment",
-        description: "Where cultural trendsetters meet conscious consumers",
-        shared_attributes: ["authenticity", "social_impact", "storytelling", "community_building"],
-        overlap_percentage: 72,
+        intersection_name: "Cultural-Conscious Alignment",
+        description: "The intersection between cultural trendsetters and conscious consumers, representing individuals who drive both cultural movements and sustainable practices",
+        shared_attributes: ["authenticity_seeking", "social_impact_focused", "community_building", "storytelling"],
+        overlap_percentage: 68,
         personas_involved: ["Cultural Trendsetters", "Conscious Consumers"],
-        common_interests: ["sustainable fashion", "ethical brands", "social causes", "artistic expression"],
-        shared_brands: ["Patagonia", "Everlane", "Ben & Jerry's", "Warby Parker"],
-        behavioral_overlaps: ["values_driven", "content_creation", "brand_advocacy"],
+        common_interests: ["social_justice", "sustainable_fashion", "ethical_brands", "cultural_movements", "activism"],
+        shared_brands: ["Patagonia", "Ben & Jerry's", "Warby Parker", "Allbirds", "Reformation"],
+        behavioral_overlaps: ["values_driven_purchasing", "social_sharing", "brand_advocacy", "community_leadership"],
         marketing_opportunities: [
-          "Cause-driven creative campaigns",
-          "Sustainable product storytelling",
-          "Artist collaborations with ethical brands",
-          "Community-driven social impact initiatives"
+          "Launch cause-marketing campaigns",
+          "Create sustainable product lines",
+          "Partner with social impact organizations",
+          "Develop community-driven initiatives"
         ]
       }
     ],
     cross_domain_recommendations: [
       {
-        source_domain: "Technology",
-        target_domain: "Wellness",
-        recommendation_title: "Mindful Tech Integration",
-        description: "Leverage technology to enhance wellness experiences rather than detract from them",
-        confidence_score: 84,
-        related_entities: ["meditation apps", "fitness trackers", "sleep optimization", "digital detox tools"],
+        source_domain: domains[0] || "technology",
+        target_domain: "wellness",
+        recommendation_title: "Tech-Enabled Wellness Solutions",
+        description: "Expand from technology into wellness by creating digital health solutions, meditation apps, or fitness tracking platforms that appeal to tech-savvy health enthusiasts",
+        confidence_score: 87,
+        related_entities: ["Headspace", "Calm", "Fitbit", "Apple Health", "MyFitnessPal"],
         expansion_opportunities: [
-          "AI-powered wellness coaching",
-          "Biometric-based personalization",
-          "Community wellness challenges",
-          "Mindfulness-integrated productivity tools"
+          "Develop mindfulness apps with AI personalization",
+          "Create wearable technology for health monitoring",
+          "Build community platforms for wellness tracking",
+          "Integrate wellness features into existing tech products"
         ],
-        audience_fit: 89,
+        audience_fit: 0.84,
         implementation_difficulty: "Medium",
-        potential_reach: "High - appeals to tech-savvy wellness enthusiasts"
+        potential_reach: "High - wellness tech market growing 15% annually"
       },
       {
-        source_domain: "Fashion",
-        target_domain: "Sustainability",
-        recommendation_title: "Circular Fashion Innovation",
-        description: "Transform fashion consumption through sustainable practices and circular economy principles",
-        confidence_score: 78,
-        related_entities: ["sustainable materials", "clothing rental", "upcycling", "ethical manufacturing"],
+        source_domain: domains[0] || "technology", 
+        target_domain: "sustainability",
+        recommendation_title: "Green Technology Innovation",
+        description: "Bridge technology and environmental consciousness by developing eco-friendly tech solutions, renewable energy products, or sustainability tracking tools",
+        confidence_score: 82,
+        related_entities: ["Tesla", "Patagonia", "Ecosia", "Too Good To Go", "Olio"],
         expansion_opportunities: [
-          "Clothing-as-a-service models",
-          "Blockchain supply chain transparency",
-          "Community clothing swaps",
-          "Personalized sustainability metrics"
+          "Create carbon footprint tracking apps",
+          "Develop smart home energy management systems",
+          "Build platforms for sustainable product discovery",
+          "Design eco-friendly tech hardware"
         ],
-        audience_fit: 85,
+        audience_fit: 0.79,
         implementation_difficulty: "High",
-        potential_reach: "Medium-High - growing conscious fashion market"
+        potential_reach: "Very High - sustainability market projected to reach $150B by 2030"
+      },
+      {
+        source_domain: "lifestyle",
+        target_domain: "education",
+        recommendation_title: "Lifestyle Learning Platforms",
+        description: "Expand into educational content by creating lifestyle-focused learning experiences, skill-sharing platforms, or personal development courses",
+        confidence_score: 75,
+        related_entities: ["MasterClass", "Skillshare", "Coursera", "Udemy", "LinkedIn Learning"],
+        expansion_opportunities: [
+          "Launch lifestyle skill courses (cooking, wellness, productivity)",
+          "Create peer-to-peer learning communities",
+          "Develop micro-learning content for busy professionals",
+          "Build mentorship platforms for personal growth"
+        ],
+        audience_fit: 0.72,
+        implementation_difficulty: "Low",
+        potential_reach: "Medium - online education market growing 8% annually"
+      },
+      {
+        source_domain: domains[1] || "culture",
+        target_domain: "commerce",
+        recommendation_title: "Cultural Commerce Integration",
+        description: "Bridge cultural trends with e-commerce by creating culturally-aware shopping experiences, trend-based product curation, or community-driven marketplaces",
+        confidence_score: 80,
+        related_entities: ["Depop", "Vinted", "Etsy", "ASOS", "Urban Outfitters"],
+        expansion_opportunities: [
+          "Develop trend-prediction shopping algorithms",
+          "Create cultural community marketplaces",
+          "Build influencer-driven commerce platforms",
+          "Design culturally-curated subscription boxes"
+        ],
+        audience_fit: 0.77,
+        implementation_difficulty: "Medium",
+        potential_reach: "High - social commerce growing 30% annually"
       }
     ]
   };
