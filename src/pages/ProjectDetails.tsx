@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { getProject, getInsights, generateInsights } from '@/lib/api';
+import { generatePDFReport, PDFReportData } from '@/lib/pdfGenerator';
 import { 
   ArrowLeft, 
   Sparkles, 
@@ -19,6 +20,7 @@ import {
   Download,
   RefreshCw,
   AlertCircle,
+  FileText as FileTextIcon,
   ChevronDown,
   ChevronUp,
   Clock,
@@ -79,6 +81,8 @@ const ProjectDetails = () => {
       audience_personas: latestInsight.audience_personas,
       cultural_trends: latestInsight.cultural_trends,
       content_suggestions: latestInsight.content_suggestions,
+      taste_intersections: latestInsight.taste_intersections,
+      cross_domain_recommendations: latestInsight.cross_domain_recommendations,
       qloo_data: latestInsight.qloo_data,
     };
 
@@ -96,6 +100,41 @@ const ProjectDetails = () => {
     URL.revokeObjectURL(url);
     
     toast.success('Insights exported successfully!');
+  };
+
+  const handleExportPDF = async () => {
+    const latestInsight = insights[0];
+    if (!latestInsight || !project) {
+      toast.error('No insights to export');
+      return;
+    }
+
+    try {
+      const pdfData: PDFReportData = {
+        project: {
+          title: project.title,
+          description: project.description,
+          industry: project.industry,
+          cultural_domains: project.cultural_domains,
+          geographical_targets: project.geographical_targets,
+          created_at: project.created_at,
+        },
+        insights: {
+          audience_personas: latestInsight.audience_personas || [],
+          cultural_trends: latestInsight.cultural_trends || [],
+          content_suggestions: latestInsight.content_suggestions || [],
+          taste_intersections: latestInsight.taste_intersections || [],
+          cross_domain_recommendations: latestInsight.cross_domain_recommendations || [],
+          created_at: latestInsight.created_at,
+        },
+      };
+
+      await generatePDFReport(pdfData);
+      toast.success('PDF report generated successfully!');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error('Failed to generate PDF report');
+    }
   };
 
   // Debug: Log the insights data structure
@@ -136,6 +175,17 @@ const ProjectDetails = () => {
         </div>
         <div className="flex items-center space-x-3">
           {latestInsight && (
+            <>
+              <Button 
+                variant="outline" 
+                onClick={handleExportPDF}
+                className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                disabled={generateInsightsMutation.isPending}
+              >
+                <FileTextIcon className="w-4 h-4 mr-2" />
+                Export PDF
+              </Button>
+            </>
             <Button 
               variant="outline" 
               onClick={handleExportInsights}
