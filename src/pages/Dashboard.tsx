@@ -146,7 +146,7 @@ const Dashboard = () => {
                       </div>
                     </div>
                     <Link to={`/projects/${project.id}`}>
-                      <Button variant="outline" size="sm" className="border-slate-600 text-slate-300 hover:bg-slate-700">
+                      <Button variant="outline" size="sm" className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white">
                         View
                       </Button>
                     </Link>

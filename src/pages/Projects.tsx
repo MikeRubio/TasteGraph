@@ -294,7 +294,7 @@ const Projects = () => {
                     <Button 
                       variant="outline" 
                       size="sm"
-                      className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                      className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
                     >
                       <Eye className="w-4 h-4 mr-2" />
                       View Details
