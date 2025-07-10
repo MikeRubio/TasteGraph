@@ -49,6 +49,33 @@ interface InsightsResponse {
   audience_personas: AudiencePersona[];
   cultural_trends: CulturalTrend[];
   content_suggestions: ContentSuggestion[];
+  taste_intersections: TasteIntersection[];
+  cross_domain_recommendations: CrossDomainRecommendation[];
+}
+
+interface TasteIntersection {
+  intersection_name: string;
+  description: string;
+  shared_attributes: string[];
+  overlap_percentage: number;
+  personas_involved: string[];
+  common_interests: string[];
+  shared_brands?: string[];
+  behavioral_overlaps?: string[];
+  marketing_opportunities: string[];
+}
+
+interface CrossDomainRecommendation {
+  source_domain: string;
+  target_domain: string;
+  recommendation_title: string;
+  description: string;
+  confidence_score: number;
+  related_entities: string[];
+  expansion_opportunities: string[];
+  audience_fit: number;
+  implementation_difficulty: 'Low' | 'Medium' | 'High';
+  potential_reach?: string;
 }
 
 interface QlooResponse {

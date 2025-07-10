@@ -62,6 +62,31 @@ export interface ContentSuggestion {
   affinity_score?: number; // 0-1 scale
 }
 
+export interface TasteIntersection {
+  intersection_name: string;
+  description: string;
+  shared_attributes: string[];
+  overlap_percentage: number; // 0-100
+  personas_involved: string[];
+  common_interests: string[];
+  shared_brands?: string[];
+  behavioral_overlaps?: string[];
+  marketing_opportunities: string[];
+}
+
+export interface CrossDomainRecommendation {
+  source_domain: string;
+  target_domain: string;
+  recommendation_title: string;
+  description: string;
+  confidence_score: number; // 0-100
+  related_entities: string[];
+  expansion_opportunities: string[];
+  audience_fit: number; // 0-1 scale
+  implementation_difficulty: 'Low' | 'Medium' | 'High';
+  potential_reach?: string;
+}
+
 export interface UserProfile {
   id: string;
   email: string;
