@@ -917,6 +917,16 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
   const domains = project.cultural_domains || ["technology", "lifestyle"];
   const targets = project.geographical_targets || ["US"];
 
+  // Extract affinity scores from Qloo data if available
+  const qlooAffinityScores = qloo_data?.taste_profile?.affinity_scores || {
+    technology: 0.82,
+    wellness: 0.74,
+    sustainability: 0.78,
+    music: 0.71,
+    fashion: 0.65,
+    food: 0.69
+  };
+
   return {
     audience_personas: [
       {
@@ -937,11 +947,12 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
         },
         cultural_affinities: ["technology", "wellness", "sustainability", "premium_experiences"],
         behavioral_patterns: ["research_driven", "community_oriented", "brand_advocate", "content_creator"],
-        affinity_scores: qloo_data?.taste_profile?.affinity_scores || {
-          technology: 0.82,
-          wellness: 0.74,
-          sustainability: 0.78,
-          premium_brands: 0.71
+        affinity_scores: {
+          technology: qlooAffinityScores.technology || 0.82,
+          wellness: qlooAffinityScores.wellness || 0.74,
+          sustainability: qlooAffinityScores.sustainability || 0.78,
+          premium_brands: 0.71,
+          innovation: 0.85
         }
       },
       {
@@ -963,10 +974,11 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
         cultural_affinities: ["music", "fashion", "art", "social_movements"],
         behavioral_patterns: ["trend_discovery", "content_creation", "community_building", "social_advocacy"],
         affinity_scores: {
-          music: 0.88,
-          fashion: 0.79,
+          music: qlooAffinityScores.music || 0.88,
+          fashion: qlooAffinityScores.fashion || 0.79,
           art: 0.73,
-          social_impact: 0.81
+          social_impact: 0.81,
+          creativity: 0.86
         }
       },
       {
@@ -988,10 +1000,11 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
         cultural_affinities: ["environmental_causes", "wellness", "ethical_consumption", "community_support"],
         behavioral_patterns: ["values_driven", "research_intensive", "brand_loyalty", "advocacy"],
         affinity_scores: {
-          sustainability: 0.91,
-          wellness: 0.84,
+          sustainability: qlooAffinityScores.sustainability || 0.91,
+          wellness: qlooAffinityScores.wellness || 0.84,
           ethical_brands: 0.87,
-          community: 0.76
+          community: 0.76,
+          quality: 0.82
         }
       }
     ],

@@ -22,6 +22,46 @@ export interface Insight {
   created_at: string;
 }
 
+// Enhanced interfaces for affinity scores
+export interface AffinityScores {
+  [domain: string]: number; // 0-1 scale from Qloo
+}
+
+export interface AudiencePersona {
+  name: string;
+  description: string;
+  characteristics: string[];
+  demographics: {
+    age_range: string;
+    interests: string[];
+    platforms: string[];
+  };
+  cultural_affinities?: string[];
+  behavioral_patterns?: string[];
+  affinity_scores?: AffinityScores;
+}
+
+export interface CulturalTrend {
+  title: string;
+  description: string;
+  confidence: number;
+  impact: string;
+  timeline: string;
+  qloo_connection?: string;
+  affinity_score?: number; // 0-1 scale
+}
+
+export interface ContentSuggestion {
+  title: string;
+  description: string;
+  platforms: string[];
+  content_type: string;
+  copy: string;
+  engagement_potential: string;
+  cultural_timing?: string;
+  affinity_score?: number; // 0-1 scale
+}
+
 export interface UserProfile {
   id: string;
   email: string;
