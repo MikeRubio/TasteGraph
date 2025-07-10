@@ -27,7 +27,11 @@ import {
   Lightbulb,
   Brain,
   Globe,
-  Zap
+  Zap,
+  ArrowRight,
+  Network,
+  Link2,
+  Layers
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -239,6 +243,20 @@ const ProjectDetails = () => {
                 </div>
                 <div className="text-sm text-slate-300">Content Ideas</div>
               </div>
+              <div className="text-center p-4 bg-slate-800/30 rounded-lg">
+                <Target className="w-8 h-8 text-green-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-white">
+                  {latestInsight.taste_intersections?.length || 0}
+                </div>
+                <div className="text-sm text-slate-300">Taste Intersections</div>
+              </div>
+              <div className="text-center p-4 bg-slate-800/30 rounded-lg">
+                <Globe className="w-8 h-8 text-cyan-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-white">
+                  {latestInsight.cross_domain_recommendations?.length || 0}
+                </div>
+                <div className="text-sm text-slate-300">Cross-Domain Recs</div>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -286,6 +304,7 @@ const ProjectDetails = () => {
       ) : latestInsight ? (
         <Tabs defaultValue="personas" className="space-y-4">
           <TabsList className="grid w-full grid-cols-3 bg-slate-800/50">
+          <TabsList className="grid w-full grid-cols-5 bg-slate-800/50">
             <TabsTrigger value="personas" className="data-[state=active]:bg-blue-500/20">
               <Users className="w-4 h-4 mr-2" />
               Personas ({latestInsight.audience_personas?.length || 0})
@@ -297,6 +316,14 @@ const ProjectDetails = () => {
             <TabsTrigger value="content" className="data-[state=active]:bg-blue-500/20">
               <FileText className="w-4 h-4 mr-2" />
               Content ({latestInsight.content_suggestions?.length || 0})
+            </TabsTrigger>
+            <TabsTrigger value="intersections" className="data-[state=active]:bg-green-500/20">
+              <Target className="w-4 h-4 mr-2" />
+              Intersections ({latestInsight.taste_intersections?.length || 0})
+            </TabsTrigger>
+            <TabsTrigger value="cross-domain" className="data-[state=active]:bg-cyan-500/20">
+              <Globe className="w-4 h-4 mr-2" />
+              Cross-Domain ({latestInsight.cross_domain_recommendations?.length || 0})
             </TabsTrigger>
           </TabsList>
 
@@ -381,6 +408,64 @@ const ProjectDetails = () => {
                     icon={FileText}
                     title="No content suggestions yet"
                     description="Click 'Generate Insights' to create content ideas."
+                  />
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="intersections" className="space-y-4">
+            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <Target className="w-5 h-5 mr-2" />
+                  Taste Intersections
+                </CardTitle>
+                <CardDescription className="text-slate-300">
+                  Discover how different audience segments overlap in their cultural preferences
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {latestInsight.taste_intersections?.length > 0 ? (
+                  <div className="space-y-6">
+                    {latestInsight.taste_intersections.map((intersection: any, index: number) => (
+                      <TasteIntersectionCard key={index} intersection={intersection} index={index} />
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState 
+                    icon={Target}
+                    title="No taste intersections found"
+                    description="Click 'Generate Insights' to discover audience overlaps."
+                  />
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="cross-domain" className="space-y-4">
+            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <Globe className="w-5 h-5 mr-2" />
+                  Cross-Domain Recommendations
+                </CardTitle>
+                <CardDescription className="text-slate-300">
+                  Explore expansion opportunities across different cultural domains
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {latestInsight.cross_domain_recommendations?.length > 0 ? (
+                  <div className="space-y-6">
+                    {latestInsight.cross_domain_recommendations.map((recommendation: any, index: number) => (
+                      <CrossDomainCard key={index} recommendation={recommendation} index={index} />
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState 
+                    icon={Globe}
+                    title="No cross-domain recommendations yet"
+                    description="Click 'Generate Insights' to discover expansion opportunities."
                   />
                 )}
               </CardContent>
@@ -767,7 +852,7 @@ const TasteIntersectionCard = ({ intersection, index }: { intersection: any; ind
         <div className="flex-1">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xl font-semibold text-white flex items-center">
-              <GitMerge className="w-5 h-5 mr-2 text-green-400" />
+              <Target className="w-5 h-5 mr-2 text-green-400" />
               {intersection.intersection_name || `Intersection ${index + 1}`}
             </h3>
             {intersection.overlap_percentage && (
@@ -903,7 +988,7 @@ const CrossDomainCard = ({ recommendation, index }: { recommendation: any; index
         <div className="flex-1">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xl font-semibold text-white flex items-center">
-              <Network className="w-5 h-5 mr-2 text-cyan-400" />
+              <Globe className="w-5 h-5 mr-2 text-cyan-400" />
               {recommendation.recommendation_title || `Recommendation ${index + 1}`}
             </h3>
             <div className="flex items-center space-x-2">
