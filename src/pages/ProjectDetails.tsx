@@ -295,6 +295,29 @@ const ProjectDetails = () => {
                             </div>
                           </div>
                         )}
+                        {persona.affinity_scores && (
+                          <div className="mt-3 pt-3 border-t border-slate-600">
+                            <h4 className="text-sm font-medium text-slate-400 mb-2">Cultural Affinities:</h4>
+                            <div className="grid grid-cols-2 gap-2">
+                              {Object.entries(persona.affinity_scores).map(([domain, score]: [string, any]) => (
+                                <div key={domain} className="flex items-center justify-between p-2 bg-slate-800/50 rounded">
+                                  <span className="text-xs text-slate-300 capitalize">{domain.replace('_', ' ')}</span>
+                                  <div className="flex items-center space-x-2">
+                                    <div className="w-12 h-1.5 bg-slate-600 rounded-full overflow-hidden">
+                                      <div 
+                                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-300"
+                                        style={{ width: `${Math.round(score * 100)}%` }}
+                                      ></div>
+                                    </div>
+                                    <span className="text-xs font-medium text-white min-w-[2rem]">
+                                      {Math.round(score * 100)}%
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -343,6 +366,24 @@ const ProjectDetails = () => {
                           <div className="mt-2">
                             <h4 className="text-sm font-medium text-slate-400 mb-1">Timeline:</h4>
                             <p className="text-sm text-slate-300">{trend.timeline}</p>
+                          </div>
+                        )}
+                        {trend.affinity_score && (
+                          <div className="mt-3 pt-3 border-t border-slate-600">
+                            <div className="flex items-center justify-between">
+                              <h4 className="text-sm font-medium text-slate-400">Cultural Relevance:</h4>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-16 h-2 bg-slate-600 rounded-full overflow-hidden">
+                                  <div 
+                                    className="h-full bg-gradient-to-r from-green-500 to-blue-500 rounded-full transition-all duration-300"
+                                    style={{ width: `${Math.round(trend.affinity_score * 100)}%` }}
+                                  ></div>
+                                </div>
+                                <span className="text-sm font-medium text-white">
+                                  {Math.round(trend.affinity_score * 100)}%
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -404,6 +445,22 @@ const ProjectDetails = () => {
                           <div className="p-3 bg-slate-800/50 rounded border border-slate-600">
                             <h4 className="text-sm font-medium text-slate-400 mb-1">Sample Copy:</h4>
                             <p className="text-sm text-slate-300 italic">"{suggestion.copy}"</p>
+                          </div>
+                        )}
+                        {suggestion.affinity_score && (
+                          <div className="mt-3 flex items-center justify-between">
+                            <span className="text-sm text-slate-400">Audience Match:</span>
+                            <div className="flex items-center space-x-2">
+                              <div className="w-12 h-1.5 bg-slate-600 rounded-full overflow-hidden">
+                                <div 
+                                  className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full transition-all duration-300"
+                                  style={{ width: `${Math.round(suggestion.affinity_score * 100)}%` }}
+                                ></div>
+                              </div>
+                              <span className="text-xs font-medium text-white">
+                                {Math.round(suggestion.affinity_score * 100)}%
+                              </span>
+                            </div>
                           </div>
                         )}
                       </div>

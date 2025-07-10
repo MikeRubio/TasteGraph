@@ -936,7 +936,13 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
           platforms: ["LinkedIn", "Instagram", "TikTok", "YouTube"]
         },
         cultural_affinities: ["technology", "wellness", "sustainability", "premium_experiences"],
-        behavioral_patterns: ["research_driven", "community_oriented", "brand_advocate", "content_creator"]
+        behavioral_patterns: ["research_driven", "community_oriented", "brand_advocate", "content_creator"],
+        affinity_scores: qloo_data?.taste_profile?.affinity_scores || {
+          technology: 0.82,
+          wellness: 0.74,
+          sustainability: 0.78,
+          premium_brands: 0.71
+        }
       },
       {
         name: "Cultural Trendsetters",
@@ -955,7 +961,13 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
           platforms: ["TikTok", "Instagram", "Twitter", "YouTube"]
         },
         cultural_affinities: ["music", "fashion", "art", "social_movements"],
-        behavioral_patterns: ["trend_discovery", "content_creation", "community_building", "social_advocacy"]
+        behavioral_patterns: ["trend_discovery", "content_creation", "community_building", "social_advocacy"],
+        affinity_scores: {
+          music: 0.88,
+          fashion: 0.79,
+          art: 0.73,
+          social_impact: 0.81
+        }
       },
       {
         name: "Conscious Consumers",
@@ -974,7 +986,13 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
           platforms: ["Instagram", "LinkedIn", "Facebook", "YouTube"]
         },
         cultural_affinities: ["environmental_causes", "wellness", "ethical_consumption", "community_support"],
-        behavioral_patterns: ["values_driven", "research_intensive", "brand_loyalty", "advocacy"]
+        behavioral_patterns: ["values_driven", "research_intensive", "brand_loyalty", "advocacy"],
+        affinity_scores: {
+          sustainability: 0.91,
+          wellness: 0.84,
+          ethical_brands: 0.87,
+          community: 0.76
+        }
       }
     ],
     cultural_trends: [
@@ -984,7 +1002,8 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
         confidence: 88, // Fixed: Now a whole number between 0-100
         impact: "Brands showing authentic stories see 3x higher engagement and stronger emotional connections",
         timeline: "Current trend with 18+ months of sustained growth expected",
-        qloo_connection: "Aligns with Qloo's data showing high affinity for authenticity and transparency"
+        qloo_connection: "Aligns with Qloo's data showing high affinity for authenticity and transparency",
+        affinity_score: 0.85
       },
       {
         title: "Community-Driven Discovery",
@@ -992,7 +1011,8 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
         confidence: 82, // Fixed: Now a whole number between 0-100
         impact: "Community recommendations drive 4x higher conversion rates than traditional advertising",
         timeline: "Emerging trend accelerating across all demographics",
-        qloo_connection: "Supported by Qloo's behavioral data showing preference for community-driven content"
+        qloo_connection: "Supported by Qloo's behavioral data showing preference for community-driven content",
+        affinity_score: 0.78
       },
       {
         title: "Micro-Moment Engagement",
@@ -1000,7 +1020,8 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
         confidence: 91, // Fixed: Now a whole number between 0-100
         impact: "Short-form content generates 2.5x more shares and comments than long-form",
         timeline: "Dominant trend continuing to evolve with new platform features",
-        qloo_connection: "Reflects Qloo's platform preference data favoring TikTok and Instagram Reels"
+        qloo_connection: "Reflects Qloo's platform preference data favoring TikTok and Instagram Reels",
+        affinity_score: 0.89
       },
       {
         title: "Values-Based Brand Loyalty",
@@ -1008,7 +1029,8 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
         confidence: 85, // Fixed: Now a whole number between 0-100
         impact: "Values-aligned brands command 15-20% price premium and higher customer lifetime value",
         timeline: "Long-term trend with accelerating importance among younger demographics",
-        qloo_connection: "Correlates with Qloo's cultural context data on conscious consumption patterns"
+        qloo_connection: "Correlates with Qloo's cultural context data on conscious consumption patterns",
+        affinity_score: 0.83
       }
     ],
     content_suggestions: [
@@ -1019,7 +1041,8 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
         content_type: "Short-form Video",
         copy: "Ever wondered how we create [your product]? Take a peek behind the curtain and see the passion that goes into every detail. #BehindTheScenes #AuthenticBrand",
         engagement_potential: "Very High",
-        cultural_timing: "Perfect for the authenticity movement - post during peak engagement hours"
+        cultural_timing: "Perfect for the authenticity movement - post during peak engagement hours",
+        affinity_score: 0.87
       },
       {
         title: "Community Spotlight Series",
@@ -1028,7 +1051,8 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
         content_type: "Mixed Media",
         copy: "Meet [Customer Name], who transformed their [relevant area] with our help. Their story shows what's possible when innovation meets determination. #CustomerSpotlight #RealStories",
         engagement_potential: "High",
-        cultural_timing: "Aligns with community-driven discovery trend - share weekly for consistency"
+        cultural_timing: "Aligns with community-driven discovery trend - share weekly for consistency",
+        affinity_score: 0.81
       },
       {
         title: "Trend Reaction Content",
@@ -1037,7 +1061,8 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
         content_type: "Short-form Video",
         copy: "Everyone's talking about [trending topic]. Here's how we see it fitting into the future of [your industry]. What's your take? #TrendTalk #FutureThinking",
         engagement_potential: "High",
-        cultural_timing: "Strike while trends are hot - respond within 24-48 hours of trend emergence"
+        cultural_timing: "Strike while trends are hot - respond within 24-48 hours of trend emergence",
+        affinity_score: 0.79
       },
       {
         title: "Educational Micro-Content",
@@ -1046,7 +1071,8 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
         content_type: "Carousel/Video",
         copy: "3 things you didn't know about [your industry topic]. Swipe to become an expert in 30 seconds. #QuickTips #DidYouKnow",
         engagement_potential: "Medium-High",
-        cultural_timing: "Capitalize on micro-moment engagement - post during commute hours"
+        cultural_timing: "Capitalize on micro-moment engagement - post during commute hours",
+        affinity_score: 0.74
       },
       {
         title: "Values-in-Action Content",
@@ -1055,7 +1081,8 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
         content_type: "Long-form Video",
         copy: "Actions speak louder than words. See how we're making a real difference in [relevant cause/area] and join us in creating positive change. #ValuesInAction #MakeADifference",
         engagement_potential: "Medium-High",
-        cultural_timing: "Tie to relevant awareness days or social movements for maximum impact"
+        cultural_timing: "Tie to relevant awareness days or social movements for maximum impact",
+        affinity_score: 0.82
       },
       {
         title: "Interactive Q&A Sessions",
@@ -1064,7 +1091,8 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
         content_type: "Live Video",
         copy: "Got questions about [your expertise area]? Join us live for honest answers and real talk. No scripts, just authentic conversation. #AskMeAnything #LiveChat",
         engagement_potential: "Very High",
-        cultural_timing: "Schedule during peak audience activity - announce 24 hours in advance"
+        cultural_timing: "Schedule during peak audience activity - announce 24 hours in advance",
+        affinity_score: 0.85
       }
     ]
   };
