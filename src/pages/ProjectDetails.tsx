@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { getProject, getInsights, generateInsights } from '@/lib/api';
 import { 
   ArrowLeft, 
@@ -17,7 +18,16 @@ import {
   MapPin,
   Download,
   RefreshCw,
-  AlertCircle
+  AlertCircle,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  BarChart3,
+  Target,
+  Lightbulb,
+  Brain,
+  Globe,
+  Zap
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -69,6 +79,7 @@ const ProjectDetails = () => {
       audience_personas: latestInsight.audience_personas,
       cultural_trends: latestInsight.cultural_trends,
       content_suggestions: latestInsight.content_suggestions,
+      qloo_data: latestInsight.qloo_data,
     };
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], {
@@ -86,6 +97,9 @@ const ProjectDetails = () => {
     
     toast.success('Insights exported successfully!');
   };
+
+  // Debug: Log the insights data structure
+  console.log('Insights data structure:', insights);
 
   if (projectLoading || !project) {
     return (
@@ -190,6 +204,46 @@ const ProjectDetails = () => {
         </CardContent>
       </Card>
 
+      {/* Report Overview */}
+      {latestInsight && (
+        <Card className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/20 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center">
+              <BarChart3 className="w-5 h-5 mr-2" />
+              Insights Report Overview
+            </CardTitle>
+            <CardDescription className="text-slate-300">
+              AI-powered analysis generated on {format(new Date(latestInsight.created_at), 'MMM d, yyyy \'at\' h:mm a')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center p-4 bg-slate-800/30 rounded-lg">
+                <Users className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-white">
+                  {latestInsight.audience_personas?.length || 0}
+                </div>
+                <div className="text-sm text-slate-300">Audience Personas</div>
+              </div>
+              <div className="text-center p-4 bg-slate-800/30 rounded-lg">
+                <TrendingUp className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-white">
+                  {latestInsight.cultural_trends?.length || 0}
+                </div>
+                <div className="text-sm text-slate-300">Cultural Trends</div>
+              </div>
+              <div className="text-center p-4 bg-slate-800/30 rounded-lg">
+                <Lightbulb className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-white">
+                  {latestInsight.content_suggestions?.length || 0}
+                </div>
+                <div className="text-sm text-slate-300">Content Ideas</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Insights */}
       {insightsLoading ? (
         <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
@@ -234,97 +288,42 @@ const ProjectDetails = () => {
           <TabsList className="grid w-full grid-cols-3 bg-slate-800/50">
             <TabsTrigger value="personas" className="data-[state=active]:bg-blue-500/20">
               <Users className="w-4 h-4 mr-2" />
-              Personas
+              Personas ({latestInsight.audience_personas?.length || 0})
             </TabsTrigger>
             <TabsTrigger value="trends" className="data-[state=active]:bg-blue-500/20">
               <TrendingUp className="w-4 h-4 mr-2" />
-              Trends
+              Trends ({latestInsight.cultural_trends?.length || 0})
             </TabsTrigger>
             <TabsTrigger value="content" className="data-[state=active]:bg-blue-500/20">
               <FileText className="w-4 h-4 mr-2" />
-              Content
+              Content ({latestInsight.content_suggestions?.length || 0})
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="personas" className="space-y-4">
             <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="text-white">Audience Personas</CardTitle>
+                <CardTitle className="text-white flex items-center">
+                  <Users className="w-5 h-5 mr-2" />
+                  Audience Personas
+                </CardTitle>
                 <CardDescription className="text-slate-300">
-                  AI-generated personas based on Qloo's Taste AI™ analysis
+                  AI-generated personas based on Qloo's Taste AI™ cultural intelligence
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {latestInsight.audience_personas?.length > 0 ? (
                   <div className="space-y-6">
                     {latestInsight.audience_personas.map((persona: any, index: number) => (
-                      <div key={index} className="p-4 bg-slate-700/30 rounded-lg">
-                        <h3 className="font-semibold text-white mb-2">
-                          {persona.name || `Persona ${index + 1}`}
-                        </h3>
-                        <p className="text-slate-300 mb-3">
-                          {persona.description || 'No description available'}
-                        </p>
-                        {persona.characteristics && (
-                          <div className="space-y-2">
-                            <h4 className="text-sm font-medium text-slate-400">Key Characteristics:</h4>
-                            <ul className="text-sm text-slate-300 space-y-1">
-                              {persona.characteristics.map((char: string, charIndex: number) => (
-                                <li key={charIndex} className="flex items-start">
-                                  <span className="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                                  {char}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                        {persona.demographics && (
-                          <div className="mt-3 pt-3 border-t border-slate-600">
-                            <h4 className="text-sm font-medium text-slate-400 mb-2">Demographics:</h4>
-                            <div className="flex flex-wrap gap-2">
-                              {persona.demographics.age_range && (
-                                <Badge variant="secondary" className="text-xs">
-                                  Age: {persona.demographics.age_range}
-                                </Badge>
-                              )}
-                              {persona.demographics.platforms?.map((platform: string, platformIndex: number) => (
-                                <Badge key={platformIndex} variant="outline" className="text-xs">
-                                  {platform}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        {persona.affinity_scores && (
-                          <div className="mt-3 pt-3 border-t border-slate-600">
-                            <h4 className="text-sm font-medium text-slate-400 mb-2">Cultural Affinities:</h4>
-                            <div className="grid grid-cols-2 gap-2">
-                              {Object.entries(persona.affinity_scores).map(([domain, score]: [string, any]) => (
-                                <div key={domain} className="flex items-center justify-between p-2 bg-slate-800/50 rounded">
-                                  <span className="text-xs text-slate-300 capitalize">{domain.replace('_', ' ')}</span>
-                                  <div className="flex items-center space-x-2">
-                                    <div className="w-12 h-1.5 bg-slate-600 rounded-full overflow-hidden">
-                                      <div 
-                                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-300"
-                                        style={{ width: `${Math.round(score * 100)}%` }}
-                                      ></div>
-                                    </div>
-                                    <span className="text-xs font-medium text-white min-w-[2rem]">
-                                      {Math.round(score * 100)}%
-                                    </span>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                      <PersonaCard key={index} persona={persona} index={index} />
                     ))}
                   </div>
                 ) : (
-                  <p className="text-slate-300 text-center py-8">
-                    No personas generated yet. Click "Generate Insights" to create audience personas.
-                  </p>
+                  <EmptyState 
+                    icon={Users}
+                    title="No personas generated yet"
+                    description="Click 'Generate Insights' to create audience personas."
+                  />
                 )}
               </CardContent>
             </Card>
@@ -333,7 +332,10 @@ const ProjectDetails = () => {
           <TabsContent value="trends" className="space-y-4">
             <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="text-white">Cultural Trends</CardTitle>
+                <CardTitle className="text-white flex items-center">
+                  <TrendingUp className="w-5 h-5 mr-2" />
+                  Cultural Trends
+                </CardTitle>
                 <CardDescription className="text-slate-300">
                   Emerging trends and cultural insights for your target audience
                 </CardDescription>
@@ -342,57 +344,15 @@ const ProjectDetails = () => {
                 {latestInsight.cultural_trends?.length > 0 ? (
                   <div className="space-y-4">
                     {latestInsight.cultural_trends.map((trend: any, index: number) => (
-                      <div key={index} className="p-4 bg-slate-700/30 rounded-lg">
-                        <div className="flex items-start justify-between mb-2">
-                          <h3 className="font-semibold text-white">
-                            {trend.title || `Trend ${index + 1}`}
-                          </h3>
-                          {trend.confidence && (
-                            <Badge variant="secondary" className="text-xs">
-                              {trend.confidence}% confidence
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-slate-300 mb-3">
-                          {trend.description || 'No description available'}
-                        </p>
-                        {trend.impact && (
-                          <div>
-                            <h4 className="text-sm font-medium text-slate-400 mb-1">Impact:</h4>
-                            <p className="text-sm text-slate-300">{trend.impact}</p>
-                          </div>
-                        )}
-                        {trend.timeline && (
-                          <div className="mt-2">
-                            <h4 className="text-sm font-medium text-slate-400 mb-1">Timeline:</h4>
-                            <p className="text-sm text-slate-300">{trend.timeline}</p>
-                          </div>
-                        )}
-                        {trend.affinity_score && (
-                          <div className="mt-3 pt-3 border-t border-slate-600">
-                            <div className="flex items-center justify-between">
-                              <h4 className="text-sm font-medium text-slate-400">Cultural Relevance:</h4>
-                              <div className="flex items-center space-x-2">
-                                <div className="w-16 h-2 bg-slate-600 rounded-full overflow-hidden">
-                                  <div 
-                                    className="h-full bg-gradient-to-r from-green-500 to-blue-500 rounded-full transition-all duration-300"
-                                    style={{ width: `${Math.round(trend.affinity_score * 100)}%` }}
-                                  ></div>
-                                </div>
-                                <span className="text-sm font-medium text-white">
-                                  {Math.round(trend.affinity_score * 100)}%
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                      <TrendCard key={index} trend={trend} index={index} />
                     ))}
                   </div>
                 ) : (
-                  <p className="text-slate-300 text-center py-8">
-                    No trends identified yet. Click "Generate Insights" to discover cultural trends.
-                  </p>
+                  <EmptyState 
+                    icon={TrendingUp}
+                    title="No trends identified yet"
+                    description="Click 'Generate Insights' to discover cultural trends."
+                  />
                 )}
               </CardContent>
             </Card>
@@ -401,7 +361,10 @@ const ProjectDetails = () => {
           <TabsContent value="content" className="space-y-4">
             <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="text-white">Content Suggestions</CardTitle>
+                <CardTitle className="text-white flex items-center">
+                  <FileText className="w-5 h-5 mr-2" />
+                  Content Suggestions
+                </CardTitle>
                 <CardDescription className="text-slate-300">
                   AI-generated content ideas and campaign strategies
                 </CardDescription>
@@ -410,66 +373,15 @@ const ProjectDetails = () => {
                 {latestInsight.content_suggestions?.length > 0 ? (
                   <div className="space-y-4">
                     {latestInsight.content_suggestions.map((suggestion: any, index: number) => (
-                      <div key={index} className="p-4 bg-slate-700/30 rounded-lg">
-                        <h3 className="font-semibold text-white mb-2">
-                          {suggestion.title || `Content Idea ${index + 1}`}
-                        </h3>
-                        <p className="text-slate-300 mb-3">
-                          {suggestion.description || 'No description available'}
-                        </p>
-                        {suggestion.platforms && (
-                          <div className="mb-3">
-                            <h4 className="text-sm font-medium text-slate-400 mb-1">Best Platforms:</h4>
-                            <div className="flex flex-wrap gap-1">
-                              {suggestion.platforms.map((platform: string, platformIndex: number) => (
-                                <Badge key={platformIndex} variant="outline" className="text-xs">
-                                  {platform}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        {suggestion.content_type && (
-                          <div className="mb-3">
-                            <Badge variant="secondary" className="text-xs">
-                              {suggestion.content_type}
-                            </Badge>
-                            {suggestion.engagement_potential && (
-                              <Badge variant="outline" className="text-xs ml-2">
-                                {suggestion.engagement_potential} engagement
-                              </Badge>
-                            )}
-                          </div>
-                        )}
-                        {suggestion.copy && (
-                          <div className="p-3 bg-slate-800/50 rounded border border-slate-600">
-                            <h4 className="text-sm font-medium text-slate-400 mb-1">Sample Copy:</h4>
-                            <p className="text-sm text-slate-300 italic">"{suggestion.copy}"</p>
-                          </div>
-                        )}
-                        {suggestion.affinity_score && (
-                          <div className="mt-3 flex items-center justify-between">
-                            <span className="text-sm text-slate-400">Audience Match:</span>
-                            <div className="flex items-center space-x-2">
-                              <div className="w-12 h-1.5 bg-slate-600 rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full transition-all duration-300"
-                                  style={{ width: `${Math.round(suggestion.affinity_score * 100)}%` }}
-                                ></div>
-                              </div>
-                              <span className="text-xs font-medium text-white">
-                                {Math.round(suggestion.affinity_score * 100)}%
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                      <ContentCard key={index} suggestion={suggestion} index={index} />
                     ))}
                   </div>
                 ) : (
-                  <p className="text-slate-300 text-center py-8">
-                    No content suggestions yet. Click "Generate Insights" to create content ideas.
-                  </p>
+                  <EmptyState 
+                    icon={FileText}
+                    title="No content suggestions yet"
+                    description="Click 'Generate Insights' to create content ideas."
+                  />
                 )}
               </CardContent>
             </Card>
@@ -501,5 +413,361 @@ const ProjectDetails = () => {
     </div>
   );
 };
+
+// Persona Card Component
+const PersonaCard = ({ persona, index }: { persona: any; index: number }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className="p-6 bg-gradient-to-r from-slate-700/30 to-slate-800/30 rounded-lg border border-slate-600/30">
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex-1">
+          <h3 className="text-xl font-semibold text-white mb-2 flex items-center">
+            <Target className="w-5 h-5 mr-2 text-blue-400" />
+            {persona.name || `Persona ${index + 1}`}
+          </h3>
+          <p className="text-slate-300 leading-relaxed">
+            {persona.description || 'No description available'}
+          </p>
+        </div>
+      </div>
+
+      <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+        <CollapsibleTrigger asChild>
+          <Button variant="ghost" className="w-full justify-between text-slate-300 hover:text-white p-0 h-auto">
+            <span className="text-sm font-medium">
+              {isExpanded ? 'Hide Details' : 'Show Details'}
+            </span>
+            {isExpanded ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+          </Button>
+        </CollapsibleTrigger>
+        
+        <CollapsibleContent className="space-y-4 mt-4">
+          {/* Characteristics */}
+          {persona.characteristics && persona.characteristics.length > 0 && (
+            <div>
+              <h4 className="text-sm font-medium text-slate-400 mb-3 flex items-center">
+                <Brain className="w-4 h-4 mr-2" />
+                Key Characteristics
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {persona.characteristics.map((char: string, charIndex: number) => (
+                  <div key={charIndex} className="flex items-start p-3 bg-slate-800/50 rounded-lg">
+                    <span className="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <span className="text-sm text-slate-300">{char}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Demographics */}
+          {persona.demographics && (
+            <div>
+              <h4 className="text-sm font-medium text-slate-400 mb-3 flex items-center">
+                <Users className="w-4 h-4 mr-2" />
+                Demographics & Platforms
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {persona.demographics.age_range && (
+                  <div className="p-3 bg-slate-800/50 rounded-lg">
+                    <div className="text-xs text-slate-400 mb-1">Age Range</div>
+                    <div className="text-sm font-medium text-white">{persona.demographics.age_range}</div>
+                  </div>
+                )}
+                {persona.demographics.interests && (
+                  <div className="p-3 bg-slate-800/50 rounded-lg">
+                    <div className="text-xs text-slate-400 mb-1">Top Interests</div>
+                    <div className="flex flex-wrap gap-1">
+                      {persona.demographics.interests.slice(0, 3).map((interest: string, idx: number) => (
+                        <Badge key={idx} variant="secondary" className="text-xs">
+                          {interest}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {persona.demographics.platforms && (
+                  <div className="p-3 bg-slate-800/50 rounded-lg">
+                    <div className="text-xs text-slate-400 mb-1">Platforms</div>
+                    <div className="flex flex-wrap gap-1">
+                      {persona.demographics.platforms.slice(0, 3).map((platform: string, idx: number) => (
+                        <Badge key={idx} variant="outline" className="text-xs">
+                          {platform}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Cultural Affinities */}
+          {persona.affinity_scores && Object.keys(persona.affinity_scores).length > 0 && (
+            <div>
+              <h4 className="text-sm font-medium text-slate-400 mb-3 flex items-center">
+                <Globe className="w-4 h-4 mr-2" />
+                Cultural Affinities
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {Object.entries(persona.affinity_scores).map(([domain, score]: [string, any]) => (
+                  <div key={domain} className="p-3 bg-slate-800/50 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-slate-300 capitalize font-medium">
+                        {domain.replace('_', ' ')}
+                      </span>
+                      <span className="text-sm font-bold text-white">
+                        {Math.round(score * 100)}%
+                      </span>
+                    </div>
+                    <div className="w-full h-2 bg-slate-600 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500"
+                        style={{ width: `${Math.round(score * 100)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Behavioral Patterns */}
+          {persona.behavioral_patterns && persona.behavioral_patterns.length > 0 && (
+            <div>
+              <h4 className="text-sm font-medium text-slate-400 mb-3 flex items-center">
+                <Zap className="w-4 h-4 mr-2" />
+                Behavioral Patterns
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {persona.behavioral_patterns.map((pattern: string, idx: number) => (
+                  <Badge key={idx} variant="outline" className="text-xs">
+                    {pattern.replace('_', ' ')}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+        </CollapsibleContent>
+      </Collapsible>
+    </div>
+  );
+};
+
+// Trend Card Component
+const TrendCard = ({ trend, index }: { trend: any; index: number }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className="p-6 bg-gradient-to-r from-slate-700/30 to-slate-800/30 rounded-lg border border-slate-600/30">
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex-1">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xl font-semibold text-white flex items-center">
+              <TrendingUp className="w-5 h-5 mr-2 text-purple-400" />
+              {trend.title || `Trend ${index + 1}`}
+            </h3>
+            {trend.confidence && (
+              <Badge variant="secondary" className="text-xs">
+                {trend.confidence}% confidence
+              </Badge>
+            )}
+          </div>
+          <p className="text-slate-300 leading-relaxed">
+            {trend.description || 'No description available'}
+          </p>
+        </div>
+      </div>
+
+      <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+        <CollapsibleTrigger asChild>
+          <Button variant="ghost" className="w-full justify-between text-slate-300 hover:text-white p-0 h-auto">
+            <span className="text-sm font-medium">
+              {isExpanded ? 'Hide Details' : 'Show Details'}
+            </span>
+            {isExpanded ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+          </Button>
+        </CollapsibleTrigger>
+        
+        <CollapsibleContent className="space-y-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {trend.impact && (
+              <div className="p-4 bg-slate-800/50 rounded-lg">
+                <h4 className="text-sm font-medium text-slate-400 mb-2 flex items-center">
+                  <Target className="w-4 h-4 mr-2" />
+                  Impact
+                </h4>
+                <p className="text-sm text-slate-300">{trend.impact}</p>
+              </div>
+            )}
+            
+            {trend.timeline && (
+              <div className="p-4 bg-slate-800/50 rounded-lg">
+                <h4 className="text-sm font-medium text-slate-400 mb-2 flex items-center">
+                  <Clock className="w-4 h-4 mr-2" />
+                  Timeline
+                </h4>
+                <p className="text-sm text-slate-300">{trend.timeline}</p>
+              </div>
+            )}
+          </div>
+
+          {trend.qloo_connection && (
+            <div className="p-4 bg-slate-800/50 rounded-lg">
+              <h4 className="text-sm font-medium text-slate-400 mb-2 flex items-center">
+                <Brain className="w-4 h-4 mr-2" />
+                Qloo Intelligence
+              </h4>
+              <p className="text-sm text-slate-300">{trend.qloo_connection}</p>
+            </div>
+          )}
+
+          {trend.affinity_score && (
+            <div className="p-4 bg-slate-800/50 rounded-lg">
+              <h4 className="text-sm font-medium text-slate-400 mb-2">Cultural Relevance</h4>
+              <div className="flex items-center space-x-3">
+                <div className="flex-1 h-3 bg-slate-600 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-green-500 to-blue-500 rounded-full transition-all duration-500"
+                    style={{ width: `${Math.round(trend.affinity_score * 100)}%` }}
+                  ></div>
+                </div>
+                <span className="text-sm font-bold text-white min-w-[3rem]">
+                  {Math.round(trend.affinity_score * 100)}%
+                </span>
+              </div>
+            </div>
+          )}
+        </CollapsibleContent>
+      </Collapsible>
+    </div>
+  );
+};
+
+// Content Card Component
+const ContentCard = ({ suggestion, index }: { suggestion: any; index: number }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className="p-6 bg-gradient-to-r from-slate-700/30 to-slate-800/30 rounded-lg border border-slate-600/30">
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex-1">
+          <h3 className="text-xl font-semibold text-white mb-2 flex items-center">
+            <Lightbulb className="w-5 h-5 mr-2 text-yellow-400" />
+            {suggestion.title || `Content Idea ${index + 1}`}
+          </h3>
+          <p className="text-slate-300 leading-relaxed">
+            {suggestion.description || 'No description available'}
+          </p>
+        </div>
+      </div>
+
+      <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+        <CollapsibleTrigger asChild>
+          <Button variant="ghost" className="w-full justify-between text-slate-300 hover:text-white p-0 h-auto">
+            <span className="text-sm font-medium">
+              {isExpanded ? 'Hide Details' : 'Show Details'}
+            </span>
+            {isExpanded ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
+          </Button>
+        </CollapsibleTrigger>
+        
+        <CollapsibleContent className="space-y-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {suggestion.platforms && (
+              <div className="p-4 bg-slate-800/50 rounded-lg">
+                <h4 className="text-sm font-medium text-slate-400 mb-2">Best Platforms</h4>
+                <div className="flex flex-wrap gap-1">
+                  {suggestion.platforms.map((platform: string, idx: number) => (
+                    <Badge key={idx} variant="outline" className="text-xs">
+                      {platform}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {suggestion.content_type && (
+              <div className="p-4 bg-slate-800/50 rounded-lg">
+                <h4 className="text-sm font-medium text-slate-400 mb-2">Content Type</h4>
+                <Badge variant="secondary" className="text-xs">
+                  {suggestion.content_type}
+                </Badge>
+                {suggestion.engagement_potential && (
+                  <Badge variant="outline" className="text-xs ml-2">
+                    {suggestion.engagement_potential} engagement
+                  </Badge>
+                )}
+              </div>
+            )}
+          </div>
+
+          {suggestion.copy && (
+            <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-600">
+              <h4 className="text-sm font-medium text-slate-400 mb-2 flex items-center">
+                <FileText className="w-4 h-4 mr-2" />
+                Sample Copy
+              </h4>
+              <p className="text-sm text-slate-300 italic leading-relaxed">"{suggestion.copy}"</p>
+            </div>
+          )}
+
+          {suggestion.cultural_timing && (
+            <div className="p-4 bg-slate-800/50 rounded-lg">
+              <h4 className="text-sm font-medium text-slate-400 mb-2 flex items-center">
+                <Clock className="w-4 h-4 mr-2" />
+                Cultural Timing
+              </h4>
+              <p className="text-sm text-slate-300">{suggestion.cultural_timing}</p>
+            </div>
+          )}
+
+          {suggestion.affinity_score && (
+            <div className="p-4 bg-slate-800/50 rounded-lg">
+              <h4 className="text-sm font-medium text-slate-400 mb-2">Audience Match</h4>
+              <div className="flex items-center space-x-3">
+                <div className="flex-1 h-3 bg-slate-600 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full transition-all duration-500"
+                    style={{ width: `${Math.round(suggestion.affinity_score * 100)}%` }}
+                  ></div>
+                </div>
+                <span className="text-sm font-bold text-white min-w-[3rem]">
+                  {Math.round(suggestion.affinity_score * 100)}%
+                </span>
+              </div>
+            </div>
+          )}
+        </CollapsibleContent>
+      </Collapsible>
+    </div>
+  );
+};
+
+// Empty State Component
+const EmptyState = ({ icon: Icon, title, description }: { 
+  icon: any; 
+  title: string; 
+  description: string; 
+}) => (
+  <div className="text-center py-12">
+    <Icon className="w-16 h-16 text-slate-500 mx-auto mb-4" />
+    <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
+    <p className="text-slate-300">{description}</p>
+  </div>
+);
 
 export default ProjectDetails;
