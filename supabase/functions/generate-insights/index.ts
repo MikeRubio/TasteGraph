@@ -218,6 +218,8 @@ serve(async (req: Request) => {
             audience_personas: fallbackInsights.audience_personas,
             cultural_trends: fallbackInsights.cultural_trends,
             content_suggestions: fallbackInsights.content_suggestions,
+            taste_intersections: fallbackInsights.taste_intersections,
+            cross_domain_recommendations: fallbackInsights.cross_domain_recommendations,
             qloo_data: qloo_data,
           },
         ])
@@ -257,6 +259,8 @@ serve(async (req: Request) => {
           audience_personas: insights.audience_personas,
           cultural_trends: insights.cultural_trends,
           content_suggestions: insights.content_suggestions,
+          taste_intersections: insights.taste_intersections,
+          cross_domain_recommendations: insights.cross_domain_recommendations,
           qloo_data: qloo_data,
         },
       ])
@@ -1133,6 +1137,76 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
         engagement_potential: "Very High",
         cultural_timing: "Schedule during peak audience activity - announce 24 hours in advance",
         affinity_score: 0.85
+      }
+    ],
+    taste_intersections: [
+      {
+        intersection_name: "Tech-Wellness Convergence",
+        description: "The overlap between technology enthusiasts and wellness advocates",
+        shared_attributes: ["innovation", "self-improvement", "data-driven decisions", "premium quality"],
+        overlap_percentage: 68,
+        personas_involved: [`${industryName} Innovators`, "Conscious Consumers"],
+        common_interests: ["wearable tech", "health apps", "mindfulness", "productivity tools"],
+        shared_brands: ["Apple", "Fitbit", "Headspace", "Oura"],
+        behavioral_overlaps: ["early_adopter", "research_driven", "community_oriented"],
+        marketing_opportunities: [
+          "Tech products with wellness benefits",
+          "Data-driven wellness solutions",
+          "Community-based health challenges",
+          "Premium wellness tech accessories"
+        ]
+      },
+      {
+        intersection_name: "Creative-Conscious Alignment",
+        description: "Where cultural trendsetters meet conscious consumers",
+        shared_attributes: ["authenticity", "social_impact", "storytelling", "community_building"],
+        overlap_percentage: 72,
+        personas_involved: ["Cultural Trendsetters", "Conscious Consumers"],
+        common_interests: ["sustainable fashion", "ethical brands", "social causes", "artistic expression"],
+        shared_brands: ["Patagonia", "Everlane", "Ben & Jerry's", "Warby Parker"],
+        behavioral_overlaps: ["values_driven", "content_creation", "brand_advocacy"],
+        marketing_opportunities: [
+          "Cause-driven creative campaigns",
+          "Sustainable product storytelling",
+          "Artist collaborations with ethical brands",
+          "Community-driven social impact initiatives"
+        ]
+      }
+    ],
+    cross_domain_recommendations: [
+      {
+        source_domain: "Technology",
+        target_domain: "Wellness",
+        recommendation_title: "Mindful Tech Integration",
+        description: "Leverage technology to enhance wellness experiences rather than detract from them",
+        confidence_score: 84,
+        related_entities: ["meditation apps", "fitness trackers", "sleep optimization", "digital detox tools"],
+        expansion_opportunities: [
+          "AI-powered wellness coaching",
+          "Biometric-based personalization",
+          "Community wellness challenges",
+          "Mindfulness-integrated productivity tools"
+        ],
+        audience_fit: 89,
+        implementation_difficulty: "Medium",
+        potential_reach: "High - appeals to tech-savvy wellness enthusiasts"
+      },
+      {
+        source_domain: "Fashion",
+        target_domain: "Sustainability",
+        recommendation_title: "Circular Fashion Innovation",
+        description: "Transform fashion consumption through sustainable practices and circular economy principles",
+        confidence_score: 78,
+        related_entities: ["sustainable materials", "clothing rental", "upcycling", "ethical manufacturing"],
+        expansion_opportunities: [
+          "Clothing-as-a-service models",
+          "Blockchain supply chain transparency",
+          "Community clothing swaps",
+          "Personalized sustainability metrics"
+        ],
+        audience_fit: 85,
+        implementation_difficulty: "High",
+        potential_reach: "Medium-High - growing conscious fashion market"
       }
     ]
   };
