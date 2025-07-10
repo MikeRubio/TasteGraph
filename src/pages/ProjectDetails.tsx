@@ -54,14 +54,18 @@ const ProjectDetails = () => {
   const {
     data: project,
     isLoading: projectLoading,
-  } = useQuery(['project', id], () => getProject(id!), {
+  } = useQuery({
+    queryKey: ['project', id],
+    queryFn: () => getProject(id!),
     enabled: !!id,
   });
 
   const {
     data: insights = [],
     isLoading: insightsLoading,
-  } = useQuery(['insights', id], () => getInsights(id!), {
+  } = useQuery({
+    queryKey: ['insights', id],
+    queryFn: () => getInsights(id!),
     enabled: !!id,
   });
 
