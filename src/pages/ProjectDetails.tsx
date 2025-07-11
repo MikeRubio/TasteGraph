@@ -18,6 +18,9 @@ import {
 } from "@/components/ui/collapsible";
 import { getProject, getInsights, generateInsights } from "@/lib/api";
 import { generatePDFReport, PDFReportData } from "@/lib/pdfGenerator";
+import AffinityRadarChart from "@/components/visualizations/AffinityRadarChart";
+import TrendConfidenceChart from "@/components/visualizations/TrendConfidenceChart";
+import TasteIntersectionHeatmap from "@/components/visualizations/TasteIntersectionHeatmap";
 import {
   ArrowLeft,
   Sparkles,
@@ -40,6 +43,7 @@ import {
   Brain,
   Globe,
   Zap,
+  BarChart3 as BarChart,
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -362,7 +366,7 @@ const ProjectDetails = () => {
         </Card>
       ) : latestInsight ? (
         <Tabs defaultValue="personas" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3 bg-gray-800/50">
+          <TabsList className="grid w-full grid-cols-4 bg-gray-800/50">
             <TabsTrigger
               value="personas"
               className="data-[state=active]:bg-blue-500/20"
@@ -383,6 +387,13 @@ const ProjectDetails = () => {
             >
               <FileText className="w-4 h-4 mr-2" />
               Content ({latestInsight.content_suggestions?.length || 0})
+            </TabsTrigger>
+            <TabsTrigger
+              value="visualizations"
+              className="data-[state=active]:bg-blue-500/20"
+            >
+              <BarChart className="w-4 h-4 mr-2" />
+              Charts
             </TabsTrigger>
           </TabsList>
 
@@ -486,6 +497,40 @@ const ProjectDetails = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="visualizations" className="space-y-6">
+            {/* Affinity Radar Chart */}
+            {latestInsight.audience_personas && latestInsight.audience_personas.length > 0 && (
+              <AffinityRadarChart personas={latestInsight.audience_personas} />
+            )}
+
+            {/* Trend Confidence Chart */}
+            {latestInsight.cultural_trends && latestInsight.cultural_trends.length > 0 && (
+              <TrendConfidenceChart trends={latestInsight.cultural_trends} />
+            )}
+
+            {/* Taste Intersection Heatmap */}
+            {latestInsight.taste_intersections && latestInsight.taste_intersections.length > 0 && (
+              <TasteIntersectionHeatmap intersections={latestInsight.taste_intersections} />
+            )}
+
+            {/* Empty State for Visualizations */}
+            {(!latestInsight.audience_personas || latestInsight.audience_personas.length === 0) &&
+             (!latestInsight.cultural_trends || latestInsight.cultural_trends.length === 0) &&
+             (!latestInsight.taste_intersections || latestInsight.taste_intersections.length === 0) && (
+              <Card className="bg-gray-800/50 border-gray-700/50 backdrop-blur-sm">
+                <CardContent className="p-8 text-center">
+                  <BarChart className="w-16 h-16 text-gray-500 mx-auto mb-3" />
+                  <h3 className="text-lg font-semibold text-white mb-2">
+                    No visualization data available
+                  </h3>
+                  <p className="text-gray-300">
+                    Generate insights to see interactive charts and visualizations.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       ) : (
