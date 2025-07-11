@@ -392,19 +392,11 @@ async function getQlooInsightsWithRetry(project: any): Promise<QlooResponse> {
       console.log("Resolved geographical target IDs:", geographicalTargetIds);
 
       // Enhanced payload with resolved tag IDs as per v2 API specification
-      const qlooPayload = {
+      const qlooPayload: any = {
         input: {
           description: project.description,
           industry: project.industry || "general",
           language: "en",
-        },
-        signal: {
-          interests: {
-            tags: culturalDomainIds.length > 0 ? culturalDomainIds : undefined
-          },
-          geography: {
-            tags: geographicalTargetIds.length > 0 ? geographicalTargetIds : undefined
-          }
         },
         options: {
           include_demographics: true,
@@ -414,6 +406,22 @@ async function getQlooInsightsWithRetry(project: any): Promise<QlooResponse> {
           entity_types: ["brands", "influencers", "media"]
         }
       };
+
+      // Only attach signal if we have at least one cultural domain tag
+      if (culturalDomainIds.length > 0) {
+        qlooPayload.signal = {
+          type: "interests",
+          tags: culturalDomainIds
+        };
+      }
+
+      // Only attach filter if we have at least one geography tag
+      if (geographicalTargetIds.length > 0) {
+        qlooPayload.filter = {
+          type: "geography",
+          tags: geographicalTargetIds
+        };
+      }
 
       console.log("Qloo v2 request payload:", JSON.stringify(qlooPayload, null, 2));
 
@@ -455,7 +463,7 @@ async function getQlooInsightsWithRetry(project: any): Promise<QlooResponse> {
         let errorMessage = "Qloo API client error";
         switch (qlooResponse.status) {
           case 400:
-            errorMessage = "Invalid request payload sent to Qloo API";
+            errorMessage = `Qloo API error ${qlooResponse.status}: ${errorText}`;
             break;
           case 401:
             errorMessage = "Qloo API error: Invalid API key";
@@ -512,7 +520,7 @@ async function getQlooInsightsWithRetry(project: any): Promise<QlooResponse> {
       }
       
       if (attempt < MAX_RETRIES && !error.message.includes("rate limited")) {
-        const delay = RETRY_DELAY_MS * Math.pow(2, attempt - 1);
+        const delay = RETRY_DELAY_MS * attempt;
         console.log(`Network error, retrying in ${delay}ms...`);
         await new Promise(resolve => setTimeout(resolve, delay));
         continue;
