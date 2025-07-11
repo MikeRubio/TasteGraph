@@ -47,6 +47,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import html2canvas from "html2canvas";
 
 const ProjectDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -125,33 +126,67 @@ const ProjectDetails = () => {
       toast.error("No insights to export");
       return;
     }
+    toast.loading("Preparing PDF charts...", { id: "pdf-charts" });
+    // Give charts a little time to render offscreen if needed
+    await new Promise((res) => setTimeout(res, 400));
+
+    // Get chart images using html2canvas
+    const affinityRadarNode = document.getElementById("affinity-radar-pdf");
+    const trendConfidenceNode = document.getElementById("trend-confidence-pdf");
+    const tasteIntersectionNode = document.getElementById("taste-heatmap-pdf");
+
+    const [affinityImage, trendImage, tasteImage] = await Promise.all([
+      affinityRadarNode && affinityRadarNode.childElementCount
+        ? html2canvas(affinityRadarNode, {
+            backgroundColor: "#fff",
+            useCORS: true,
+          }).then((c) => c.toDataURL("image/png"))
+        : null,
+      trendConfidenceNode && trendConfidenceNode.childElementCount
+        ? html2canvas(trendConfidenceNode, {
+            backgroundColor: "#fff",
+            useCORS: true,
+          }).then((c) => c.toDataURL("image/png"))
+        : null,
+      tasteIntersectionNode && tasteIntersectionNode.childElementCount
+        ? html2canvas(tasteIntersectionNode, {
+            backgroundColor: "#fff",
+            useCORS: true,
+          }).then((c) => c.toDataURL("image/png"))
+        : null,
+    ]);
+
+    const pdfData: PDFReportData = {
+      project: {
+        title: project.title,
+        description: project.description,
+        industry: project.industry,
+        cultural_domains: project.cultural_domains || [],
+        geographical_targets: project.geographical_targets || [],
+        created_at: project.created_at,
+      },
+      insights: {
+        audience_personas: latestInsight.audience_personas || [],
+        cultural_trends: latestInsight.cultural_trends || [],
+        content_suggestions: latestInsight.content_suggestions || [],
+        taste_intersections: latestInsight.taste_intersections || [],
+        cross_domain_recommendations:
+          latestInsight.cross_domain_recommendations || [],
+        created_at: latestInsight.created_at,
+      },
+      chart_images: {
+        affinityRadarChart: affinityImage || "",
+        trendConfidenceChart: trendImage || "",
+        tasteIntersectionHeatmap: tasteImage || "",
+      },
+    };
 
     try {
-      const pdfData: PDFReportData = {
-        project: {
-          title: project.title,
-          description: project.description,
-          industry: project.industry,
-          cultural_domains: project.cultural_domains || [],
-          geographical_targets: project.geographical_targets || [],
-          created_at: project.created_at,
-        },
-        insights: {
-          audience_personas: latestInsight.audience_personas || [],
-          cultural_trends: latestInsight.cultural_trends || [],
-          content_suggestions: latestInsight.content_suggestions || [],
-          taste_intersections: latestInsight.taste_intersections || [],
-          cross_domain_recommendations:
-            latestInsight.cross_domain_recommendations || [],
-          created_at: latestInsight.created_at,
-        },
-      };
-
       await generatePDFReport(pdfData);
-      toast.success("PDF report generated successfully!");
+      toast.success("PDF report generated successfully!", { id: "pdf-charts" });
     } catch (error) {
       console.error("Error generating PDF:", error);
-      toast.error("Failed to generate PDF report");
+      toast.error("Failed to generate PDF report", { id: "pdf-charts" });
     }
   };
 
@@ -501,36 +536,47 @@ const ProjectDetails = () => {
 
           <TabsContent value="visualizations" className="space-y-6">
             {/* Affinity Radar Chart */}
-            {latestInsight.audience_personas && latestInsight.audience_personas.length > 0 && (
-              <AffinityRadarChart personas={latestInsight.audience_personas} />
-            )}
+            {latestInsight.audience_personas &&
+              latestInsight.audience_personas.length > 0 && (
+                <AffinityRadarChart
+                  personas={latestInsight.audience_personas}
+                />
+              )}
 
             {/* Trend Confidence Chart */}
-            {latestInsight.cultural_trends && latestInsight.cultural_trends.length > 0 && (
-              <TrendConfidenceChart trends={latestInsight.cultural_trends} />
-            )}
+            {latestInsight.cultural_trends &&
+              latestInsight.cultural_trends.length > 0 && (
+                <TrendConfidenceChart trends={latestInsight.cultural_trends} />
+              )}
 
             {/* Taste Intersection Heatmap */}
-            {latestInsight.taste_intersections && latestInsight.taste_intersections.length > 0 && (
-              <TasteIntersectionHeatmap intersections={latestInsight.taste_intersections} />
-            )}
+            {latestInsight.taste_intersections &&
+              latestInsight.taste_intersections.length > 0 && (
+                <TasteIntersectionHeatmap
+                  intersections={latestInsight.taste_intersections}
+                />
+              )}
 
             {/* Empty State for Visualizations */}
-            {(!latestInsight.audience_personas || latestInsight.audience_personas.length === 0) &&
-             (!latestInsight.cultural_trends || latestInsight.cultural_trends.length === 0) &&
-             (!latestInsight.taste_intersections || latestInsight.taste_intersections.length === 0) && (
-              <Card className="bg-gray-800/50 border-gray-700/50 backdrop-blur-sm">
-                <CardContent className="p-8 text-center">
-                  <BarChart className="w-16 h-16 text-gray-500 mx-auto mb-3" />
-                  <h3 className="text-lg font-semibold text-white mb-2">
-                    No visualization data available
-                  </h3>
-                  <p className="text-gray-300">
-                    Generate insights to see interactive charts and visualizations.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+            {(!latestInsight.audience_personas ||
+              latestInsight.audience_personas.length === 0) &&
+              (!latestInsight.cultural_trends ||
+                latestInsight.cultural_trends.length === 0) &&
+              (!latestInsight.taste_intersections ||
+                latestInsight.taste_intersections.length === 0) && (
+                <Card className="bg-gray-800/50 border-gray-700/50 backdrop-blur-sm">
+                  <CardContent className="p-8 text-center">
+                    <BarChart className="w-16 h-16 text-gray-500 mx-auto mb-3" />
+                    <h3 className="text-lg font-semibold text-white mb-2">
+                      No visualization data available
+                    </h3>
+                    <p className="text-gray-300">
+                      Generate insights to see interactive charts and
+                      visualizations.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
           </TabsContent>
         </Tabs>
       ) : (
@@ -561,6 +607,38 @@ const ProjectDetails = () => {
           </CardContent>
         </Card>
       )}
+      {/* --- Hidden charts for PDF export --- */}
+      <div
+        style={{
+          position: "absolute",
+          left: "-9999px",
+          top: 0,
+          width: 600,
+          background: "white",
+          pointerEvents: "none",
+        }}
+      >
+        <div id="affinity-radar-pdf">
+          {latestInsight?.audience_personas &&
+            latestInsight.audience_personas.length > 0 && (
+              <AffinityRadarChart personas={latestInsight.audience_personas} />
+            )}
+        </div>
+        <div id="trend-confidence-pdf">
+          {latestInsight?.cultural_trends &&
+            latestInsight.cultural_trends.length > 0 && (
+              <TrendConfidenceChart trends={latestInsight.cultural_trends} />
+            )}
+        </div>
+        <div id="taste-heatmap-pdf">
+          {latestInsight?.taste_intersections &&
+            latestInsight.taste_intersections.length > 0 && (
+              <TasteIntersectionHeatmap
+                intersections={latestInsight.taste_intersections}
+              />
+            )}
+        </div>
+      </div>
     </div>
   );
 };
