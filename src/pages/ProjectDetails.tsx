@@ -1,24 +1,36 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { getProject, getInsights, generateInsights } from '@/lib/api';
-import { 
-  ArrowLeft, 
-  Sparkles, 
-  Users, 
-  TrendingUp, 
-  FileText, 
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { getProject, getInsights, generateInsights } from "@/lib/api";
+import { generatePDFReport, PDFReportData } from "@/lib/pdfGenerator";
+import {
+  ArrowLeft,
+  Sparkles,
+  Users,
+  TrendingUp,
+  FileText,
   Calendar,
   Building,
   MapPin,
   Download,
   RefreshCw,
   AlertCircle,
+  FileText as FileTextIcon,
   ChevronDown,
   ChevronUp,
   Clock,
@@ -27,10 +39,10 @@ import {
   Lightbulb,
   Brain,
   Globe,
-  Zap
-} from 'lucide-react';
-import { format } from 'date-fns';
-import { toast } from 'sonner';
+  Zap,
+} from "lucide-react";
+import { format } from "date-fns";
+import { toast } from "sonner";
 
 const ProjectDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -81,6 +93,8 @@ const ProjectDetails = () => {
       audience_personas: latestInsight.audience_personas,
       cultural_trends: latestInsight.cultural_trends,
       content_suggestions: latestInsight.content_suggestions,
+      taste_intersections: latestInsight.taste_intersections,
+      cross_domain_recommendations: latestInsight.cross_domain_recommendations,
       qloo_data: latestInsight.qloo_data,
     };
 
@@ -99,6 +113,42 @@ const ProjectDetails = () => {
     URL.revokeObjectURL(url);
 
     toast.success("Insights exported successfully!");
+  };
+
+  const handleExportPDF = async () => {
+    const latestInsight = insights[0];
+    if (!latestInsight || !project) {
+      toast.error("No insights to export");
+      return;
+    }
+
+    try {
+      const pdfData: PDFReportData = {
+        project: {
+          title: project.title,
+          description: project.description,
+          industry: project.industry,
+          cultural_domains: project.cultural_domains,
+          geographical_targets: project.geographical_targets,
+          created_at: project.created_at,
+        },
+        insights: {
+          audience_personas: latestInsight.audience_personas || [],
+          cultural_trends: latestInsight.cultural_trends || [],
+          content_suggestions: latestInsight.content_suggestions || [],
+          taste_intersections: latestInsight.taste_intersections || [],
+          cross_domain_recommendations:
+            latestInsight.cross_domain_recommendations || [],
+          created_at: latestInsight.created_at,
+        },
+      };
+
+      await generatePDFReport(pdfData);
+      toast.success("PDF report generated successfully!");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("Failed to generate PDF report");
+    }
   };
 
   // Debug: Log the insights data structure
@@ -139,15 +189,26 @@ const ProjectDetails = () => {
         </div>
         <div className="flex items-center space-x-3">
           {latestInsight && (
-            <Button
-              variant="secondary"
-              onClick={handleExportInsights}
-              className="border-gray-600  hover:bg-gray-700 hover:text-gray-300"
-              disabled={generateInsightsMutation.isPending}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export JSON
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                onClick={handleExportPDF}
+                className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                disabled={generateInsightsMutation.isPending}
+              >
+                <FileTextIcon className="w-4 h-4 mr-2" />
+                Export PDF
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleExportInsights}
+                className="border-gray-600  hover:bg-gray-700 hover:text-gray-300"
+                disabled={generateInsightsMutation.isPending}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export JSON
+              </Button>
+            </>
           )}
           <Button
             onClick={handleGenerateInsights}
