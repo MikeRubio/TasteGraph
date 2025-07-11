@@ -390,20 +390,12 @@ async function getQlooInsightsWithRetry(project: any): Promise<QlooResponse> {
       console.log("Resolved cultural domain IDs:", culturalDomainIds);
       console.log("Resolved geographical target IDs:", geographicalTargetIds);
 
-      // Enhanced payload with resolved tag IDs as per v2 API specification
-      const qlooPayload = {
+      // Base payload structure
+      const qlooPayload: any = {
         input: {
           description: project.description,
           industry: project.industry || "general",
           language: "en",
-        },
-        signal: {
-          type: "interests",
-          tags: culturalDomainIds.map(id => ({ tag: id })),
-        },
-        filter: {
-          type: "geography",
-          tags: geographicalTargetIds.map(id => ({ tag: id })),
         },
         options: {
           include_demographics: true,
@@ -413,6 +405,22 @@ async function getQlooInsightsWithRetry(project: any): Promise<QlooResponse> {
           entity_types: ["brands", "influencers", "media"]
         }
       };
+
+      // Only include signal if we have cultural domain tags
+      if (culturalDomainIds.length > 0) {
+        qlooPayload.signal = {
+          type: "interests",
+          tags: culturalDomainIds.map(id => ({ tag: id })),
+        };
+      }
+
+      // Only include filter if we have geography tags
+      if (geographicalTargetIds.length > 0) {
+        qlooPayload.filter = {
+          type: "geography",
+          tags: geographicalTargetIds.map(id => ({ tag: id })),
+        };
+      }
 
       console.log("Qloo v2 request payload:", JSON.stringify(qlooPayload, null, 2));
 
