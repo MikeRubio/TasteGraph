@@ -24,6 +24,7 @@ interface AudiencePersona {
   };
   cultural_affinities?: string[];
   behavioral_patterns?: string[];
+  affinity_scores?: { [domain: string]: number };
 }
 
 interface CulturalTrend {
@@ -33,6 +34,7 @@ interface CulturalTrend {
   impact: string;
   timeline: string;
   qloo_connection?: string;
+  affinity_score?: number;
 }
 
 interface ContentSuggestion {
@@ -43,14 +45,7 @@ interface ContentSuggestion {
   copy: string;
   engagement_potential: string;
   cultural_timing?: string;
-}
-
-interface InsightsResponse {
-  audience_personas: AudiencePersona[];
-  cultural_trends: CulturalTrend[];
-  content_suggestions: ContentSuggestion[];
-  taste_intersections: TasteIntersection[];
-  cross_domain_recommendations: CrossDomainRecommendation[];
+  affinity_score?: number;
 }
 
 interface TasteIntersection {
@@ -78,6 +73,14 @@ interface CrossDomainRecommendation {
   potential_reach?: string;
 }
 
+interface InsightsResponse {
+  audience_personas: AudiencePersona[];
+  cultural_trends: CulturalTrend[];
+  content_suggestions: ContentSuggestion[];
+  taste_intersections: TasteIntersection[];
+  cross_domain_recommendations: CrossDomainRecommendation[];
+}
+
 interface QlooResponse {
   taste_profile?: any;
   related_entities?: any;
@@ -92,6 +95,12 @@ interface CacheEntry {
   id: string;
   qloo_response: QlooResponse;
   created_at: string;
+}
+
+interface QlooTag {
+  id: string;
+  name: string;
+  category?: string;
 }
 
 serve(async (req: Request) => {
@@ -202,47 +211,13 @@ serve(async (req: Request) => {
     const validationResult = validateInsightsStructure(insights);
     if (!validationResult.isValid) {
       console.error("Insights validation failed:", validationResult.errors);
-      // Log the malformed response for debugging
-      console.error("Malformed insights structure:", JSON.stringify(insights, null, 2));
-      
-      // Fall back to mock data with proper structure
-      const fallbackInsights = generateMockInsights(project, qloo_data);
-      console.log("Using fallback mock insights due to validation failure");
-      
-      // Store fallback insights
-      const { data: savedInsight, error: insertError } = await supabaseServiceRole
-        .from("insights")
-        .insert([
-          {
-            project_id: project_id,
-            audience_personas: fallbackInsights.audience_personas,
-            cultural_trends: fallbackInsights.cultural_trends,
-            content_suggestions: fallbackInsights.content_suggestions,
-            qloo_data: qloo_data,
-          },
-        ])
-        .select()
-        .single();
-
-      if (insertError) {
-        console.error("Error saving fallback insights:", insertError);
-        return new Response(
-          JSON.stringify({ error: "Failed to save insights" }),
-          {
-            status: 500,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
-        );
-      }
-
       return new Response(
-        JSON.stringify({
-          success: true,
-          data: savedInsight,
-          warning: "Used fallback data due to validation issues"
+        JSON.stringify({ 
+          error: "Generated insights failed validation",
+          details: validationResult.errors
         }),
         {
-          status: 200,
+          status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );
@@ -257,6 +232,8 @@ serve(async (req: Request) => {
           audience_personas: insights.audience_personas,
           cultural_trends: insights.cultural_trends,
           content_suggestions: insights.content_suggestions,
+          taste_intersections: insights.taste_intersections,
+          cross_domain_recommendations: insights.cross_domain_recommendations,
           qloo_data: qloo_data,
         },
       ])
@@ -301,18 +278,27 @@ serve(async (req: Request) => {
       });
       
       // Check for specific API-related errors
-      if (error.message.includes("Qloo API error: Invalid API key")) {
-        errorMessage = "Qloo API configuration error: Invalid QLOO_API_KEY - please verify your Qloo API key in Supabase Edge Function settings";
+      if (error.message.includes("QLOO_API_KEY not configured")) {
+        errorMessage = "Qloo API key not configured. Please set QLOO_API_KEY in Supabase Edge Function environment variables.";
+        statusCode = 401;
+      } else if (error.message.includes("OPENAI_API_KEY not configured")) {
+        errorMessage = "OpenAI API key not configured. Please set OPENAI_API_KEY in Supabase Edge Function environment variables.";
+        statusCode = 401;
+      } else if (error.message.includes("Qloo API error: Invalid API key")) {
+        errorMessage = "Invalid Qloo API key. Please verify your QLOO_API_KEY in Supabase Edge Function settings.";
         statusCode = 401;
       } else if (error.message.includes("OpenAI API error: Invalid API key")) {
-        errorMessage = "OpenAI API configuration error: Invalid OPENAI_API_KEY - please verify your OpenAI API key in Supabase Edge Function settings";
+        errorMessage = "Invalid OpenAI API key. Please verify your OPENAI_API_KEY in Supabase Edge Function settings.";
         statusCode = 401;
       } else if (error.message.includes("rate limited")) {
         errorMessage = "API rate limit exceeded. Please try again later.";
         statusCode = 429;
-      } else if (error.message.includes("client error")) {
-        errorMessage = "API client error: " + error.message;
-        statusCode = 400;
+      } else if (error.message.includes("Qloo API")) {
+        errorMessage = "Qloo API service error. Please try again later.";
+        statusCode = 502;
+      } else if (error.message.includes("OpenAI API")) {
+        errorMessage = "OpenAI API service error. Please try again later.";
+        statusCode = 502;
       } else if (error.message.includes("Missing") && error.message.includes("authorization")) {
         errorMessage = "Missing or invalid authorization header";
         statusCode = 401;
@@ -323,8 +309,9 @@ serve(async (req: Request) => {
         errorMessage = "Missing project_id in request";
         statusCode = 400;
       } else {
-        // For debugging purposes, include the actual error message in development
-        errorMessage = `Internal server error: ${error.message}`;
+        // For debugging purposes, include the actual error message
+        errorMessage = `Service error: ${error.message}`;
+        statusCode = 502;
       }
     }
     
@@ -341,28 +328,83 @@ serve(async (req: Request) => {
   }
 });
 
-// Enhanced function to get insights from Qloo's Taste AI™ with retry logic
+// Function to resolve free-text tags to Qloo tag IDs
+async function resolveTagsToIds(tags: string[], qlooApiKey: string, qlooBaseUrl: string): Promise<string[]> {
+  const tagIds: string[] = [];
+  
+  for (const tag of tags) {
+    try {
+      console.log(`Resolving tag: ${tag}`);
+      
+      const tagResponse = await fetch(
+        `${qlooBaseUrl}/v2/tags?query=${encodeURIComponent(tag)}`,
+        {
+          headers: {
+            "x-api-key": qlooApiKey,
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+          },
+        }
+      );
+
+      if (tagResponse.ok) {
+        const tagData = await tagResponse.json();
+        if (tagData.items && tagData.items.length > 0) {
+          tagIds.push(tagData.items[0].id);
+          console.log(`Resolved "${tag}" to ID: ${tagData.items[0].id}`);
+        } else {
+          console.warn(`No tag ID found for: ${tag}`);
+        }
+      } else {
+        console.warn(`Failed to resolve tag "${tag}": ${tagResponse.status}`);
+      }
+    } catch (error) {
+      console.warn(`Error resolving tag "${tag}":`, error);
+    }
+  }
+  
+  return tagIds;
+}
+
+// Enhanced function to get insights from Qloo's Taste AI™ v2 with retry logic
 async function getQlooInsightsWithRetry(project: any): Promise<QlooResponse> {
   const qlooApiKey = Deno.env.get("QLOO_API_KEY");
   const qlooBaseUrl = Deno.env.get("QLOO_BASE_URL") || "https://hackathon.api.qloo.com";
   
   if (!qlooApiKey) {
-    console.warn("Qloo API key not found, using mock data");
-    return generateMockQlooData(project);
+    throw new Error("QLOO_API_KEY not configured. Please set the Qloo API key in Supabase Edge Function environment variables.");
   }
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       console.log(`Qloo API attempt ${attempt}/${MAX_RETRIES} with base URL:`, qlooBaseUrl);
       
-      // Enhanced payload with richer context as per Hackathon guide
+      // Resolve cultural domains and geographical targets to tag IDs
+      const culturalDomainIds = project.cultural_domains && project.cultural_domains.length > 0 
+        ? await resolveTagsToIds(project.cultural_domains, qlooApiKey, qlooBaseUrl)
+        : [];
+      
+      const geographicalTargetIds = project.geographical_targets && project.geographical_targets.length > 0
+        ? await resolveTagsToIds(project.geographical_targets, qlooApiKey, qlooBaseUrl)
+        : [];
+
+      console.log("Resolved cultural domain IDs:", culturalDomainIds);
+      console.log("Resolved geographical target IDs:", geographicalTargetIds);
+
+      // Enhanced payload with resolved tag IDs as per v2 API specification
       const qlooPayload = {
         input: {
           description: project.description,
           industry: project.industry || "general",
-          cultural_domains: (project.cultural_domains && project.cultural_domains.length > 0) ? project.cultural_domains : ["general"],
-          geographical_targets: (project.geographical_targets && project.geographical_targets.length > 0) ? project.geographical_targets : ["US"],
           language: "en",
+        },
+        signal: {
+          interests: {
+            tags: culturalDomainIds.length > 0 ? culturalDomainIds : undefined
+          },
+          geography: {
+            tags: geographicalTargetIds.length > 0 ? geographicalTargetIds : undefined
+          }
         },
         options: {
           include_demographics: true,
@@ -373,10 +415,10 @@ async function getQlooInsightsWithRetry(project: any): Promise<QlooResponse> {
         }
       };
 
-      console.log("Qloo request payload:", JSON.stringify(qlooPayload, null, 2));
+      console.log("Qloo v2 request payload:", JSON.stringify(qlooPayload, null, 2));
 
-      // Make the API call to Qloo
-      const qlooResponse = await fetch(`${qlooBaseUrl}/v1/taste/insights`, {
+      // Make the API call to Qloo v2/insights endpoint
+      const qlooResponse = await fetch(`${qlooBaseUrl}/v2/insights`, {
         method: "POST",
         headers: {
           "x-api-key": qlooApiKey,
@@ -392,7 +434,15 @@ async function getQlooInsightsWithRetry(project: any): Promise<QlooResponse> {
       if (qlooResponse.status === 429) {
         const errorText = await qlooResponse.text();
         console.error("Qloo API rate limited:", errorText);
-        throw new Error("Qloo API rate limited. Please try again later.");
+        
+        if (attempt < MAX_RETRIES) {
+          const delay = RETRY_DELAY_MS * Math.pow(2, attempt); // Exponential backoff
+          console.log(`Rate limited, retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        } else {
+          throw new Error("Qloo API rate limited. Please try again later.");
+        }
       }
 
       // Handle client errors (4xx) - don't retry, return specific error
@@ -408,7 +458,7 @@ async function getQlooInsightsWithRetry(project: any): Promise<QlooResponse> {
             errorMessage = "Invalid request payload sent to Qloo API";
             break;
           case 401:
-            errorMessage = "Invalid Qloo API key";
+            errorMessage = "Qloo API error: Invalid API key";
             break;
           case 403:
             errorMessage = "Qloo API access forbidden";
@@ -431,12 +481,11 @@ async function getQlooInsightsWithRetry(project: any): Promise<QlooResponse> {
         
         if (attempt < MAX_RETRIES) {
           const delay = RETRY_DELAY_MS * Math.pow(2, attempt - 1); // Exponential backoff
-          console.log(`Retrying in ${delay}ms...`);
+          console.log(`Server error, retrying in ${delay}ms...`);
           await new Promise(resolve => setTimeout(resolve, delay));
           continue;
         } else {
-          console.log("Max retries reached, falling back to mock data");
-          return generateMockQlooData(project);
+          throw new Error("Qloo API service unavailable after retries");
         }
       }
 
@@ -464,18 +513,17 @@ async function getQlooInsightsWithRetry(project: any): Promise<QlooResponse> {
       
       if (attempt < MAX_RETRIES && !error.message.includes("rate limited")) {
         const delay = RETRY_DELAY_MS * Math.pow(2, attempt - 1);
-        console.log(`Retrying in ${delay}ms...`);
+        console.log(`Network error, retrying in ${delay}ms...`);
         await new Promise(resolve => setTimeout(resolve, delay));
         continue;
       } else {
-        console.log("Falling back to mock data due to error");
-        return generateMockQlooData(project);
+        throw new Error(`Qloo API error: ${error.message}`);
       }
     }
   }
 
-  // Fallback if all retries failed
-  return generateMockQlooData(project);
+  // This should never be reached, but just in case
+  throw new Error("Qloo API: Maximum retries exceeded");
 }
 
 // Enhanced function to generate insights using OpenAI GPT with retry logic
@@ -483,8 +531,7 @@ async function generateInsightsWithOpenAIRetry(project: any, qloo_data: any): Pr
   const openaiApiKey = Deno.env.get("OPENAI_API_KEY");
   
   if (!openaiApiKey) {
-    console.warn("OpenAI API key not found, using mock data");
-    return generateMockInsights(project, qloo_data);
+    throw new Error("OPENAI_API_KEY not configured. Please set the OpenAI API key in Supabase Edge Function environment variables.");
   }
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
@@ -492,7 +539,7 @@ async function generateInsightsWithOpenAIRetry(project: any, qloo_data: any): Pr
       console.log(`OpenAI API attempt ${attempt}/${MAX_RETRIES}`);
       
       const prompt = `
-Based on the following project and enhanced cultural intelligence data from Qloo's Taste AI™, generate detailed audience insights:
+Based on the following project and enhanced cultural intelligence data from Qloo's Taste AI™ v2, generate detailed audience insights:
 
 PROJECT DETAILS:
 - Title: ${project.title}
@@ -504,7 +551,12 @@ PROJECT DETAILS:
 ENHANCED QLOO CULTURAL INTELLIGENCE DATA:
 ${JSON.stringify(qloo_data, null, 2)}
 
-Please generate comprehensive insights with the following structure. IMPORTANT: Confidence scores must be whole numbers between 0-100 (e.g., 85, not 0.85 or 85%).
+Please generate comprehensive insights with the following structure. IMPORTANT: 
+- Confidence scores must be whole numbers between 0-100 (e.g., 85, not 0.85 or 85%)
+- Affinity scores must be decimal numbers between 0-1 (e.g., 0.85, not 85)
+- Include affinity_scores for each persona with at least 5 cultural domains
+- Include taste_intersections showing overlaps between personas
+- Include cross_domain_recommendations for market expansion
 
 Format the response as valid JSON with this exact structure:
 {
@@ -519,17 +571,22 @@ Format the response as valid JSON with this exact structure:
         "platforms": ["string"]
       },
       "cultural_affinities": ["string"],
-      "behavioral_patterns": ["string"]
+      "behavioral_patterns": ["string"],
+      "affinity_scores": {
+        "domain1": 0.85,
+        "domain2": 0.72
+      }
     }
   ],
   "cultural_trends": [
     {
       "title": "string",
       "description": "string",
-      "confidence": number (0-100, whole number),
+      "confidence": 85,
       "impact": "string",
       "timeline": "string",
-      "qloo_connection": "string"
+      "qloo_connection": "string",
+      "affinity_score": 0.85
     }
   ],
   "content_suggestions": [
@@ -540,12 +597,37 @@ Format the response as valid JSON with this exact structure:
       "content_type": "string",
       "copy": "string",
       "engagement_potential": "string",
-      "cultural_timing": "string"
+      "cultural_timing": "string",
+      "affinity_score": 0.85
+    }
+  ],
+  "taste_intersections": [
+    {
+      "intersection_name": "string",
+      "description": "string",
+      "shared_attributes": ["string"],
+      "overlap_percentage": 75,
+      "personas_involved": ["string"],
+      "common_interests": ["string"],
+      "marketing_opportunities": ["string"]
+    }
+  ],
+  "cross_domain_recommendations": [
+    {
+      "source_domain": "string",
+      "target_domain": "string",
+      "recommendation_title": "string",
+      "description": "string",
+      "confidence_score": 85,
+      "related_entities": ["string"],
+      "expansion_opportunities": ["string"],
+      "audience_fit": 0.85,
+      "implementation_difficulty": "Medium"
     }
   ]
 }
 
-Generate 3-4 personas, 4-5 trends, and 6-8 content suggestions. Ensure all insights are specific, actionable, and directly leverage the Qloo cultural intelligence data provided.
+Generate 3-4 personas, 4-5 trends, 6-8 content suggestions, 2-3 taste intersections, and 3-4 cross-domain recommendations. Ensure all insights are specific, actionable, and directly leverage the Qloo cultural intelligence data provided.
 `;
 
       const requestPayload = {
@@ -553,7 +635,7 @@ Generate 3-4 personas, 4-5 trends, and 6-8 content suggestions. Ensure all insig
         messages: [
           {
             role: "system",
-            content: "You are an expert marketing strategist and cultural analyst specializing in audience insights and content strategy. You have deep expertise in interpreting Qloo's Taste AI™ cultural intelligence data and translating it into actionable marketing insights. Generate detailed, culturally-aware insights that leverage the full depth of Qloo's taste profiles, demographics, preferences, and affinity scores. Always respond with valid JSON in the exact format requested. Confidence scores must be whole numbers between 0-100."
+            content: "You are an expert marketing strategist and cultural analyst specializing in audience insights and content strategy. You have deep expertise in interpreting Qloo's Taste AI™ cultural intelligence data and translating it into actionable marketing insights. Generate detailed, culturally-aware insights that leverage the full depth of Qloo's taste profiles, demographics, preferences, and affinity scores. Always respond with valid JSON in the exact format requested. Confidence scores must be whole numbers between 0-100. Affinity scores must be decimal numbers between 0-1."
           },
           {
             role: "user",
@@ -584,7 +666,7 @@ Generate 3-4 personas, 4-5 trends, and 6-8 content suggestions. Ensure all insig
         
         if (attempt < MAX_RETRIES) {
           const delay = RETRY_DELAY_MS * Math.pow(2, attempt); // Exponential backoff
-          console.log(`Retrying in ${delay}ms...`);
+          console.log(`Rate limited, retrying in ${delay}ms...`);
           await new Promise(resolve => setTimeout(resolve, delay));
           continue;
         } else {
@@ -604,7 +686,7 @@ Generate 3-4 personas, 4-5 trends, and 6-8 content suggestions. Ensure all insig
             errorMessage = "Invalid request payload sent to OpenAI API";
             break;
           case 401:
-            errorMessage = "Invalid OpenAI API key";
+            errorMessage = "OpenAI API error: Invalid API key";
             break;
           case 403:
             errorMessage = "OpenAI API access forbidden";
@@ -627,11 +709,11 @@ Generate 3-4 personas, 4-5 trends, and 6-8 content suggestions. Ensure all insig
         
         if (attempt < MAX_RETRIES) {
           const delay = RETRY_DELAY_MS * Math.pow(2, attempt - 1);
-          console.log(`Retrying in ${delay}ms...`);
+          console.log(`Server error, retrying in ${delay}ms...`);
           await new Promise(resolve => setTimeout(resolve, delay));
           continue;
         } else {
-          return generateMockInsights(project, qloo_data);
+          throw new Error("OpenAI API service unavailable after retries");
         }
       }
 
@@ -659,8 +741,7 @@ Generate 3-4 personas, 4-5 trends, and 6-8 content suggestions. Ensure all insig
             console.log("Retrying due to parse error...");
             continue;
           } else {
-            console.log("Max retries reached, using mock data due to parse error");
-            return generateMockInsights(project, qloo_data);
+            throw new Error("OpenAI API returned invalid JSON format after retries");
           }
         }
       }
@@ -681,17 +762,17 @@ Generate 3-4 personas, 4-5 trends, and 6-8 content suggestions. Ensure all insig
       
       if (attempt < MAX_RETRIES && !error.message.includes("rate limited")) {
         const delay = RETRY_DELAY_MS * Math.pow(2, attempt - 1);
-        console.log(`Retrying in ${delay}ms...`);
+        console.log(`Network error, retrying in ${delay}ms...`);
         await new Promise(resolve => setTimeout(resolve, delay));
         continue;
       } else {
-        return generateMockInsights(project, qloo_data);
+        throw new Error(`OpenAI API error: ${error.message}`);
       }
     }
   }
 
-  // Fallback if all retries failed
-  return generateMockInsights(project, qloo_data);
+  // This should never be reached, but just in case
+  throw new Error("OpenAI API: Maximum retries exceeded");
 }
 
 // Function to generate a cache key based on project parameters
@@ -871,373 +952,4 @@ function validateInsightsStructure(insights: any): { isValid: boolean; errors: s
   }
 
   return { isValid: errors.length === 0, errors };
-}
-
-// Enhanced mock data generators with proper confidence score scaling
-function generateMockQlooData(project: any): QlooResponse {
-  const domains = project.cultural_domains || ["lifestyle", "technology"];
-  const targets = project.geographical_targets || ["US"];
-  
-  return {
-    taste_profile: {
-      domains: domains,
-      preferences: ["quality", "innovation", "authenticity", "sustainability", "community"],
-      affinity_scores: {
-        music: 0.78,
-        fashion: 0.65,
-        technology: 0.82,
-        food: 0.71,
-        travel: 0.69,
-        wellness: 0.74
-      },
-      demographic_insights: {
-        age_groups: ["25-34", "35-44"],
-        interests: domains.concat(["digital_culture", "premium_brands", "social_impact"]),
-        behaviors: ["social_media_active", "brand_conscious", "value_driven", "early_adopter", "community_builder"]
-      },
-      cultural_affinity: {
-        music_genres: ["indie", "electronic", "alternative", "pop"],
-        entertainment: ["streaming", "podcasts", "gaming", "live_events"],
-        lifestyle: ["wellness", "travel", "food_culture", "sustainability"]
-      }
-    },
-    related_entities: {
-      brands: ["Apple", "Nike", "Spotify", "Netflix", "Tesla", "Patagonia", "Airbnb", "Whole Foods"],
-      influencers: ["tech_reviewers", "lifestyle_bloggers", "sustainability_advocates", "wellness_coaches"],
-      media: ["TikTok", "Instagram", "YouTube", "LinkedIn", "Spotify", "Netflix"]
-    },
-    cultural_context: {
-      trending_topics: ["sustainability", "digital_transformation", "wellness", "authenticity", "community_building"],
-      regional_preferences: targets,
-      emerging_patterns: ["community_driven_commerce", "personalization", "conscious_consumption", "micro_influencer_trust"]
-    },
-    demographics: {
-      age_distribution: {
-        "18-24": 0.15,
-        "25-34": 0.35,
-        "35-44": 0.30,
-        "45-54": 0.20
-      },
-      income_levels: ["middle_class", "upper_middle_class"],
-      education: ["college_educated", "graduate_degree"],
-      lifestyle_segments: ["urban_professionals", "suburban_families", "digital_nomads"]
-    },
-    preferences: {
-      content_types: ["video", "interactive", "educational", "behind_scenes"],
-      platform_preferences: ["instagram", "tiktok", "youtube", "linkedin"],
-      engagement_styles: ["authentic", "educational", "entertaining", "inspiring"]
-    },
-    confidence_scores: {
-      demographic_accuracy: 0.87,
-      preference_reliability: 0.81,
-      trend_prediction: 0.84,
-      cultural_relevance: 0.79
-    }
-  };
-}
-
-function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
-  const industryName = project.industry ? 
-    project.industry.charAt(0).toUpperCase() + project.industry.slice(1) : 
-    'Digital';
-
-  const domains = project.cultural_domains || ["technology", "lifestyle"];
-  const targets = project.geographical_targets || ["US"];
-
-  // Extract affinity scores from Qloo data if available
-  const qlooAffinityScores = qloo_data?.taste_profile?.affinity_scores || {
-    technology: 0.82,
-    wellness: 0.74,
-    sustainability: 0.78,
-    music: 0.71,
-    fashion: 0.65,
-    food: 0.69
-  };
-
-  return {
-    audience_personas: [
-      {
-        name: `${industryName} Innovators`,
-        description: `Forward-thinking professionals who embrace new technologies and trends in ${project.description.toLowerCase()}`,
-        characteristics: [
-          "Early adopters of new technologies and platforms",
-          "Values quality and innovation over price",
-          "Actively shares experiences on social media",
-          "Influences purchasing decisions through research and reviews",
-          "Seeks authentic and sustainable brand experiences",
-          "Builds communities around shared interests"
-        ],
-        demographics: {
-          age_range: "28-42",
-          interests: domains.concat(["innovation", "sustainability", "premium_brands", "community"]),
-          platforms: ["LinkedIn", "Instagram", "TikTok", "YouTube"]
-        },
-        cultural_affinities: ["technology", "wellness", "sustainability", "premium_experiences"],
-        behavioral_patterns: ["research_driven", "community_oriented", "brand_advocate", "content_creator"],
-        affinity_scores: {
-          technology: qlooAffinityScores.technology || 0.82,
-          wellness: qlooAffinityScores.wellness || 0.74,
-          sustainability: qlooAffinityScores.sustainability || 0.78,
-          premium_brands: 0.71,
-          innovation: 0.85
-        }
-      },
-      {
-        name: "Cultural Trendsetters",
-        description: "Influential individuals who discover and amplify emerging cultural trends",
-        characteristics: [
-          "First to discover and share new trends",
-          "High engagement with brand content",
-          "Values authenticity and social responsibility",
-          "Creates and shares user-generated content",
-          "Builds communities around shared interests",
-          "Influences others through storytelling"
-        ],
-        demographics: {
-          age_range: "22-35",
-          interests: ["culture", "trends", "social_impact", "creativity", "storytelling"],
-          platforms: ["TikTok", "Instagram", "Twitter", "YouTube"]
-        },
-        cultural_affinities: ["music", "fashion", "art", "social_movements"],
-        behavioral_patterns: ["trend_discovery", "content_creation", "community_building", "social_advocacy"],
-        affinity_scores: {
-          music: qlooAffinityScores.music || 0.88,
-          fashion: qlooAffinityScores.fashion || 0.79,
-          art: 0.73,
-          social_impact: 0.81,
-          creativity: 0.86
-        }
-      },
-      {
-        name: "Conscious Consumers",
-        description: "Mindful buyers who prioritize values-aligned purchases and sustainable practices",
-        characteristics: [
-          "Researches brand values before purchasing",
-          "Willing to pay premium for sustainable options",
-          "Advocates for social and environmental causes",
-          "Seeks transparency in brand communications",
-          "Influences others through word-of-mouth recommendations",
-          "Supports local and ethical businesses"
-        ],
-        demographics: {
-          age_range: "30-45",
-          interests: ["sustainability", "wellness", "social_impact", "quality", "ethics"],
-          platforms: ["Instagram", "LinkedIn", "Facebook", "YouTube"]
-        },
-        cultural_affinities: ["environmental_causes", "wellness", "ethical_consumption", "community_support"],
-        behavioral_patterns: ["values_driven", "research_intensive", "brand_loyalty", "advocacy"],
-        affinity_scores: {
-          sustainability: qlooAffinityScores.sustainability || 0.91,
-          wellness: qlooAffinityScores.wellness || 0.84,
-          ethical_brands: 0.87,
-          community: 0.76,
-          quality: 0.82
-        }
-      }
-    ],
-    cultural_trends: [
-      {
-        title: "Authentic Storytelling Movement",
-        description: "Growing demand for genuine, behind-the-scenes content that showcases real people and processes",
-        confidence: 88,
-        impact: "Brands showing authentic stories see 3x higher engagement and stronger emotional connections",
-        timeline: "Current trend with 18+ months of sustained growth expected",
-        qloo_connection: "Aligns with Qloo's data showing high affinity for authenticity and transparency",
-        affinity_score: 0.85
-      },
-      {
-        title: "Community-Driven Discovery",
-        description: "Shift from influencer marketing to peer recommendations and community-based product discovery",
-        confidence: 82,
-        impact: "Community recommendations drive 4x higher conversion rates than traditional advertising",
-        timeline: "Emerging trend accelerating across all demographics",
-        qloo_connection: "Supported by Qloo's behavioral data showing preference for community-driven content",
-        affinity_score: 0.78
-      },
-      {
-        title: "Micro-Moment Engagement",
-        description: "Preference for bite-sized, instantly consumable content that delivers immediate value",
-        confidence: 91,
-        impact: "Short-form content generates 2.5x more shares and comments than long-form",
-        timeline: "Dominant trend continuing to evolve with new platform features",
-        qloo_connection: "Reflects Qloo's platform preference data favoring TikTok and Instagram Reels",
-        affinity_score: 0.89
-      },
-      {
-        title: "Values-Based Brand Loyalty",
-        description: "Consumer decisions increasingly influenced by brand values and social impact initiatives",
-        confidence: 85,
-        impact: "Values-aligned brands command 15-20% price premium and higher customer lifetime value",
-        timeline: "Long-term trend with accelerating importance among younger demographics",
-        qloo_connection: "Correlates with Qloo's cultural context data on conscious consumption patterns",
-        affinity_score: 0.83
-      }
-    ],
-    content_suggestions: [
-      {
-        title: "Behind-the-Scenes Process Stories",
-        description: "Show the authentic journey of how your product or service comes to life",
-        platforms: ["Instagram Stories", "TikTok", "YouTube Shorts"],
-        content_type: "Short-form Video",
-        copy: "Ever wondered how we create [your product]? Take a peek behind the curtain and see the passion that goes into every detail. #BehindTheScenes #AuthenticBrand",
-        engagement_potential: "Very High",
-        cultural_timing: "Perfect for the authenticity movement - post during peak engagement hours",
-        affinity_score: 0.87
-      },
-      {
-        title: "Community Spotlight Series",
-        description: "Feature real customers and their stories with your brand",
-        platforms: ["Instagram", "LinkedIn", "YouTube"],
-        content_type: "Mixed Media",
-        copy: "Meet [Customer Name], who transformed their [relevant area] with our help. Their story shows what's possible when innovation meets determination. #CustomerSpotlight #RealStories",
-        engagement_potential: "High",
-        cultural_timing: "Aligns with community-driven discovery trend - share weekly for consistency",
-        affinity_score: 0.81
-      },
-      {
-        title: "Trend Reaction Content",
-        description: "Respond to cultural trends with your unique brand perspective",
-        platforms: ["TikTok", "Instagram Reels", "Twitter"],
-        content_type: "Short-form Video",
-        copy: "Everyone's talking about [trending topic]. Here's how we see it fitting into the future of [your industry]. What's your take? #TrendTalk #FutureThinking",
-        engagement_potential: "High",
-        cultural_timing: "Strike while trends are hot - respond within 24-48 hours of trend emergence",
-        affinity_score: 0.79
-      },
-      {
-        title: "Educational Micro-Content",
-        description: "Share quick tips and insights related to your expertise",
-        platforms: ["LinkedIn", "Instagram", "TikTok"],
-        content_type: "Carousel/Video",
-        copy: "3 things you didn't know about [your industry topic]. Swipe to become an expert in 30 seconds. #QuickTips #DidYouKnow",
-        engagement_potential: "Medium-High",
-        cultural_timing: "Capitalize on micro-moment engagement - post during commute hours",
-        affinity_score: 0.74
-      },
-      {
-        title: "Values-in-Action Content",
-        description: "Showcase your brand values through concrete actions and initiatives",
-        platforms: ["LinkedIn", "Instagram", "YouTube"],
-        content_type: "Long-form Video",
-        copy: "Actions speak louder than words. See how we're making a real difference in [relevant cause/area] and join us in creating positive change. #ValuesInAction #MakeADifference",
-        engagement_potential: "Medium-High",
-        cultural_timing: "Tie to relevant awareness days or social movements for maximum impact",
-        affinity_score: 0.82
-      },
-      {
-        title: "Interactive Q&A Sessions",
-        description: "Host live sessions where your audience can ask questions and get real-time answers",
-        platforms: ["Instagram Live", "LinkedIn Live", "TikTok Live"],
-        content_type: "Live Video",
-        copy: "Got questions about [your expertise area]? Join us live for honest answers and real talk. No scripts, just authentic conversation. #AskMeAnything #LiveChat",
-        engagement_potential: "Very High",
-        cultural_timing: "Schedule during peak audience activity - announce 24 hours in advance",
-        affinity_score: 0.85
-      }
-    ],
-    taste_intersections: [
-      {
-        intersection_name: "Tech-Wellness Convergence",
-        description: "The overlap between technology enthusiasts and wellness-conscious consumers, representing a growing segment that values digital solutions for health and mindfulness",
-        shared_attributes: ["innovation_seeking", "quality_focused", "community_oriented", "data_driven"],
-        overlap_percentage: 73,
-        personas_involved: [`${industryName} Innovators`, "Conscious Consumers"],
-        common_interests: ["wearable_technology", "meditation_apps", "fitness_tracking", "sustainable_tech", "biohacking"],
-        shared_brands: ["Apple", "Fitbit", "Headspace", "Calm", "Oura", "Peloton"],
-        behavioral_overlaps: ["early_adoption", "research_intensive", "community_sharing", "premium_willingness"],
-        marketing_opportunities: [
-          "Cross-promote wellness tech products",
-          "Create content bridging technology and health",
-          "Partner with wellness influencers in tech spaces",
-          "Develop integrated health-tech solutions"
-        ]
-      },
-      {
-        intersection_name: "Cultural-Conscious Alignment",
-        description: "The intersection between cultural trendsetters and conscious consumers, representing individuals who drive both cultural movements and sustainable practices",
-        shared_attributes: ["authenticity_seeking", "social_impact_focused", "community_building", "storytelling"],
-        overlap_percentage: 68,
-        personas_involved: ["Cultural Trendsetters", "Conscious Consumers"],
-        common_interests: ["social_justice", "sustainable_fashion", "ethical_brands", "cultural_movements", "activism"],
-        shared_brands: ["Patagonia", "Ben & Jerry's", "Warby Parker", "Allbirds", "Reformation"],
-        behavioral_overlaps: ["values_driven_purchasing", "social_sharing", "brand_advocacy", "community_leadership"],
-        marketing_opportunities: [
-          "Launch cause-marketing campaigns",
-          "Create sustainable product lines",
-          "Partner with social impact organizations",
-          "Develop community-driven initiatives"
-        ]
-      }
-    ],
-    cross_domain_recommendations: [
-      {
-        source_domain: domains[0] || "technology",
-        target_domain: "wellness",
-        recommendation_title: "Tech-Enabled Wellness Solutions",
-        description: "Expand from technology into wellness by creating digital health solutions, meditation apps, or fitness tracking platforms that appeal to tech-savvy health enthusiasts",
-        confidence_score: 87,
-        related_entities: ["Headspace", "Calm", "Fitbit", "Apple Health", "MyFitnessPal"],
-        expansion_opportunities: [
-          "Develop mindfulness apps with AI personalization",
-          "Create wearable technology for health monitoring",
-          "Build community platforms for wellness tracking",
-          "Integrate wellness features into existing tech products"
-        ],
-        audience_fit: 0.84,
-        implementation_difficulty: "Medium",
-        potential_reach: "High - wellness tech market growing 15% annually"
-      },
-      {
-        source_domain: domains[0] || "technology", 
-        target_domain: "sustainability",
-        recommendation_title: "Green Technology Innovation",
-        description: "Bridge technology and environmental consciousness by developing eco-friendly tech solutions, renewable energy products, or sustainability tracking tools",
-        confidence_score: 82,
-        related_entities: ["Tesla", "Patagonia", "Ecosia", "Too Good To Go", "Olio"],
-        expansion_opportunities: [
-          "Create carbon footprint tracking apps",
-          "Develop smart home energy management systems",
-          "Build platforms for sustainable product discovery",
-          "Design eco-friendly tech hardware"
-        ],
-        audience_fit: 0.79,
-        implementation_difficulty: "High",
-        potential_reach: "Very High - sustainability market projected to reach $150B by 2030"
-      },
-      {
-        source_domain: "lifestyle",
-        target_domain: "education",
-        recommendation_title: "Lifestyle Learning Platforms",
-        description: "Expand into educational content by creating lifestyle-focused learning experiences, skill-sharing platforms, or personal development courses",
-        confidence_score: 75,
-        related_entities: ["MasterClass", "Skillshare", "Coursera", "Udemy", "LinkedIn Learning"],
-        expansion_opportunities: [
-          "Launch lifestyle skill courses (cooking, wellness, productivity)",
-          "Create peer-to-peer learning communities",
-          "Develop micro-learning content for busy professionals",
-          "Build mentorship platforms for personal growth"
-        ],
-        audience_fit: 0.72,
-        implementation_difficulty: "Low",
-        potential_reach: "Medium - online education market growing 8% annually"
-      },
-      {
-        source_domain: domains[1] || "culture",
-        target_domain: "commerce",
-        recommendation_title: "Cultural Commerce Integration",
-        description: "Bridge cultural trends with e-commerce by creating culturally-aware shopping experiences, trend-based product curation, or community-driven marketplaces",
-        confidence_score: 80,
-        related_entities: ["Depop", "Vinted", "Etsy", "ASOS", "Urban Outfitters"],
-        expansion_opportunities: [
-          "Develop trend-prediction shopping algorithms",
-          "Create cultural community marketplaces",
-          "Build influencer-driven commerce platforms",
-          "Design culturally-curated subscription boxes"
-        ],
-        audience_fit: 0.77,
-        implementation_difficulty: "Medium",
-        potential_reach: "High - social commerce growing 30% annually"
-      }
-    ]
-  };
 }
