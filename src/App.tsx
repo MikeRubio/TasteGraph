@@ -9,6 +9,8 @@ import Projects from './pages/Projects';
 import ProjectDetails from './pages/ProjectDetails';
 import Profile from './pages/Profile';
 import ApiAccess from './pages/ApiAccess';
+import LiveDiscovery from './pages/LiveDiscovery';
+import MarketFit from './pages/MarketFit';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -65,6 +67,20 @@ function App() {
                 <ProtectedRoute>
                   <Layout>
                     <ApiAccess />
+                  </Layout>
+                </ProtectedRoute>
+              } />
+              <Route path="/live-discovery" element={
+                <ProtectedRoute>
+                  <Layout>
+                    <LiveDiscovery />
+                  </Layout>
+                </ProtectedRoute>
+              } />
+              <Route path="/market-fit" element={
+                <ProtectedRoute>
+                  <Layout>
+                    <MarketFit />
                   </Layout>
                 </ProtectedRoute>
               } />
