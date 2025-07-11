@@ -299,3 +299,4 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
     // API queries could be tracked separately in the future
     total_api_queries: (insights?.length || 0) * 2, // Rough estimate: 1 Qloo + 1 OpenAI call per insight
   };
+}
