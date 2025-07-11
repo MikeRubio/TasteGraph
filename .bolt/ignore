@@ -1,4 +1,6 @@
 src/components/ui/*
+src/lib/*
+
 hooks/use-toast.ts
 vite.config.ts
 tsconfig.node.json
