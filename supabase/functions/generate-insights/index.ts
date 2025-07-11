@@ -1039,7 +1039,7 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
       {
         title: "Authentic Storytelling Movement",
         description: "Growing demand for genuine, behind-the-scenes content that showcases real people and processes",
-        confidence: 88, // Fixed: Now a whole number between 0-100
+        confidence: 88,
         impact: "Brands showing authentic stories see 3x higher engagement and stronger emotional connections",
         timeline: "Current trend with 18+ months of sustained growth expected",
         qloo_connection: "Aligns with Qloo's data showing high affinity for authenticity and transparency",
@@ -1048,7 +1048,7 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
       {
         title: "Community-Driven Discovery",
         description: "Shift from influencer marketing to peer recommendations and community-based product discovery",
-        confidence: 82, // Fixed: Now a whole number between 0-100
+        confidence: 82,
         impact: "Community recommendations drive 4x higher conversion rates than traditional advertising",
         timeline: "Emerging trend accelerating across all demographics",
         qloo_connection: "Supported by Qloo's behavioral data showing preference for community-driven content",
@@ -1057,7 +1057,7 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
       {
         title: "Micro-Moment Engagement",
         description: "Preference for bite-sized, instantly consumable content that delivers immediate value",
-        confidence: 91, // Fixed: Now a whole number between 0-100
+        confidence: 91,
         impact: "Short-form content generates 2.5x more shares and comments than long-form",
         timeline: "Dominant trend continuing to evolve with new platform features",
         qloo_connection: "Reflects Qloo's platform preference data favoring TikTok and Instagram Reels",
@@ -1066,7 +1066,7 @@ function generateMockInsights(project: any, qloo_data: any): InsightsResponse {
       {
         title: "Values-Based Brand Loyalty",
         description: "Consumer decisions increasingly influenced by brand values and social impact initiatives",
-        confidence: 85, // Fixed: Now a whole number between 0-100
+        confidence: 85,
         impact: "Values-aligned brands command 15-20% price premium and higher customer lifetime value",
         timeline: "Long-term trend with accelerating importance among younger demographics",
         qloo_connection: "Correlates with Qloo's cultural context data on conscious consumption patterns",
