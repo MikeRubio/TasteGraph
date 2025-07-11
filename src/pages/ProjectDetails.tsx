@@ -613,30 +613,42 @@ const ProjectDetails = () => {
           position: "absolute",
           left: "-9999px",
           top: 0,
-          width: 600,
-          background: "white",
+          width: 800,
           pointerEvents: "none",
         }}
       >
-        <div id="affinity-radar-pdf">
-          {latestInsight?.audience_personas &&
-            latestInsight.audience_personas.length > 0 && (
-              <AffinityRadarChart personas={latestInsight.audience_personas} />
-            )}
+        <div
+          id="affinity-radar-pdf"
+          style={{ width: 800, height: 500, background: "white" }}
+        >
+          {latestInsight?.audience_personas?.length > 0 && (
+            <AffinityRadarChart
+              personas={latestInsight.audience_personas}
+              theme="light"
+            />
+          )}
         </div>
-        <div id="trend-confidence-pdf">
-          {latestInsight?.cultural_trends &&
-            latestInsight.cultural_trends.length > 0 && (
-              <TrendConfidenceChart trends={latestInsight.cultural_trends} />
-            )}
+        <div
+          id="trend-confidence-pdf"
+          style={{ width: 800, height: 500, background: "white" }}
+        >
+          {latestInsight?.cultural_trends?.length > 0 && (
+            <TrendConfidenceChart
+              trends={latestInsight.cultural_trends}
+              // theme="light"
+            />
+          )}
         </div>
-        <div id="taste-heatmap-pdf">
-          {latestInsight?.taste_intersections &&
-            latestInsight.taste_intersections.length > 0 && (
-              <TasteIntersectionHeatmap
-                intersections={latestInsight.taste_intersections}
-              />
-            )}
+        <div
+          id="taste-heatmap-pdf"
+          style={{ width: 800, height: 500, background: "white" }}
+        >
+          {latestInsight?.taste_intersections?.length > 0 && (
+            <TasteIntersectionHeatmap
+              intersections={latestInsight.taste_intersections}
+              // theme="light"
+            />
+          )}
         </div>
       </div>
     </div>
