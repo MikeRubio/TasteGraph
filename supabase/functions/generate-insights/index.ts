@@ -329,19 +329,18 @@ serve(async (req: Request) => {
 });
 
 // Function to resolve free-text tags to Qloo tag IDs
-async function resolveTagsToIds(tags: string[], qlooApiKey: string, qlooBaseUrl: string): Promise<string[]> {
+async function resolveTagsToIds(tags: string[], tagType: 'domain' | 'geography', qlooApiKey: string, qlooBaseUrl: string): Promise<string[]> {
   const tagIds: string[] = [];
   
   for (const tag of tags) {
     try {
-      console.log(`Resolving tag: ${tag}`);
+      console.log(`Resolving ${tagType} tag: ${tag}`);
       
       const tagResponse = await fetch(
-        `${qlooBaseUrl}/v2/tags?query=${encodeURIComponent(tag)}`,
+        `${qlooBaseUrl}/v2/tags?type=${tagType}&query=${encodeURIComponent(tag)}`,
         {
           headers: {
             "x-api-key": qlooApiKey,
-            "Content-Type": "application/json",
             "Accept": "application/json",
           },
         }
@@ -349,17 +348,17 @@ async function resolveTagsToIds(tags: string[], qlooApiKey: string, qlooBaseUrl:
 
       if (tagResponse.ok) {
         const tagData = await tagResponse.json();
-        if (tagData.items && tagData.items.length > 0) {
+        if (tagData.items?.length > 0) {
           tagIds.push(tagData.items[0].id);
-          console.log(`Resolved "${tag}" to ID: ${tagData.items[0].id}`);
+          console.log(`Resolved ${tagType} "${tag}" to ID: ${tagData.items[0].id}`);
         } else {
-          console.warn(`No tag ID found for: ${tag}`);
+          console.warn(`No ${tagType} tag ID found for: ${tag}`);
         }
       } else {
-        console.warn(`Failed to resolve tag "${tag}": ${tagResponse.status}`);
+        console.warn(`Failed to resolve ${tagType} tag "${tag}": ${tagResponse.status}`);
       }
     } catch (error) {
-      console.warn(`Error resolving tag "${tag}":`, error);
+      console.warn(`Error resolving ${tagType} tag "${tag}":`, error);
     }
   }
   
@@ -381,22 +380,34 @@ async function getQlooInsightsWithRetry(project: any): Promise<QlooResponse> {
       
       // Resolve cultural domains and geographical targets to tag IDs
       const culturalDomainIds = project.cultural_domains && project.cultural_domains.length > 0 
-        ? await resolveTagsToIds(project.cultural_domains, qlooApiKey, qlooBaseUrl)
+        ? await resolveTagsToIds(project.cultural_domains, 'domain', qlooApiKey, qlooBaseUrl)
         : [];
       
       const geographicalTargetIds = project.geographical_targets && project.geographical_targets.length > 0
-        ? await resolveTagsToIds(project.geographical_targets, qlooApiKey, qlooBaseUrl)
+        ? await resolveTagsToIds(project.geographical_targets, 'geography', qlooApiKey, qlooBaseUrl)
         : [];
 
       console.log("Resolved cultural domain IDs:", culturalDomainIds);
       console.log("Resolved geographical target IDs:", geographicalTargetIds);
 
       // Enhanced payload with resolved tag IDs as per v2 API specification
-      const qlooPayload: any = {
+      const qlooPayload = {
         input: {
           description: project.description,
           industry: project.industry || "general",
           language: "en",
+        },
+        // signal block is for interests - always include even if empty
+        signal: {
+          interests: {
+            tags: culturalDomainIds  // [] or [<ids>]
+          }
+        },
+        // filter block is for geography - always include even if empty
+        filter: {
+          geography: {
+            tags: geographicalTargetIds  // [] or [<ids>]
+          }
         },
         options: {
           include_demographics: true,
@@ -406,22 +417,6 @@ async function getQlooInsightsWithRetry(project: any): Promise<QlooResponse> {
           entity_types: ["brands", "influencers", "media"]
         }
       };
-
-      // Only attach signal if we have at least one cultural domain tag
-      if (culturalDomainIds.length > 0) {
-        qlooPayload.signal = {
-          type: "interests",
-          tags: culturalDomainIds
-        };
-      }
-
-      // Only attach filter if we have at least one geography tag
-      if (geographicalTargetIds.length > 0) {
-        qlooPayload.filter = {
-          type: "geography",
-          tags: geographicalTargetIds
-        };
-      }
 
       console.log("Qloo v2 request payload:", JSON.stringify(qlooPayload, null, 2));
 
