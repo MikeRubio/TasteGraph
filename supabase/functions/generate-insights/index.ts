@@ -397,17 +397,13 @@ async function getQlooInsightsWithRetry(project: any): Promise<QlooResponse> {
           industry: project.industry || "general",
           language: "en",
         },
-        // signal block is for interests - always include even if empty
         signal: {
-          interests: {
-            tags: culturalDomainIds  // [] or [<ids>]
-          }
+          type: "interests",
+          tags: culturalDomainIds.map(id => ({ tag: id })),
         },
-        // filter block is for geography - always include even if empty
         filter: {
-          geography: {
-            tags: geographicalTargetIds  // [] or [<ids>]
-          }
+          type: "geography",
+          tags: geographicalTargetIds.map(id => ({ tag: id })),
         },
         options: {
           include_demographics: true,
