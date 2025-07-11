@@ -117,24 +117,24 @@ const Projects = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         <div className="flex justify-between items-center">
-          <h2 className="text-3xl font-bold text-white">Projects</h2>
-          <Button disabled className="bg-blue-500">
+          <div>
+            <h2 className="text-3xl font-bold text-black">Projects</h2>
+            <p className="text-gray-600 mt-1">Manage your audience discovery projects</p>
+          </div>
+          <Button disabled className="bg-black text-white">
             <Plus className="w-4 h-4 mr-2" />
             New Project
           </Button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
-            <Card
-              key={i}
-              className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm"
-            >
+            <Card key={i} className="bg-white border border-gray-200">
               <CardHeader>
                 <div className="animate-pulse">
-                  <div className="h-4 bg-slate-700 rounded w-3/4 mb-2"></div>
-                  <div className="h-3 bg-slate-700 rounded w-1/2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
                 </div>
               </CardHeader>
             </Card>
@@ -145,58 +145,58 @@ const Projects = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold text-white">Projects</h2>
-          <p className="text-slate-300 mt-1">
+          <h2 className="text-3xl font-bold text-black">Projects</h2>
+          <p className="text-gray-600 mt-1">
             Manage your audience discovery projects
           </p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-blue-500 hover:bg-blue-600 text-white">
+            <Button className="bg-black hover:bg-gray-800 text-white">
               <Plus className="w-4 h-4 mr-2" />
               New Project
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-slate-800 border-slate-700 text-white">
+          <DialogContent className="bg-white border border-gray-200 text-black max-w-lg">
             <DialogHeader>
-              <DialogTitle>Create New Project</DialogTitle>
-              <DialogDescription className="text-slate-300">
+              <DialogTitle className="text-black">Create New Project</DialogTitle>
+              <DialogDescription className="text-gray-600">
                 Set up a new audience discovery project with AI-powered insights
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="title">Project Title</Label>
+                <Label htmlFor="title" className="text-black font-medium">Project Title</Label>
                 <Input
                   id="title"
                   placeholder="Enter project title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
-                  className="bg-slate-700/50 border-slate-600"
+                  className="border-gray-300 focus:border-black focus:ring-black"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description" className="text-black font-medium">Description</Label>
                 <Textarea
                   id="description"
                   placeholder="Describe your project goals and target audience..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   required
-                  className="bg-slate-700/50 border-slate-600 min-h-20"
+                  className="border-gray-300 focus:border-black focus:ring-black min-h-20"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="industry">Industry (Optional)</Label>
+                <Label htmlFor="industry" className="text-black font-medium">Industry (Optional)</Label>
                 <Select value={industry} onValueChange={setIndustry}>
-                  <SelectTrigger className="bg-slate-700/50 border-slate-600">
+                  <SelectTrigger className="border-gray-300 focus:border-black focus:ring-black">
                     <SelectValue placeholder="Select industry" />
                   </SelectTrigger>
                   <SelectContent>
@@ -205,9 +205,7 @@ const Projects = () => {
                     <SelectItem value="healthcare">Healthcare</SelectItem>
                     <SelectItem value="finance">Finance</SelectItem>
                     <SelectItem value="entertainment">Entertainment</SelectItem>
-                    <SelectItem value="food-beverage">
-                      Food & Beverage
-                    </SelectItem>
+                    <SelectItem value="food-beverage">Food & Beverage</SelectItem>
                     <SelectItem value="travel">Travel</SelectItem>
                     <SelectItem value="education">Education</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
@@ -216,15 +214,15 @@ const Projects = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Cultural Domains</Label>
+                <Label className="text-black font-medium">Cultural Domains</Label>
                 <div className="flex flex-wrap gap-2">
                   {CULTURAL_DOMAIN_TAGS.map((tag) => (
                     <Badge
                       key={tag.id}
                       className={`cursor-pointer px-3 py-1 rounded-lg transition-all ${
                         culturalDomainTags.includes(tag.id)
-                          ? "bg-blue-600 text-white"
-                          : "bg-slate-700 text-slate-300 hover:bg-blue-800/70"
+                          ? "bg-black text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                       }`}
                       onClick={() => {
                         setCulturalDomainTags((prev) =>
@@ -241,15 +239,15 @@ const Projects = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Geographical Targets</Label>
+                <Label className="text-black font-medium">Geographical Targets</Label>
                 <div className="flex flex-wrap gap-2">
                   {GEOGRAPHY_TAGS.map((tag) => (
                     <Badge
                       key={tag.id}
                       className={`cursor-pointer px-3 py-1 rounded-lg transition-all ${
                         geoTargetTags.includes(tag.id)
-                          ? "bg-blue-600 text-white"
-                          : "bg-slate-700 text-slate-300 hover:bg-blue-800/70"
+                          ? "bg-black text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                       }`}
                       onClick={() => {
                         setGeoTargetTags((prev) =>
@@ -270,14 +268,14 @@ const Projects = () => {
                   type="button"
                   variant="outline"
                   onClick={() => setIsCreateOpen(false)}
-                  className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                  className="border-gray-300 text-gray-700 hover:bg-gray-50"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={createMutation.isPending}
-                  className="bg-blue-500 hover:bg-blue-600"
+                  className="bg-black hover:bg-gray-800 text-white"
                 >
                   {createMutation.isPending ? "Creating..." : "Create Project"}
                 </Button>
@@ -289,19 +287,20 @@ const Projects = () => {
 
       {/* Projects Grid */}
       {projects.length === 0 ? (
-        <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
+        <Card className="bg-white border border-gray-200">
           <CardContent className="p-12 text-center">
-            <Plus className="w-16 h-16 text-slate-500 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Plus className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-black mb-2">
               No projects yet
             </h3>
-            <p className="text-slate-300 mb-6">
-              Create your first project to start discovering audience insights
-              with AI
+            <p className="text-gray-600 mb-6">
+              Create your first project to start discovering audience insights with AI
             </p>
             <Button
               onClick={() => setIsCreateOpen(true)}
-              className="bg-blue-500 hover:bg-blue-600 text-white"
+              className="bg-black hover:bg-gray-800 text-white"
             >
               Create Your First Project
             </Button>
@@ -312,15 +311,15 @@ const Projects = () => {
           {projects.map((project) => (
             <Card
               key={project.id}
-              className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/70 transition-colors"
+              className="bg-white border border-gray-200 hover:shadow-md transition-shadow"
             >
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <CardTitle className="text-white text-lg">
+                    <CardTitle className="text-black text-lg">
                       {project.title}
                     </CardTitle>
-                    <CardDescription className="text-slate-300 mt-1">
+                    <CardDescription className="text-gray-600 mt-1">
                       {project.description.substring(0, 100)}...
                     </CardDescription>
                   </div>
@@ -328,20 +327,20 @@ const Projects = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDelete(project.id)}
-                    className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center text-sm text-slate-400">
+                <div className="flex items-center text-sm text-gray-500">
                   <Calendar className="w-4 h-4 mr-2" />
                   {format(new Date(project.created_at), "MMM d, yyyy")}
                 </div>
 
                 {project.industry && (
-                  <div className="flex items-center text-sm text-slate-400">
+                  <div className="flex items-center text-sm text-gray-500">
                     <Building className="w-4 h-4 mr-2" />
                     {project.industry}
                   </div>
@@ -349,7 +348,7 @@ const Projects = () => {
 
                 {project.geographical_targets &&
                   project.geographical_targets.length > 0 && (
-                    <div className="flex items-center text-sm text-slate-400">
+                    <div className="flex items-center text-sm text-gray-500">
                       <MapPin className="w-4 h-4 mr-2" />
                       {project.geographical_targets.slice(0, 2).join(", ")}
                       {project.geographical_targets.length > 2 &&
@@ -366,13 +365,13 @@ const Projects = () => {
                           <Badge
                             key={index}
                             variant="secondary"
-                            className="text-xs"
+                            className="text-xs bg-gray-100 text-gray-700"
                           >
                             {domain}
                           </Badge>
                         ))}
                       {project.cultural_domains.length > 3 && (
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-700">
                           +{project.cultural_domains.length - 3} more
                         </Badge>
                       )}
@@ -384,7 +383,7 @@ const Projects = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
+                      className="border-gray-300 text-gray-700 hover:bg-gray-50"
                     >
                       <Eye className="w-4 h-4 mr-2" />
                       View Details

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { 
   LayoutDashboard, 
   FolderOpen, 
@@ -13,7 +12,8 @@ import {
   X,
   Brain,
   Target,
-  Zap
+  Zap,
+  Activity
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -36,44 +36,44 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/projects', label: 'Projects', icon: FolderOpen },
-    { path: '/live-discovery', label: 'Live Discovery', icon: Zap },
+    { path: '/live-discovery', label: 'Live Discovery', icon: Activity },
     { path: '/market-fit', label: 'Market Fit', icon: Target },
     { path: '/profile', label: 'Profile', icon: User },
     { path: '/api-access', label: 'API Access', icon: Code },
   ];
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="flex h-screen bg-white">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-20 lg:hidden"
+          className="fixed inset-0 bg-black/20 z-20 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-30 w-64 bg-slate-800/80 backdrop-blur-sm border-r border-slate-700/50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
+        fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <div className="flex items-center justify-between h-16 px-4 border-b border-slate-700/50">
+        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
           <div className="flex items-center space-x-2">
-            <Brain className="w-8 h-8 text-blue-400" />
-            <span className="text-xl font-bold text-white">TasteGraph.ai</span>
+            <Brain className="w-7 h-7 text-black" />
+            <span className="text-xl font-semibold text-black">TasteGraph.ai</span>
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-slate-400 hover:text-white"
+            className="lg:hidden text-gray-400 hover:text-black"
           >
             <X className="w-5 h-5" />
           </Button>
         </div>
 
         <nav className="mt-8 px-4">
-          <div className="space-y-2">
+          <div className="space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
@@ -83,10 +83,10 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   key={item.path}
                   to={item.path}
                   className={`
-                    flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors
+                    flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors text-sm font-medium
                     ${isActive 
-                      ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' 
-                      : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                      ? 'bg-gray-100 text-black' 
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-black'
                     }
                   `}
                   onClick={() => setSidebarOpen(false)}
@@ -103,7 +103,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <Button
             variant="ghost"
             onClick={handleSignOut}
-            className="w-full justify-start text-slate-300 hover:text-white hover:bg-slate-700/50"
+            className="w-full justify-start text-gray-600 hover:text-black hover:bg-gray-50"
           >
             <LogOut className="w-5 h-5 mr-3" />
             Sign Out
@@ -114,26 +114,26 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="h-16 bg-slate-800/80 backdrop-blur-sm border-b border-slate-700/50 flex items-center justify-between px-4">
+        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden text-slate-400 hover:text-white"
+            className="lg:hidden text-gray-600 hover:text-black"
           >
             <Menu className="w-5 h-5" />
           </Button>
           
           <div className="flex-1 lg:ml-0 ml-4">
-            <h1 className="text-2xl font-bold text-white">
+            <h1 className="text-2xl font-bold text-black">
               {navItems.find(item => item.path === location.pathname)?.label || 'Dashboard'}
             </h1>
           </div>
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-auto p-6">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 overflow-auto bg-gray-50">
+          <div className="max-w-7xl mx-auto p-6">
             {children}
           </div>
         </main>

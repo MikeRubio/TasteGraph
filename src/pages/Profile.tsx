@@ -46,13 +46,16 @@ const Profile = () => {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <h2 className="text-3xl font-bold text-white">Profile</h2>
-        <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
+      <div className="space-y-8">
+        <div>
+          <h2 className="text-3xl font-bold text-black">Profile</h2>
+          <p className="text-gray-600 mt-1">Manage your account settings and preferences</p>
+        </div>
+        <Card className="bg-white border border-gray-200">
           <CardHeader>
             <div className="animate-pulse">
-              <div className="h-6 bg-slate-700 rounded w-1/4 mb-2"></div>
-              <div className="h-4 bg-slate-700 rounded w-1/2"></div>
+              <div className="h-6 bg-gray-200 rounded w-1/4 mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
             </div>
           </CardHeader>
         </Card>
@@ -61,75 +64,81 @@ const Profile = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div>
-        <h2 className="text-3xl font-bold text-white">Profile</h2>
-        <p className="text-slate-300 mt-1">Manage your account settings and preferences</p>
+        <h2 className="text-3xl font-bold text-black">Profile</h2>
+        <p className="text-gray-600 mt-1">Manage your account settings and preferences</p>
       </div>
 
       {/* Profile Info */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <Card className="bg-white border border-gray-200">
+          <CardHeader className="border-b border-gray-100">
+            <CardTitle className="text-black flex items-center">
               <User className="w-5 h-5 mr-2" />
               Account Information
             </CardTitle>
-            <CardDescription className="text-slate-300">
+            <CardDescription className="text-gray-600">
               Your basic account details
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="p-6 space-y-6">
             <div className="flex items-center space-x-3">
-              <Mail className="w-5 h-5 text-slate-400" />
+              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                <Mail className="w-5 h-5 text-gray-600" />
+              </div>
               <div>
-                <p className="text-sm text-slate-400">Email</p>
-                <p className="text-white">{user?.email}</p>
+                <p className="text-sm text-gray-600 font-medium">Email</p>
+                <p className="text-black">{user?.email}</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <Briefcase className="w-5 h-5 text-slate-400" />
+              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                <Briefcase className="w-5 h-5 text-gray-600" />
+              </div>
               <div>
-                <p className="text-sm text-slate-400">Job Role</p>
-                <p className="text-white">{profile?.job_role || 'Not specified'}</p>
+                <p className="text-sm text-gray-600 font-medium">Job Role</p>
+                <p className="text-black">{profile?.job_role || 'Not specified'}</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <Building className="w-5 h-5 text-slate-400" />
+              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                <Building className="w-5 h-5 text-gray-600" />
+              </div>
               <div>
-                <p className="text-sm text-slate-400">Industry</p>
-                <p className="text-white">{profile?.industry || 'Not specified'}</p>
+                <p className="text-sm text-gray-600 font-medium">Industry</p>
+                <p className="text-black">{profile?.industry || 'Not specified'}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2 bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-white">Update Profile</CardTitle>
-            <CardDescription className="text-slate-300">
+        <Card className="lg:col-span-2 bg-white border border-gray-200">
+          <CardHeader className="border-b border-gray-100">
+            <CardTitle className="text-black">Update Profile</CardTitle>
+            <CardDescription className="text-gray-600">
               Update your professional information to get better insights
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-slate-300">Email Address</Label>
+                <Label htmlFor="email" className="text-black font-medium">Email Address</Label>
                 <Input
                   id="email"
                   type="email"
                   value={user?.email || ''}
                   disabled
-                  className="bg-slate-700/30 border-slate-600 text-slate-400"
+                  className="bg-gray-50 border-gray-300 text-gray-500"
                 />
-                <p className="text-xs text-slate-400">Email cannot be changed</p>
+                <p className="text-xs text-gray-500">Email cannot be changed</p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="job-role" className="text-slate-300">Job Role</Label>
+                <Label htmlFor="job-role" className="text-black font-medium">Job Role</Label>
                 <Select value={jobRole} onValueChange={setJobRole}>
-                  <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
+                  <SelectTrigger className="border-gray-300 focus:border-black focus:ring-black">
                     <SelectValue placeholder="Select your role" />
                   </SelectTrigger>
                   <SelectContent>
@@ -145,9 +154,9 @@ const Profile = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="industry" className="text-slate-300">Industry</Label>
+                <Label htmlFor="industry" className="text-black font-medium">Industry</Label>
                 <Select value={industry} onValueChange={setIndustry}>
-                  <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
+                  <SelectTrigger className="border-gray-300 focus:border-black focus:ring-black">
                     <SelectValue placeholder="Select your industry" />
                   </SelectTrigger>
                   <SelectContent>
@@ -168,7 +177,7 @@ const Profile = () => {
                 <Button
                   type="submit"
                   disabled={updateMutation.isPending}
-                  className="bg-blue-500 hover:bg-blue-600 text-white"
+                  className="bg-black hover:bg-gray-800 text-white"
                 >
                   {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
                 </Button>
