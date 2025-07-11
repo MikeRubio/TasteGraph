@@ -132,8 +132,8 @@ const ProjectDetails = () => {
           title: project.title,
           description: project.description,
           industry: project.industry,
-          cultural_domains: project.cultural_domains,
-          geographical_targets: project.geographical_targets,
+          cultural_domains: project.cultural_domains || [],
+          geographical_targets: project.geographical_targets || [],
           created_at: project.created_at,
         },
         insights: {
