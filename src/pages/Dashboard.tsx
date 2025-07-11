@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { getProjects } from '@/lib/api';
+import { getProjects, getDashboardStats } from '@/lib/api';
 import { Plus, FolderOpen, TrendingUp, Users, Zap, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -13,9 +13,14 @@ const Dashboard = () => {
     queryFn: getProjects,
   });
 
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: ['dashboard-stats'],
+    queryFn: getDashboardStats,
+  });
+
   const recentProjects = projects.slice(0, 3);
 
-  if (isLoading) {
+  if (isLoading || statsLoading) {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
@@ -64,7 +69,7 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-300">Total Projects</p>
-                <p className="text-3xl font-bold text-white">{projects.length}</p>
+                <p className="text-3xl font-bold text-white">{stats?.total_projects || 0}</p>
               </div>
               <FolderOpen className="w-8 h-8 text-blue-400" />
             </div>
@@ -76,7 +81,7 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-300">Insights Generated</p>
-                <p className="text-3xl font-bold text-white">{projects.length * 2}</p>
+                <p className="text-3xl font-bold text-white">{stats?.total_insights || 0}</p>
               </div>
               <TrendingUp className="w-8 h-8 text-purple-400" />
             </div>
@@ -88,7 +93,7 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-300">Personas Created</p>
-                <p className="text-3xl font-bold text-white">{projects.length * 3}</p>
+                <p className="text-3xl font-bold text-white">{stats?.total_personas || 0}</p>
               </div>
               <Users className="w-8 h-8 text-green-400" />
             </div>
@@ -100,13 +105,66 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-300">AI Queries</p>
-                <p className="text-3xl font-bold text-white">{projects.length * 5}</p>
+                <p className="text-3xl font-bold text-white">{stats?.total_api_queries || 0}</p>
               </div>
               <Zap className="w-8 h-8 text-yellow-400" />
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Additional Stats Row */}
+      {stats && (stats.total_trends > 0 || stats.total_content_suggestions > 0) && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-300">Cultural Trends</p>
+                  <p className="text-3xl font-bold text-white">{stats.total_trends}</p>
+                </div>
+                <TrendingUp className="w-8 h-8 text-purple-400" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-300">Content Ideas</p>
+                  <p className="text-3xl font-bold text-white">{stats.total_content_suggestions}</p>
+                </div>
+                <Zap className="w-8 h-8 text-yellow-400" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-300">Taste Intersections</p>
+                  <p className="text-3xl font-bold text-white">{stats.total_taste_intersections}</p>
+                </div>
+                <Users className="w-8 h-8 text-green-400" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-300">Cross-Domain Recs</p>
+                  <p className="text-3xl font-bold text-white">{stats.total_cross_domain_recommendations}</p>
+                </div>
+                <FolderOpen className="w-8 h-8 text-blue-400" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Recent Projects */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
