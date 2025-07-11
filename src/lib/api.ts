@@ -228,3 +228,75 @@ export const updateUserProfile = async (updates: Partial<UserProfile>) => {
   if (error) throw error;
   return data;
 };
+
+// Dashboard Statistics API
+export interface DashboardStats {
+  total_projects: number;
+  total_insights: number;
+  total_personas: number;
+  total_trends: number;
+  total_content_suggestions: number;
+  total_taste_intersections: number;
+  total_cross_domain_recommendations: number;
+  total_api_queries: number;
+}
+
+export const getDashboardStats = async (): Promise<DashboardStats> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  // Get total projects count
+  const { count: projectsCount, error: projectsError } = await supabase
+    .from('projects')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id);
+
+  if (projectsError) throw projectsError;
+
+  // Get all insights for the user's projects
+  const { data: insights, error: insightsError } = await supabase
+    .from('insights')
+    .select(`
+      id,
+      audience_personas,
+      cultural_trends,
+      content_suggestions,
+      projects!inner(user_id)
+    `)
+    .eq('projects.user_id', user.id);
+
+  if (insightsError) throw insightsError;
+
+  // Calculate detailed counts from actual data
+  let totalPersonas = 0;
+  let totalTrends = 0;
+  let totalContentSuggestions = 0;
+  let totalTasteIntersections = 0;
+  let totalCrossDomainRecommendations = 0;
+
+  insights?.forEach(insight => {
+    totalPersonas += insight.audience_personas?.length || 0;
+    totalTrends += insight.cultural_trends?.length || 0;
+    totalContentSuggestions += insight.content_suggestions?.length || 0;
+    
+    // Note: These fields might not exist in older insights, so we handle gracefully
+    if (insight.taste_intersections) {
+      totalTasteIntersections += insight.taste_intersections.length || 0;
+    }
+    if (insight.cross_domain_recommendations) {
+      totalCrossDomainRecommendations += insight.cross_domain_recommendations.length || 0;
+    }
+  });
+
+  return {
+    total_projects: projectsCount || 0,
+    total_insights: insights?.length || 0,
+    total_personas: totalPersonas,
+    total_trends: totalTrends,
+    total_content_suggestions: totalContentSuggestions,
+    total_taste_intersections: totalTasteIntersections,
+    total_cross_domain_recommendations: totalCrossDomainRecommendations,
+    // API queries could be tracked separately in the future
+    total_api_queries: (insights?.length || 0) * 2, // Rough estimate: 1 Qloo + 1 OpenAI call per insight
+  };
+};
