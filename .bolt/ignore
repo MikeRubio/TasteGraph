@@ -1,5 +1,6 @@
 src/components/ui/*
 src/lib/*
+src/contexts/*
 
 hooks/use-toast.ts
 vite.config.ts
