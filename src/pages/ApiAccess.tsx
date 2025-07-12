@@ -101,31 +101,11 @@ print(insights)`,
 
       {/* API Documentation */}
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 bg-gray-100">
-          <TabsTrigger
-            value="overview"
-            className="data-[state=active]:bg-white"
-          >
-            Overview
-          </TabsTrigger>
-          <TabsTrigger
-            value="endpoints"
-            className="data-[state=active]:bg-white"
-          >
-            Endpoints
-          </TabsTrigger>
-          <TabsTrigger
-            value="examples"
-            className="data-[state=active]:bg-white"
-          >
-            Examples
-          </TabsTrigger>
-          <TabsTrigger
-            value="response"
-            className="data-[state=active]:bg-white"
-          >
-            Response
-          </TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="endpoints">Endpoints</TabsTrigger>
+          <TabsTrigger value="examples">Examples</TabsTrigger>
+          <TabsTrigger value="response">Response</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">

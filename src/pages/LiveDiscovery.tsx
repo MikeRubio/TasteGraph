@@ -1,27 +1,30 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
-import { Progress } from '@/components/ui/progress';
-import { 
-  Zap, 
-  Users, 
-  TrendingUp, 
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import {
+  Zap,
+  Users,
+  TrendingUp,
   Lightbulb,
   Save,
   RefreshCw,
   Clock,
   Target,
-  Globe,
   Sparkles,
-  BarChart3
-} from 'lucide-react';
-import { toast } from 'sonner';
+  BarChart3,
+} from "lucide-react";
+import { toast } from "sonner";
 
 interface LivePersona {
   name: string;
@@ -57,8 +60,8 @@ interface LiveInsights {
 }
 
 const LiveDiscovery = () => {
-  const [description, setDescription] = useState('');
-  const [industry, setIndustry] = useState('');
+  const [description, setDescription] = useState("");
+  const [industry, setIndustry] = useState("");
   const [culturalDomains, setCulturalDomains] = useState<string[]>([]);
   const [geographicTargets, setGeographicTargets] = useState<string[]>([]);
   const [ageRange, setAgeRange] = useState([25, 45]);
@@ -67,13 +70,31 @@ const LiveDiscovery = () => {
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
   const CULTURAL_DOMAINS = [
-    'Music', 'Fashion', 'Gaming', 'Sports', 'Technology', 'Food', 
-    'Film', 'Art', 'Travel', 'Fitness', 'Beauty', 'Books'
+    "Music",
+    "Fashion",
+    "Gaming",
+    "Sports",
+    "Technology",
+    "Food",
+    "Film",
+    "Art",
+    "Travel",
+    "Fitness",
+    "Beauty",
+    "Books",
   ];
 
   const GEOGRAPHIC_TARGETS = [
-    'United States', 'United Kingdom', 'Canada', 'Australia', 
-    'Germany', 'France', 'Japan', 'Brazil', 'India', 'Global'
+    "United States",
+    "United Kingdom",
+    "Canada",
+    "Australia",
+    "Germany",
+    "France",
+    "Japan",
+    "Brazil",
+    "India",
+    "Global",
   ];
 
   // Debounced live generation
@@ -91,102 +112,112 @@ const LiveDiscovery = () => {
     if (!description.trim()) return;
 
     setIsGenerating(true);
-    
+
     try {
       // Simulate API call with realistic delay
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+
       // Mock live insights - replace with actual API call
       const mockInsights: LiveInsights = {
         personas: [
           {
-            name: 'Digital Natives',
-            description: 'Tech-savvy millennials who embrace digital solutions',
+            name: "Digital Natives",
+            description: "Tech-savvy millennials who embrace digital solutions",
             affinity_score: 0.89,
-            key_traits: ['Early adopters', 'Social media active', 'Value convenience'],
-            platforms: ['Instagram', 'TikTok', 'LinkedIn'],
-            confidence: 92
+            key_traits: [
+              "Early adopters",
+              "Social media active",
+              "Value convenience",
+            ],
+            platforms: ["Instagram", "TikTok", "LinkedIn"],
+            confidence: 92,
           },
           {
-            name: 'Conscious Consumers',
-            description: 'Environmentally aware users seeking sustainable options',
+            name: "Conscious Consumers",
+            description:
+              "Environmentally aware users seeking sustainable options",
             affinity_score: 0.76,
-            key_traits: ['Sustainability-focused', 'Research-driven', 'Brand loyal'],
-            platforms: ['Pinterest', 'YouTube', 'Twitter'],
-            confidence: 84
+            key_traits: [
+              "Sustainability-focused",
+              "Research-driven",
+              "Brand loyal",
+            ],
+            platforms: ["Pinterest", "YouTube", "Twitter"],
+            confidence: 84,
           },
           {
-            name: 'Efficiency Seekers',
-            description: 'Busy professionals looking for time-saving solutions',
+            name: "Efficiency Seekers",
+            description: "Busy professionals looking for time-saving solutions",
             affinity_score: 0.82,
-            key_traits: ['Time-conscious', 'ROI-focused', 'Mobile-first'],
-            platforms: ['LinkedIn', 'Email', 'Podcasts'],
-            confidence: 88
-          }
+            key_traits: ["Time-conscious", "ROI-focused", "Mobile-first"],
+            platforms: ["LinkedIn", "Email", "Podcasts"],
+            confidence: 88,
+          },
         ],
         trends: [
           {
-            title: 'AI-First Mindset',
-            description: 'Growing acceptance of AI-powered solutions in daily workflows',
+            title: "AI-First Mindset",
+            description:
+              "Growing acceptance of AI-powered solutions in daily workflows",
             strength: 85,
-            timeline: 'Next 6-12 months',
-            confidence: 91
+            timeline: "Next 6-12 months",
+            confidence: 91,
           },
           {
-            title: 'Privacy-Conscious Adoption',
-            description: 'Increased demand for transparent data handling',
+            title: "Privacy-Conscious Adoption",
+            description: "Increased demand for transparent data handling",
             strength: 78,
-            timeline: 'Current trend',
-            confidence: 86
+            timeline: "Current trend",
+            confidence: 86,
           },
           {
-            title: 'No-Code Movement',
-            description: 'Rising preference for solutions requiring minimal technical setup',
+            title: "No-Code Movement",
+            description:
+              "Rising preference for solutions requiring minimal technical setup",
             strength: 72,
-            timeline: 'Next 12-18 months',
-            confidence: 79
-          }
+            timeline: "Next 12-18 months",
+            confidence: 79,
+          },
         ],
         content: [
           {
-            title: 'Behind-the-Scenes AI Training',
-            description: 'Show how your AI learns from documents',
-            platforms: ['YouTube', 'TikTok'],
+            title: "Behind-the-Scenes AI Training",
+            description: "Show how your AI learns from documents",
+            platforms: ["YouTube", "TikTok"],
             engagement_potential: 87,
-            confidence: 89
+            confidence: 89,
           },
           {
-            title: 'Customer Success Stories',
-            description: 'Real testimonials showing time savings',
-            platforms: ['LinkedIn', 'Website'],
+            title: "Customer Success Stories",
+            description: "Real testimonials showing time savings",
+            platforms: ["LinkedIn", "Website"],
             engagement_potential: 92,
-            confidence: 94
+            confidence: 94,
           },
           {
-            title: 'Setup Speed Challenge',
-            description: 'Time-lapse video of complete setup process',
-            platforms: ['Instagram', 'Twitter'],
+            title: "Setup Speed Challenge",
+            description: "Time-lapse video of complete setup process",
+            platforms: ["Instagram", "Twitter"],
             engagement_potential: 78,
-            confidence: 82
+            confidence: 82,
           },
           {
-            title: 'AI vs Human Response Comparison',
-            description: 'Side-by-side comparison of response quality',
-            platforms: ['LinkedIn', 'Blog'],
+            title: "AI vs Human Response Comparison",
+            description: "Side-by-side comparison of response quality",
+            platforms: ["LinkedIn", "Blog"],
             engagement_potential: 85,
-            confidence: 88
-          }
+            confidence: 88,
+          },
         ],
         market_fit_score: 84,
-        cultural_relevance: 79
+        cultural_relevance: 79,
       };
 
       setInsights(mockInsights);
       setLastUpdate(new Date());
-      
     } catch (error) {
-      toast.error('Failed to generate live insights');
-      console.error('Live insights error:', error);
+      toast.error("Failed to generate live insights");
+      console.error("Live insights error:", error);
     } finally {
       setIsGenerating(false);
     }
@@ -194,21 +225,21 @@ const LiveDiscovery = () => {
 
   const handleSaveAsProject = () => {
     if (!insights) return;
-    
+
     // This would navigate to create project with pre-filled data
-    toast.success('Insights saved as new project!');
+    toast.success("Insights saved as new project!");
   };
 
   const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 85) return 'text-green-600';
-    if (confidence >= 70) return 'text-yellow-600';
-    return 'text-red-600';
+    if (confidence >= 85) return "text-green-600";
+    if (confidence >= 70) return "text-yellow-600";
+    return "text-red-600";
   };
 
   const getStrengthColor = (strength: number) => {
-    if (strength >= 80) return 'bg-green-500';
-    if (strength >= 60) return 'bg-yellow-500';
-    return 'bg-red-500';
+    if (strength >= 80) return "bg-green-500";
+    if (strength >= 60) return "bg-yellow-500";
+    return "bg-red-500";
   };
 
   return (
@@ -249,7 +280,9 @@ const LiveDiscovery = () => {
                 <div className="flex items-center justify-between text-xs text-gray-600">
                   <div className="flex items-center">
                     <Clock className="w-3 h-3 mr-1" />
-                    {isGenerating ? 'Generating insights...' : 'Live analysis active'}
+                    {isGenerating
+                      ? "Generating insights..."
+                      : "Live analysis active"}
                   </div>
                   <span>{description.length} characters</span>
                 </div>
@@ -257,7 +290,9 @@ const LiveDiscovery = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="industry" className="text-black">Industry</Label>
+              <Label htmlFor="industry" className="text-black">
+                Industry
+              </Label>
               <Select value={industry} onValueChange={setIndustry}>
                 <SelectTrigger className="bg-white border-gray-300 text-black">
                   <SelectValue placeholder="Select industry" />
@@ -282,13 +317,13 @@ const LiveDiscovery = () => {
                     key={domain}
                     className={`cursor-pointer px-3 py-1 rounded-lg transition-all ${
                       culturalDomains.includes(domain)
-                        ? 'bg-black text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        ? "bg-black text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                     onClick={() => {
-                      setCulturalDomains(prev =>
+                      setCulturalDomains((prev) =>
                         prev.includes(domain)
-                          ? prev.filter(d => d !== domain)
+                          ? prev.filter((d) => d !== domain)
                           : [...prev, domain]
                       );
                     }}
@@ -307,13 +342,13 @@ const LiveDiscovery = () => {
                     key={target}
                     className={`cursor-pointer px-3 py-1 rounded-lg transition-all ${
                       geographicTargets.includes(target)
-                        ? 'bg-black text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        ? "bg-black text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                     onClick={() => {
-                      setGeographicTargets(prev =>
+                      setGeographicTargets((prev) =>
                         prev.includes(target)
-                          ? prev.filter(t => t !== target)
+                          ? prev.filter((t) => t !== target)
                           : [...prev, target]
                       );
                     }}
@@ -331,7 +366,7 @@ const LiveDiscovery = () => {
               <Slider
                 value={ageRange}
                 onValueChange={setAgeRange}
-                max={70}
+                max={90}
                 min={18}
                 step={1}
                 className="w-full"
@@ -349,9 +384,9 @@ const LiveDiscovery = () => {
                 ) : (
                   <Sparkles className="w-4 h-4 mr-2" />
                 )}
-                {isGenerating ? 'Generating...' : 'Generate Insights'}
+                {isGenerating ? "Generating..." : "Generate Insights"}
               </Button>
-              
+
               {insights && (
                 <Button
                   onClick={handleSaveAsProject}
@@ -406,13 +441,17 @@ const LiveDiscovery = () => {
                     <div className="text-2xl font-bold text-blue-600 mb-1">
                       {insights.market_fit_score}%
                     </div>
-                    <div className="text-xs text-gray-600">Market Fit Score</div>
+                    <div className="text-xs text-gray-600">
+                      Market Fit Score
+                    </div>
                   </div>
                   <div className="text-center p-4 bg-gray-50 rounded-lg">
                     <div className="text-2xl font-bold text-purple-600 mb-1">
                       {insights.cultural_relevance}%
                     </div>
-                    <div className="text-xs text-gray-600">Cultural Relevance</div>
+                    <div className="text-xs text-gray-600">
+                      Cultural Relevance
+                    </div>
                   </div>
                 </div>
 
@@ -424,30 +463,51 @@ const LiveDiscovery = () => {
                   </h4>
                   <div className="space-y-3">
                     {insights.personas.map((persona, index) => (
-                      <div key={index} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <div
+                        key={index}
+                        className="p-3 bg-gray-50 rounded-lg border border-gray-200"
+                      >
                         <div className="flex items-center justify-between mb-2">
-                          <h5 className="font-semibold text-black">{persona.name}</h5>
+                          <h5 className="font-semibold text-black">
+                            {persona.name}
+                          </h5>
                           <div className="flex items-center space-x-2">
-                            <div className={`text-sm font-bold ${getConfidenceColor(persona.confidence)}`}>
+                            <div
+                              className={`text-sm font-bold ${getConfidenceColor(
+                                persona.confidence
+                              )}`}
+                            >
                               {persona.confidence}%
                             </div>
-                            <div className="text-xs text-gray-600">confidence</div>
+                            <div className="text-xs text-gray-600">
+                              confidence
+                            </div>
                           </div>
                         </div>
-                        <p className="text-sm text-gray-600 mb-2">{persona.description}</p>
+                        <p className="text-sm text-gray-600 mb-2">
+                          {persona.description}
+                        </p>
                         <div className="flex items-center justify-between">
                           <div className="flex flex-wrap gap-1">
-                            {persona.key_traits.slice(0, 2).map((trait, idx) => (
-                              <Badge key={idx} variant="secondary" className="text-xs">
-                                {trait}
-                              </Badge>
-                            ))}
+                            {persona.key_traits
+                              .slice(0, 2)
+                              .map((trait, idx) => (
+                                <Badge
+                                  key={idx}
+                                  variant="secondary"
+                                  className="text-xs"
+                                >
+                                  {trait}
+                                </Badge>
+                              ))}
                           </div>
                           <div className="text-right">
                             <div className="text-sm font-bold text-blue-600">
                               {Math.round(persona.affinity_score * 100)}%
                             </div>
-                            <div className="text-xs text-gray-600">affinity</div>
+                            <div className="text-xs text-gray-600">
+                              affinity
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -463,24 +523,41 @@ const LiveDiscovery = () => {
                   </h4>
                   <div className="space-y-3">
                     {insights.trends.map((trend, index) => (
-                      <div key={index} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <div
+                        key={index}
+                        className="p-3 bg-gray-50 rounded-lg border border-gray-200"
+                      >
                         <div className="flex items-center justify-between mb-2">
-                          <h5 className="font-semibold text-black">{trend.title}</h5>
-                          <div className={`text-sm font-bold ${getConfidenceColor(trend.confidence)}`}>
+                          <h5 className="font-semibold text-black">
+                            {trend.title}
+                          </h5>
+                          <div
+                            className={`text-sm font-bold ${getConfidenceColor(
+                              trend.confidence
+                            )}`}
+                          >
                             {trend.confidence}%
                           </div>
                         </div>
-                        <p className="text-sm text-gray-600 mb-2">{trend.description}</p>
+                        <p className="text-sm text-gray-600 mb-2">
+                          {trend.description}
+                        </p>
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-600">{trend.timeline}</span>
+                          <span className="text-xs text-gray-600">
+                            {trend.timeline}
+                          </span>
                           <div className="flex items-center space-x-2">
                             <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                              <div 
-                                className={`h-full ${getStrengthColor(trend.strength)} transition-all duration-500`}
+                              <div
+                                className={`h-full ${getStrengthColor(
+                                  trend.strength
+                                )} transition-all duration-500`}
                                 style={{ width: `${trend.strength}%` }}
                               ></div>
                             </div>
-                            <span className="text-xs text-gray-600">{trend.strength}%</span>
+                            <span className="text-xs text-gray-600">
+                              {trend.strength}%
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -496,27 +573,46 @@ const LiveDiscovery = () => {
                   </h4>
                   <div className="space-y-3">
                     {insights.content.map((content, index) => (
-                      <div key={index} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <div
+                        key={index}
+                        className="p-3 bg-gray-50 rounded-lg border border-gray-200"
+                      >
                         <div className="flex items-center justify-between mb-2">
-                          <h5 className="font-semibold text-black">{content.title}</h5>
-                          <div className={`text-sm font-bold ${getConfidenceColor(content.confidence)}`}>
+                          <h5 className="font-semibold text-black">
+                            {content.title}
+                          </h5>
+                          <div
+                            className={`text-sm font-bold ${getConfidenceColor(
+                              content.confidence
+                            )}`}
+                          >
                             {content.confidence}%
                           </div>
                         </div>
-                        <p className="text-sm text-gray-600 mb-2">{content.description}</p>
+                        <p className="text-sm text-gray-600 mb-2">
+                          {content.description}
+                        </p>
                         <div className="flex items-center justify-between">
                           <div className="flex flex-wrap gap-1">
-                            {content.platforms.slice(0, 2).map((platform, idx) => (
-                              <Badge key={idx} variant="secondary" className="text-xs">
-                                {platform}
-                              </Badge>
-                            ))}
+                            {content.platforms
+                              .slice(0, 2)
+                              .map((platform, idx) => (
+                                <Badge
+                                  key={idx}
+                                  variant="secondary"
+                                  className="text-xs"
+                                >
+                                  {platform}
+                                </Badge>
+                              ))}
                           </div>
                           <div className="text-right">
                             <div className="text-sm font-bold text-yellow-600">
                               {content.engagement_potential}%
                             </div>
-                            <div className="text-xs text-gray-600">engagement</div>
+                            <div className="text-xs text-gray-600">
+                              engagement
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -531,7 +627,8 @@ const LiveDiscovery = () => {
                   Ready for Live Discovery
                 </h3>
                 <p className="text-gray-600">
-                  Enter a product description to start generating real-time insights
+                  Enter a product description to start generating real-time
+                  insights
                 </p>
               </div>
             )}
