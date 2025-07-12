@@ -232,7 +232,7 @@ const ProjectDetails = () => {
               <Button
                 variant="outline"
                 onClick={handleExportPDF}
-                className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                className="border-gray-300  hover:border-gray-600"
                 disabled={generateInsightsMutation.isPending}
               >
                 <FileTextIcon className="w-4 h-4 mr-2" />
@@ -241,7 +241,7 @@ const ProjectDetails = () => {
               <Button
                 variant="outline"
                 onClick={handleExportInsights}
-                className="border-gray-600  hover:bg-gray-700 hover:text-gray-300"
+                className="border-gray-300  hover:border-gray-600"
                 disabled={generateInsightsMutation.isPending}
               >
                 <Download className="w-4 h-4 mr-2" />
