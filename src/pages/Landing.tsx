@@ -19,7 +19,8 @@ import {
   Shield,
   Clock,
   Lightbulb,
-  Activity
+  Activity,
+  MessageCircle
 } from 'lucide-react';
 
 const Landing = () => {
@@ -234,6 +235,35 @@ const Landing = () => {
               </CardContent>
             </Card>
 
+            {/* Conversational Planning */}
+            <Card className="border border-gray-200 hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <MessageCircle className="w-10 h-10 text-black mb-3" />
+                <CardTitle className="text-black">
+                  Conversational Planning
+                </CardTitle>
+                <CardDescription className="text-gray-600">
+                  Chat with AI to discover audiences, create content strategies,
+                  and analyze trends through natural conversation.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="text-sm text-gray-600 space-y-2">
+                  <li className="flex items-center">
+                    <CheckCircle className="w-4 h-4 mr-2 text-green-500" />{" "}
+                    Natural language queries
+                  </li>
+                  <li className="flex items-center">
+                    <CheckCircle className="w-4 h-4 mr-2 text-green-500" />{" "}
+                    AI-powered insights
+                  </li>
+                  <li className="flex items-center">
+                    <CheckCircle className="w-4 h-4 mr-2 text-green-500" />{" "}
+                    Export conversations
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
             {/* Live Discovery */}
             <Card className="border border-gray-200 hover:shadow-lg transition-shadow">
               <CardHeader>
