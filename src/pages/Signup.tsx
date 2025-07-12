@@ -1,18 +1,24 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Brain, ArrowLeft, CheckCircle } from 'lucide-react';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Brain, ArrowLeft, CheckCircle } from "lucide-react";
+import { toast } from "sonner";
 
 const Signup = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [jobRole, setJobRole] = useState('');
-  const [industry, setIndustry] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [jobRole, setJobRole] = useState("");
+  const [industry, setIndustry] = useState("");
   const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
@@ -26,10 +32,10 @@ const Signup = () => {
         job_role: jobRole,
         industry: industry,
       });
-      navigate('/dashboard');
-      toast.success('Account created successfully!');
+      navigate("/dashboard");
+      toast.success("Account created successfully!");
     } catch (error: any) {
-      toast.error(error.message || 'Failed to create account');
+      toast.error(error.message || "Failed to create account");
     } finally {
       setLoading(false);
     }
@@ -43,10 +49,10 @@ const Signup = () => {
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="flex items-center space-x-2">
               <Brain className="w-8 h-8 text-black" />
-              <span className="text-2xl font-semibold text-black">TasteGraph.ai</span>
+              <span className="text-2xl font-semibold text-black">Libitum</span>
             </Link>
             <Link to="/">
-              <Button variant="ghost" className="text-gray-600 hover:text-black">
+              <Button variant="link">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to home
               </Button>
@@ -87,7 +93,10 @@ const Signup = () => {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="email"
+                className="text-sm font-medium text-gray-700"
+              >
                 Email
               </Label>
               <Input
@@ -102,7 +111,10 @@ const Signup = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="password"
+                className="text-sm font-medium text-gray-700"
+              >
                 Password
               </Label>
               <Input
@@ -117,7 +129,10 @@ const Signup = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="job-role" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="job-role"
+                className="text-sm font-medium text-gray-700"
+              >
                 Job Role
               </Label>
               <Select value={jobRole} onValueChange={setJobRole}>
@@ -125,8 +140,12 @@ const Signup = () => {
                   <SelectValue placeholder="Select your role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="marketing-manager">Marketing Manager</SelectItem>
-                  <SelectItem value="product-manager">Product Manager</SelectItem>
+                  <SelectItem value="marketing-manager">
+                    Marketing Manager
+                  </SelectItem>
+                  <SelectItem value="product-manager">
+                    Product Manager
+                  </SelectItem>
                   <SelectItem value="developer">Developer</SelectItem>
                   <SelectItem value="data-analyst">Data Analyst</SelectItem>
                   <SelectItem value="business-owner">Business Owner</SelectItem>
@@ -137,7 +156,10 @@ const Signup = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="industry" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="industry"
+                className="text-sm font-medium text-gray-700"
+              >
                 Industry
               </Label>
               <Select value={industry} onValueChange={setIndustry}>
@@ -163,7 +185,7 @@ const Signup = () => {
               disabled={loading}
               className="w-full bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-md transition-colors"
             >
-              {loading ? 'Creating account...' : 'Create account'}
+              {loading ? "Creating account..." : "Create account"}
             </Button>
           </form>
 
@@ -174,15 +196,17 @@ const Signup = () => {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Already have an account?</span>
+                <span className="px-2 bg-white text-gray-500">
+                  Already have an account?
+                </span>
               </div>
             </div>
           </div>
 
           {/* Sign in link */}
           <div className="mt-6 text-center">
-            <Link 
-              to="/login" 
+            <Link
+              to="/login"
               className="text-black hover:text-gray-700 font-medium transition-colors"
             >
               Sign in instead
@@ -192,10 +216,15 @@ const Signup = () => {
           {/* Footer text */}
           <div className="mt-8 text-center">
             <p className="text-xs text-gray-500">
-              By creating an account, you agree to our{' '}
-              <a href="#" className="text-black hover:text-gray-700">Terms of Service</a>
-              {' '}and{' '}
-              <a href="#" className="text-black hover:text-gray-700">Privacy Policy</a>.
+              By creating an account, you agree to our{" "}
+              <a href="#" className="text-black hover:text-gray-700">
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a href="#" className="text-black hover:text-gray-700">
+                Privacy Policy
+              </a>
+              .
             </p>
           </div>
         </div>

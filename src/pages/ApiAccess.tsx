@@ -15,10 +15,10 @@ const ApiAccess = () => {
   };
 
   const codeExamples = {
-    javascript: `// Initialize TasteGraph.ai client
+    javascript: `// Initialize Libitum client
 const tastegraph = new TasteGraph({
   apiKey: 'your-api-key-here',
-  baseUrl: 'https://api.tastegraph.ai'
+  baseUrl: 'https://api.Libitum'
 });
 
 // Generate insights for a project
@@ -35,7 +35,7 @@ console.log(insights);`,
 # Initialize client
 client = tastegraph.Client(
     api_key='your-api-key-here',
-    base_url='https://api.tastegraph.ai'
+    base_url='https://api.Libitum'
 )
 
 # Generate insights
@@ -47,7 +47,7 @@ insights = client.generate_insights(
 )
 
 print(insights)`,
-    curl: `curl -X POST https://api.tastegraph.ai/v1/insights/generate \\
+    curl: `curl -X POST https://api.Libitum/v1/insights/generate \\
   -H "Authorization: Bearer your-api-key-here" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -55,7 +55,7 @@ print(insights)`,
     "description": "Eco-friendly fashion brand targeting Gen Z",
     "cultural_domains": ["fashion", "sustainability"],
     "geographical_targets": ["US", "UK", "Canada"]
-  }'`
+  }'`,
   };
 
   return (
@@ -63,7 +63,9 @@ print(insights)`,
       {/* Header */}
       <div>
         <h2 className="text-3xl font-bold text-black">API Access</h2>
-        <p className="text-gray-600 mt-1">Integrate TasteGraph.ai into your applications</p>
+        <p className="text-gray-600 mt-1">
+          Integrate Libitum into your applications
+        </p>
       </div>
 
       {/* API Key */}
@@ -100,10 +102,30 @@ print(insights)`,
       {/* API Documentation */}
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4 bg-gray-100">
-          <TabsTrigger value="overview" className="data-[state=active]:bg-white">Overview</TabsTrigger>
-          <TabsTrigger value="endpoints" className="data-[state=active]:bg-white">Endpoints</TabsTrigger>
-          <TabsTrigger value="examples" className="data-[state=active]:bg-white">Examples</TabsTrigger>
-          <TabsTrigger value="response" className="data-[state=active]:bg-white">Response</TabsTrigger>
+          <TabsTrigger
+            value="overview"
+            className="data-[state=active]:bg-white"
+          >
+            Overview
+          </TabsTrigger>
+          <TabsTrigger
+            value="endpoints"
+            className="data-[state=active]:bg-white"
+          >
+            Endpoints
+          </TabsTrigger>
+          <TabsTrigger
+            value="examples"
+            className="data-[state=active]:bg-white"
+          >
+            Examples
+          </TabsTrigger>
+          <TabsTrigger
+            value="response"
+            className="data-[state=active]:bg-white"
+          >
+            Response
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
@@ -111,21 +133,26 @@ print(insights)`,
             <CardHeader className="border-b border-gray-100">
               <CardTitle className="text-black">API Overview</CardTitle>
               <CardDescription className="text-gray-600">
-                The TasteGraph.ai API provides programmatic access to our AI-powered audience insights
+                The Libitum API provides programmatic access to our AI-powered
+                audience insights
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                   <h4 className="font-semibold text-black mb-2">Base URL</h4>
-                  <code className="text-sm text-gray-700">https://api.tastegraph.ai/v1</code>
+                  <code className="text-sm text-gray-700">
+                    https://api.Libitum/v1
+                  </code>
                 </div>
                 <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <h4 className="font-semibold text-black mb-2">Authentication</h4>
+                  <h4 className="font-semibold text-black mb-2">
+                    Authentication
+                  </h4>
                   <code className="text-sm text-gray-700">Bearer {apiKey}</code>
                 </div>
               </div>
-              
+
               <div className="space-y-4">
                 <h4 className="font-semibold text-black">Features</h4>
                 <ul className="space-y-3 text-gray-600">
@@ -156,7 +183,7 @@ print(insights)`,
             <CardHeader className="border-b border-gray-100">
               <CardTitle className="text-black">API Endpoints</CardTitle>
               <CardDescription className="text-gray-600">
-                Available endpoints for the TasteGraph.ai API
+                Available endpoints for the Libitum API
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6 space-y-4">
@@ -166,15 +193,21 @@ print(insights)`,
                     <Badge className="bg-green-600 text-white">POST</Badge>
                     <code className="text-black">/insights/generate</code>
                   </div>
-                  <p className="text-gray-600 text-sm">Generate AI insights for a project</p>
+                  <p className="text-gray-600 text-sm">
+                    Generate AI insights for a project
+                  </p>
                 </div>
 
                 <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                   <div className="flex items-center space-x-2 mb-2">
                     <Badge className="bg-blue-600 text-white">GET</Badge>
-                    <code className="text-black">/insights/&#123;project_id&#125;</code>
+                    <code className="text-black">
+                      /insights/&#123;project_id&#125;
+                    </code>
                   </div>
-                  <p className="text-gray-600 text-sm">Retrieve insights for a specific project</p>
+                  <p className="text-gray-600 text-sm">
+                    Retrieve insights for a specific project
+                  </p>
                 </div>
 
                 <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -208,9 +241,24 @@ print(insights)`,
             <CardContent className="p-6">
               <Tabs defaultValue="javascript" className="space-y-4">
                 <TabsList className="grid w-full grid-cols-3 bg-gray-100">
-                  <TabsTrigger value="javascript" className="data-[state=active]:bg-white">JavaScript</TabsTrigger>
-                  <TabsTrigger value="python" className="data-[state=active]:bg-white">Python</TabsTrigger>
-                  <TabsTrigger value="curl" className="data-[state=active]:bg-white">cURL</TabsTrigger>
+                  <TabsTrigger
+                    value="javascript"
+                    className="data-[state=active]:bg-white"
+                  >
+                    JavaScript
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="python"
+                    className="data-[state=active]:bg-white"
+                  >
+                    Python
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="curl"
+                    className="data-[state=active]:bg-white"
+                  >
+                    cURL
+                  </TabsTrigger>
                 </TabsList>
 
                 {Object.entries(codeExamples).map(([lang, code]) => (
@@ -247,7 +295,7 @@ print(insights)`,
               <div className="relative">
                 <pre className="bg-gray-900 border border-gray-200 rounded-lg p-4 overflow-x-auto">
                   <code className="text-gray-100 text-sm">
-{`{
+                    {`{
   "success": true,
   "data": {
     "project_id": "project-123",
@@ -285,39 +333,51 @@ print(insights)`,
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => copyToClipboard(JSON.stringify({
-                    success: true,
-                    data: {
-                      project_id: "project-123",
-                      audience_personas: [
+                  onClick={() =>
+                    copyToClipboard(
+                      JSON.stringify(
                         {
-                          name: "Eco-Conscious Millennials",
-                          description: "Environmentally aware consumers aged 25-35",
-                          characteristics: [
-                            "Values sustainability over price",
-                            "Active on social media",
-                            "Influences purchasing decisions through research"
-                          ]
-                        }
-                      ],
-                      cultural_trends: [
-                        {
-                          title: "Sustainable Fashion Movement",
-                          description: "Growing demand for eco-friendly fashion",
-                          confidence: 85,
-                          impact: "High engagement with sustainable brands"
-                        }
-                      ],
-                      content_suggestions: [
-                        {
-                          title: "Behind-the-Scenes Sustainability Story",
-                          description: "Show your eco-friendly production process",
-                          platforms: ["Instagram", "TikTok", "YouTube"],
-                          copy: "See how we turn recycled materials into fashion..."
-                        }
-                      ]
-                    }
-                  }, null, 2))}
+                          success: true,
+                          data: {
+                            project_id: "project-123",
+                            audience_personas: [
+                              {
+                                name: "Eco-Conscious Millennials",
+                                description:
+                                  "Environmentally aware consumers aged 25-35",
+                                characteristics: [
+                                  "Values sustainability over price",
+                                  "Active on social media",
+                                  "Influences purchasing decisions through research",
+                                ],
+                              },
+                            ],
+                            cultural_trends: [
+                              {
+                                title: "Sustainable Fashion Movement",
+                                description:
+                                  "Growing demand for eco-friendly fashion",
+                                confidence: 85,
+                                impact:
+                                  "High engagement with sustainable brands",
+                              },
+                            ],
+                            content_suggestions: [
+                              {
+                                title: "Behind-the-Scenes Sustainability Story",
+                                description:
+                                  "Show your eco-friendly production process",
+                                platforms: ["Instagram", "TikTok", "YouTube"],
+                                copy: "See how we turn recycled materials into fashion...",
+                              },
+                            ],
+                          },
+                        },
+                        null,
+                        2
+                      )
+                    )
+                  }
                   className="absolute top-2 right-2 text-gray-400 hover:text-white"
                 >
                   <Copy className="w-4 h-4" />
@@ -341,7 +401,9 @@ print(insights)`,
             <Button
               variant="outline"
               className="justify-start border-gray-300 text-gray-700 hover:bg-gray-50"
-              onClick={() => window.open('https://docs.qloo.com/docs/faqs', '_blank')}
+              onClick={() =>
+                window.open("https://docs.qloo.com/docs/faqs", "_blank")
+              }
             >
               <ExternalLink className="w-4 h-4 mr-2" />
               Qloo Taste AI™ Documentation
@@ -349,7 +411,9 @@ print(insights)`,
             <Button
               variant="outline"
               className="justify-start border-gray-300 text-gray-700 hover:bg-gray-50"
-              onClick={() => window.open('https://platform.openai.com/docs', '_blank')}
+              onClick={() =>
+                window.open("https://platform.openai.com/docs", "_blank")
+              }
             >
               <ExternalLink className="w-4 h-4 mr-2" />
               OpenAI API Documentation

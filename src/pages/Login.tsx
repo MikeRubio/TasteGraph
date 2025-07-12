@@ -37,10 +37,10 @@ const Login = () => {
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="flex items-center space-x-2">
               <Brain className="w-8 h-8 text-black" />
-              <span className="text-2xl font-semibold text-black">TasteGraph.ai</span>
+              <span className="text-2xl font-semibold text-black">Libitum</span>
             </Link>
             <Link to="/">
-              <Button variant="ghost" className="text-gray-600 hover:text-black">
+              <Button variant="link">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to home
               </Button>
@@ -65,7 +65,10 @@ const Login = () => {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="email"
+                className="text-sm font-medium text-gray-700"
+              >
                 Email
               </Label>
               <Input
@@ -80,7 +83,10 @@ const Login = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="password"
+                className="text-sm font-medium text-gray-700"
+              >
                 Password
               </Label>
               <Input
@@ -99,7 +105,7 @@ const Login = () => {
               disabled={loading}
               className="w-full bg-black hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-md transition-colors"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? "Signing in..." : "Sign in"}
             </Button>
           </form>
 
@@ -110,15 +116,17 @@ const Login = () => {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Don't have an account?</span>
+                <span className="px-2 bg-white text-gray-500">
+                  Don't have an account?
+                </span>
               </div>
             </div>
           </div>
 
           {/* Sign up link */}
           <div className="mt-6 text-center">
-            <Link 
-              to="/signup" 
+            <Link
+              to="/signup"
               className="text-black hover:text-gray-700 font-medium transition-colors"
             >
               Sign up for free
@@ -128,10 +136,15 @@ const Login = () => {
           {/* Footer text */}
           <div className="mt-8 text-center">
             <p className="text-xs text-gray-500">
-              By signing in, you agree to our{' '}
-              <a href="#" className="text-black hover:text-gray-700">Terms of Service</a>
-              {' '}and{' '}
-              <a href="#" className="text-black hover:text-gray-700">Privacy Policy</a>.
+              By signing in, you agree to our{" "}
+              <a href="#" className="text-black hover:text-gray-700">
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a href="#" className="text-black hover:text-gray-700">
+                Privacy Policy
+              </a>
+              .
             </p>
           </div>
         </div>

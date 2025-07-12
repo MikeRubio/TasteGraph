@@ -197,7 +197,7 @@ const ProjectDetails = () => {
     return (
       <div className="space-y-6">
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" className="text-gray-600" disabled>
+          <Button variant="link" disabled>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Projects
           </Button>
@@ -217,11 +217,7 @@ const ProjectDetails = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/projects")}
-            className="text-gray-600 hover:text-black"
-          >
+          <Button variant="ghost" onClick={() => navigate("/projects")}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Projects
           </Button>

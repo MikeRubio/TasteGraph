@@ -77,7 +77,7 @@ export class PDFReportGenerator {
     this.pdf.setTextColor(255, 255, 255);
     this.pdf.setFontSize(20);
     this.pdf.setFont("helvetica", "bold");
-    this.pdf.text("TasteGraph.ai", this.margin, 15);
+    this.pdf.text("Libitum", this.margin, 15);
 
     // Subtitle
     this.pdf.setFontSize(10);

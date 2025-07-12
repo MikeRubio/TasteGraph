@@ -1,21 +1,21 @@
-import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { 
-  LayoutDashboard, 
-  FolderOpen, 
-  User, 
-  Code, 
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import {
+  LayoutDashboard,
+  FolderOpen,
+  User,
+  Code,
   LogOut,
   Menu,
   X,
   Brain,
   Target,
   Zap,
-  Activity
-} from 'lucide-react';
-import { toast } from 'sonner';
+  Activity,
+} from "lucide-react";
+import { toast } from "sonner";
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -26,41 +26,43 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const handleSignOut = async () => {
     try {
       await signOut();
-      navigate('/');
-      toast.success('Signed out successfully');
+      navigate("/");
+      toast.success("Signed out successfully");
     } catch (error) {
-      toast.error('Error signing out');
+      toast.error("Error signing out");
     }
   };
 
   const navItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/projects', label: 'Projects', icon: FolderOpen },
-    { path: '/live-discovery', label: 'Live Discovery', icon: Activity },
-    { path: '/market-fit', label: 'Market Fit', icon: Target },
-    { path: '/profile', label: 'Profile', icon: User },
-    { path: '/api-access', label: 'API Access', icon: Code },
+    { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { path: "/projects", label: "Projects", icon: FolderOpen },
+    { path: "/live-discovery", label: "Live Discovery", icon: Activity },
+    { path: "/market-fit", label: "Market Fit", icon: Target },
+    { path: "/profile", label: "Profile", icon: User },
+    { path: "/api-access", label: "API Access", icon: Code },
   ];
 
   return (
     <div className="flex h-screen bg-white">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/20 z-20 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <div className={`
+      <div
+        className={`
         fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+      `}
+      >
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
           <div className="flex items-center space-x-2">
             <Brain className="w-7 h-7 text-black" />
-            <span className="text-xl font-semibold text-black">TasteGraph.ai</span>
+            <span className="text-xl font-semibold text-black">Libitum</span>
           </div>
           <Button
             variant="ghost"
@@ -77,16 +79,17 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
-              
+
               return (
                 <Link
                   key={item.path}
                   to={item.path}
                   className={`
                     flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors text-sm font-medium
-                    ${isActive 
-                      ? 'bg-gray-100 text-black' 
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-black'
+                    ${
+                      isActive
+                        ? "bg-gray-100 text-black"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-black"
                     }
                   `}
                   onClick={() => setSidebarOpen(false)}
@@ -103,7 +106,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <Button
             variant="ghost"
             onClick={handleSignOut}
-            className="w-full justify-start text-gray-600 hover:text-black hover:bg-gray-50"
+            className="w-full justify-start"
           >
             <LogOut className="w-5 h-5 mr-3" />
             Sign Out
@@ -123,19 +126,18 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           >
             <Menu className="w-5 h-5" />
           </Button>
-          
+
           <div className="flex-1 lg:ml-0 ml-4">
             <h1 className="text-2xl font-bold text-black">
-              {navItems.find(item => item.path === location.pathname)?.label || 'Dashboard'}
+              {navItems.find((item) => item.path === location.pathname)
+                ?.label || "Dashboard"}
             </h1>
           </div>
         </header>
 
         {/* Page content */}
         <main className="flex-1 overflow-auto bg-gray-50">
-          <div className="max-w-7xl mx-auto p-6">
-            {children}
-          </div>
+          <div className="max-w-7xl mx-auto p-6">{children}</div>
         </main>
       </div>
     </div>

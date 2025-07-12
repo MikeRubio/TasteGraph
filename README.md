@@ -1,6 +1,6 @@
-# TasteGraph.ai - AI-Powered Audience Discovery Platform
+# Libitum - AI-Powered Audience Discovery Platform
 
-TasteGraph.ai is a comprehensive audience discovery and content prediction engine that combines Qloo's Taste AI™ with OpenAI's GPT to deliver personalized audience insights, predictive cultural trendspotting, and creative content suggestions.
+Libitum is a comprehensive audience discovery and content prediction engine that combines Qloo's Taste AI™ with OpenAI's GPT to deliver personalized audience insights, predictive cultural trendspotting, and creative content suggestions.
 
 ## 🚀 Features
 
