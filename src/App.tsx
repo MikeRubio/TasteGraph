@@ -11,6 +11,7 @@ import Profile from './pages/Profile';
 import ApiAccess from './pages/ApiAccess';
 import LiveDiscovery from './pages/LiveDiscovery';
 import MarketFit from './pages/MarketFit';
+import ConversationalPlanning from './pages/ConversationalPlanning';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -74,6 +75,13 @@ function App() {
                 <ProtectedRoute>
                   <Layout>
                     <LiveDiscovery />
+                  </Layout>
+                </ProtectedRoute>
+              } />
+              <Route path="/conversational-planning" element={
+                <ProtectedRoute>
+                  <Layout>
+                    <ConversationalPlanning />
                   </Layout>
                 </ProtectedRoute>
               } />

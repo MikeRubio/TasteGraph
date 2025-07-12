@@ -14,6 +14,7 @@ import {
   Target,
   Zap,
   Activity,
+  MessageCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -37,6 +38,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { path: "/projects", label: "Projects", icon: FolderOpen },
     { path: "/live-discovery", label: "Live Discovery", icon: Activity },
+    { path: "/conversational-planning", label: "Conversational Planning", icon: MessageCircle },
     { path: "/market-fit", label: "Market Fit", icon: Target },
     { path: "/profile", label: "Profile", icon: User },
     { path: "/api-access", label: "API Access", icon: Code },
