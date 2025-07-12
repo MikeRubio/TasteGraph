@@ -200,9 +200,9 @@ const LiveDiscovery = () => {
   };
 
   const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 85) return 'text-green-400';
-    if (confidence >= 70) return 'text-yellow-400';
-    return 'text-red-400';
+    if (confidence >= 85) return 'text-green-600';
+    if (confidence >= 70) return 'text-yellow-600';
+    return 'text-red-600';
   };
 
   const getStrengthColor = (strength: number) => {
@@ -215,27 +215,27 @@ const LiveDiscovery = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-3xl font-bold text-white">Live Discovery Tool</h2>
-        <p className="text-slate-300 mt-1">
+        <h2 className="text-3xl font-bold text-black">Live Discovery Tool</h2>
+        <p className="text-gray-600 mt-1">
           Real-time audience exploration with instant AI-powered insights
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Input Panel */}
-        <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
+        <Card className="bg-white border border-gray-200">
           <CardHeader>
-            <CardTitle className="text-white flex items-center">
+            <CardTitle className="text-black flex items-center">
               <Zap className="w-5 h-5 mr-2" />
               Live Input Panel
             </CardTitle>
-            <CardDescription className="text-slate-300">
+            <CardDescription className="text-gray-600">
               Adjust parameters to see real-time insights
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="description" className="text-slate-300">
+              <Label htmlFor="description" className="text-black">
                 Product/Service Description
               </Label>
               <Textarea
@@ -243,10 +243,10 @@ const LiveDiscovery = () => {
                 placeholder="Describe your product or service..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 min-h-20"
+                className="bg-white border-gray-300 text-black placeholder-gray-400 min-h-20"
               />
               {description.length > 0 && (
-                <div className="flex items-center justify-between text-xs text-slate-400">
+                <div className="flex items-center justify-between text-xs text-gray-600">
                   <div className="flex items-center">
                     <Clock className="w-3 h-3 mr-1" />
                     {isGenerating ? 'Generating insights...' : 'Live analysis active'}
@@ -257,9 +257,9 @@ const LiveDiscovery = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="industry" className="text-slate-300">Industry</Label>
+              <Label htmlFor="industry" className="text-black">Industry</Label>
               <Select value={industry} onValueChange={setIndustry}>
-                <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
+                <SelectTrigger className="bg-white border-gray-300 text-black">
                   <SelectValue placeholder="Select industry" />
                 </SelectTrigger>
                 <SelectContent>
@@ -275,15 +275,15 @@ const LiveDiscovery = () => {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-slate-300">Cultural Domains</Label>
+              <Label className="text-black">Cultural Domains</Label>
               <div className="flex flex-wrap gap-2">
                 {CULTURAL_DOMAINS.map((domain) => (
                   <Badge
                     key={domain}
                     className={`cursor-pointer px-3 py-1 rounded-lg transition-all ${
                       culturalDomains.includes(domain)
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-slate-700 text-slate-300 hover:bg-blue-800/70'
+                        ? 'bg-black text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                     onClick={() => {
                       setCulturalDomains(prev =>
@@ -300,15 +300,15 @@ const LiveDiscovery = () => {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-slate-300">Geographic Targets</Label>
+              <Label className="text-black">Geographic Targets</Label>
               <div className="flex flex-wrap gap-2">
                 {GEOGRAPHIC_TARGETS.map((target) => (
                   <Badge
                     key={target}
                     className={`cursor-pointer px-3 py-1 rounded-lg transition-all ${
                       geographicTargets.includes(target)
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-slate-700 text-slate-300 hover:bg-purple-800/70'
+                        ? 'bg-black text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                     onClick={() => {
                       setGeographicTargets(prev =>
@@ -325,7 +325,7 @@ const LiveDiscovery = () => {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-slate-300">
+              <Label className="text-black">
                 Target Age Range: {ageRange[0]} - {ageRange[1]} years
               </Label>
               <Slider
@@ -342,7 +342,7 @@ const LiveDiscovery = () => {
               <Button
                 onClick={generateLiveInsights}
                 disabled={isGenerating || !description.trim()}
-                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
+                className="flex-1 bg-black hover:bg-gray-800 text-white"
               >
                 {isGenerating ? (
                   <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
@@ -356,7 +356,7 @@ const LiveDiscovery = () => {
                 <Button
                   onClick={handleSaveAsProject}
                   variant="outline"
-                  className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                  className="border-gray-300 text-gray-700 hover:bg-gray-50"
                 >
                   <Save className="w-4 h-4 mr-2" />
                   Save as Project
@@ -367,20 +367,20 @@ const LiveDiscovery = () => {
         </Card>
 
         {/* Results Panel */}
-        <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
+        <Card className="bg-white border border-gray-200">
           <CardHeader>
-            <CardTitle className="text-white flex items-center justify-between">
+            <CardTitle className="text-black flex items-center justify-between">
               <div className="flex items-center">
                 <BarChart3 className="w-5 h-5 mr-2" />
                 Live Results
               </div>
               {lastUpdate && (
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-gray-600">
                   Updated {lastUpdate.toLocaleTimeString()}
                 </div>
               )}
             </CardTitle>
-            <CardDescription className="text-slate-300">
+            <CardDescription className="text-gray-600">
               Real-time insights powered by Qloo's cultural intelligence
             </CardDescription>
           </CardHeader>
@@ -388,12 +388,12 @@ const LiveDiscovery = () => {
             {isGenerating ? (
               <div className="space-y-4">
                 <div className="animate-pulse">
-                  <div className="h-4 bg-slate-700 rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-slate-700 rounded w-1/2 mb-4"></div>
-                  <div className="h-20 bg-slate-700 rounded mb-4"></div>
-                  <div className="h-4 bg-slate-700 rounded w-2/3"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+                  <div className="h-20 bg-gray-200 rounded mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-2/3"></div>
                 </div>
-                <div className="text-center text-slate-400">
+                <div className="text-center text-gray-600">
                   <Sparkles className="w-8 h-8 mx-auto mb-2 animate-pulse" />
                   Analyzing cultural patterns...
                 </div>
@@ -402,39 +402,39 @@ const LiveDiscovery = () => {
               <div className="space-y-6">
                 {/* Overall Scores */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-slate-700/30 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-400 mb-1">
+                  <div className="text-center p-4 bg-gray-50 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600 mb-1">
                       {insights.market_fit_score}%
                     </div>
-                    <div className="text-xs text-slate-400">Market Fit Score</div>
+                    <div className="text-xs text-gray-600">Market Fit Score</div>
                   </div>
-                  <div className="text-center p-4 bg-slate-700/30 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-400 mb-1">
+                  <div className="text-center p-4 bg-gray-50 rounded-lg">
+                    <div className="text-2xl font-bold text-purple-600 mb-1">
                       {insights.cultural_relevance}%
                     </div>
-                    <div className="text-xs text-slate-400">Cultural Relevance</div>
+                    <div className="text-xs text-gray-600">Cultural Relevance</div>
                   </div>
                 </div>
 
                 {/* Live Personas */}
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-3 flex items-center">
+                  <h4 className="text-lg font-semibold text-black mb-3 flex items-center">
                     <Users className="w-5 h-5 mr-2" />
                     Live Personas ({insights.personas.length})
                   </h4>
                   <div className="space-y-3">
                     {insights.personas.map((persona, index) => (
-                      <div key={index} className="p-3 bg-slate-700/30 rounded-lg">
+                      <div key={index} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                         <div className="flex items-center justify-between mb-2">
-                          <h5 className="font-semibold text-white">{persona.name}</h5>
+                          <h5 className="font-semibold text-black">{persona.name}</h5>
                           <div className="flex items-center space-x-2">
                             <div className={`text-sm font-bold ${getConfidenceColor(persona.confidence)}`}>
                               {persona.confidence}%
                             </div>
-                            <div className="text-xs text-slate-400">confidence</div>
+                            <div className="text-xs text-gray-600">confidence</div>
                           </div>
                         </div>
-                        <p className="text-sm text-slate-300 mb-2">{persona.description}</p>
+                        <p className="text-sm text-gray-600 mb-2">{persona.description}</p>
                         <div className="flex items-center justify-between">
                           <div className="flex flex-wrap gap-1">
                             {persona.key_traits.slice(0, 2).map((trait, idx) => (
@@ -444,10 +444,10 @@ const LiveDiscovery = () => {
                             ))}
                           </div>
                           <div className="text-right">
-                            <div className="text-sm font-bold text-blue-400">
+                            <div className="text-sm font-bold text-blue-600">
                               {Math.round(persona.affinity_score * 100)}%
                             </div>
-                            <div className="text-xs text-slate-400">affinity</div>
+                            <div className="text-xs text-gray-600">affinity</div>
                           </div>
                         </div>
                       </div>
@@ -457,30 +457,30 @@ const LiveDiscovery = () => {
 
                 {/* Live Trends */}
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-3 flex items-center">
+                  <h4 className="text-lg font-semibold text-black mb-3 flex items-center">
                     <TrendingUp className="w-5 h-5 mr-2" />
                     Live Trends ({insights.trends.length})
                   </h4>
                   <div className="space-y-3">
                     {insights.trends.map((trend, index) => (
-                      <div key={index} className="p-3 bg-slate-700/30 rounded-lg">
+                      <div key={index} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                         <div className="flex items-center justify-between mb-2">
-                          <h5 className="font-semibold text-white">{trend.title}</h5>
+                          <h5 className="font-semibold text-black">{trend.title}</h5>
                           <div className={`text-sm font-bold ${getConfidenceColor(trend.confidence)}`}>
                             {trend.confidence}%
                           </div>
                         </div>
-                        <p className="text-sm text-slate-300 mb-2">{trend.description}</p>
+                        <p className="text-sm text-gray-600 mb-2">{trend.description}</p>
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-slate-400">{trend.timeline}</span>
+                          <span className="text-xs text-gray-600">{trend.timeline}</span>
                           <div className="flex items-center space-x-2">
-                            <div className="w-16 h-2 bg-slate-600 rounded-full overflow-hidden">
+                            <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
                               <div 
                                 className={`h-full ${getStrengthColor(trend.strength)} transition-all duration-500`}
                                 style={{ width: `${trend.strength}%` }}
                               ></div>
                             </div>
-                            <span className="text-xs text-slate-400">{trend.strength}%</span>
+                            <span className="text-xs text-gray-600">{trend.strength}%</span>
                           </div>
                         </div>
                       </div>
@@ -490,20 +490,20 @@ const LiveDiscovery = () => {
 
                 {/* Live Content */}
                 <div>
-                  <h4 className="text-lg font-semibold text-white mb-3 flex items-center">
+                  <h4 className="text-lg font-semibold text-black mb-3 flex items-center">
                     <Lightbulb className="w-5 h-5 mr-2" />
                     Live Content Ideas ({insights.content.length})
                   </h4>
                   <div className="space-y-3">
                     {insights.content.map((content, index) => (
-                      <div key={index} className="p-3 bg-slate-700/30 rounded-lg">
+                      <div key={index} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                         <div className="flex items-center justify-between mb-2">
-                          <h5 className="font-semibold text-white">{content.title}</h5>
+                          <h5 className="font-semibold text-black">{content.title}</h5>
                           <div className={`text-sm font-bold ${getConfidenceColor(content.confidence)}`}>
                             {content.confidence}%
                           </div>
                         </div>
-                        <p className="text-sm text-slate-300 mb-2">{content.description}</p>
+                        <p className="text-sm text-gray-600 mb-2">{content.description}</p>
                         <div className="flex items-center justify-between">
                           <div className="flex flex-wrap gap-1">
                             {content.platforms.slice(0, 2).map((platform, idx) => (
@@ -513,10 +513,10 @@ const LiveDiscovery = () => {
                             ))}
                           </div>
                           <div className="text-right">
-                            <div className="text-sm font-bold text-yellow-400">
+                            <div className="text-sm font-bold text-yellow-600">
                               {content.engagement_potential}%
                             </div>
-                            <div className="text-xs text-slate-400">engagement</div>
+                            <div className="text-xs text-gray-600">engagement</div>
                           </div>
                         </div>
                       </div>
@@ -526,11 +526,11 @@ const LiveDiscovery = () => {
               </div>
             ) : (
               <div className="text-center py-12">
-                <Target className="w-16 h-16 text-slate-500 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-white mb-2">
+                <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-black mb-2">
                   Ready for Live Discovery
                 </h3>
-                <p className="text-slate-300">
+                <p className="text-gray-600">
                   Enter a product description to start generating real-time insights
                 </p>
               </div>

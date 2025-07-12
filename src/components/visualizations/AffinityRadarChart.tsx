@@ -30,20 +30,13 @@ interface AffinityRadarChartProps {
 }
 
 // Custom tooltip for radar chart
-const CustomTooltip = ({ active, payload, label, theme }: any) => {
+const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div
-        className={`rounded-lg p-3 shadow-lg border`}
-        style={{
-          background: theme === "dark" ? "#1e293b" : "#fff",
-          borderColor: theme === "dark" ? "#334155" : "#ddd",
-          color: theme === "dark" ? "#fff" : "#111",
-        }}
-      >
-        <p className="font-medium">{label}</p>
+      <div className="bg-white border border-gray-200 rounded-lg p-3 shadow-lg">
+        <p className="font-medium text-black">{label}</p>
         {payload.map((entry: any, index: number) => (
-          <p key={index} style={{ color: entry.color }}>
+          <p key={index} className="text-sm" style={{ color: entry.color }}>
             {entry.dataKey}: {entry.value}%
           </p>
         ))}
@@ -53,14 +46,18 @@ const CustomTooltip = ({ active, payload, label, theme }: any) => {
   return null;
 };
 
-const getColors = (theme: ChartTheme = "dark") =>
-  theme === "dark"
-    ? ["#3B82F6", "#8B5CF6", "#10B981", "#F59E0B", "#EF4444", "#06B6D4"]
-    : ["#2563eb", "#a21caf", "#059669", "#b45309", "#b91c1c", "#0e7490"];
+const getColors = () => [
+  "#000000", // Black
+  "#6B7280", // Gray-500
+  "#374151", // Gray-700
+  "#9CA3AF", // Gray-400
+  "#1F2937", // Gray-800
+  "#4B5563"  // Gray-600
+];
 
 const AffinityRadarChart: React.FC<AffinityRadarChartProps> = ({
   personas,
-  theme = "dark",
+  theme = "light",
 }) => {
   // Filter personas that have affinity scores
   const personasWithScores = personas.filter(
@@ -70,35 +67,20 @@ const AffinityRadarChart: React.FC<AffinityRadarChartProps> = ({
 
   if (personasWithScores.length === 0) {
     return (
-      <Card
-        className={
-          theme === "dark"
-            ? "bg-slate-800/50 border-slate-700/50"
-            : "bg-white border-gray-200"
-        }
-      >
+      <Card className="bg-white border border-gray-200">
         <CardHeader>
-          <CardTitle
-            className={theme === "dark" ? "text-white" : "text-slate-900"}
-          >
+          <CardTitle className="text-black flex items-center">
             <Target className="w-5 h-5 mr-2" />
-            Affinity Radar Chart
+            Cultural Affinity Radar
           </CardTitle>
-          <CardDescription
-            className={theme === "dark" ? "text-slate-300" : "text-gray-500"}
-          >
+          <CardDescription className="text-gray-600">
             No affinity score data available for visualization
           </CardDescription>
         </CardHeader>
         <CardContent className="flex items-center justify-center h-64">
           <div className="text-center">
-            <Target
-              className="w-12 h-12 mx-auto mb-3"
-              style={{ color: theme === "dark" ? "#64748b" : "#cbd5e1" }}
-            />
-            <p
-              className={theme === "dark" ? "text-slate-400" : "text-gray-500"}
-            >
+            <Target className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+            <p className="text-gray-600">
               Generate insights to see affinity visualizations
             </p>
           </div>
@@ -107,8 +89,7 @@ const AffinityRadarChart: React.FC<AffinityRadarChartProps> = ({
     );
   }
 
-  // Theme-aware colors
-  const colors = getColors(theme);
+  const colors = getColors();
 
   // Combine all affinity data for multi-persona comparison
   const allDomains = new Set<string>();
@@ -137,27 +118,13 @@ const AffinityRadarChart: React.FC<AffinityRadarChartProps> = ({
   });
 
   return (
-    <Card
-      className={
-        theme === "dark"
-          ? "bg-slate-800/50 border-slate-700/50"
-          : "bg-white border-gray-200"
-      }
-    >
+    <Card className="bg-white border border-gray-200">
       <CardHeader>
-        <CardTitle
-          className={
-            theme === "dark"
-              ? "text-white flex items-center"
-              : "text-slate-900 flex items-center"
-          }
-        >
+        <CardTitle className="text-black flex items-center">
           <Target className="w-5 h-5 mr-2" />
           Cultural Affinity Radar
         </CardTitle>
-        <CardDescription
-          className={theme === "dark" ? "text-slate-300" : "text-gray-500"}
-        >
+        <CardDescription className="text-gray-600">
           Compare cultural affinities across audience personas
         </CardDescription>
       </CardHeader>
@@ -168,13 +135,9 @@ const AffinityRadarChart: React.FC<AffinityRadarChartProps> = ({
               <Badge
                 key={index}
                 variant="secondary"
-                className="text-xs"
+                className="text-xs bg-gray-100 text-gray-700"
                 style={{
-                  backgroundColor:
-                    theme === "dark"
-                      ? `${colors[index]}20`
-                      : `${colors[index]}15`,
-                  color: colors[index],
+                  borderLeft: `3px solid ${colors[index]}`,
                 }}
               >
                 {persona.name}
@@ -188,11 +151,11 @@ const AffinityRadarChart: React.FC<AffinityRadarChartProps> = ({
             data={combinedData}
             margin={{ top: 20, right: 30, bottom: 20, left: 30 }}
           >
-            <PolarGrid stroke={theme === "dark" ? "#475569" : "#e5e7eb"} />
+            <PolarGrid stroke="#E5E7EB" />
             <PolarAngleAxis
               dataKey="subject"
               tick={{
-                fill: theme === "dark" ? "#CBD5E1" : "#222",
+                fill: "#374151",
                 fontSize: 12,
               }}
             />
@@ -200,14 +163,14 @@ const AffinityRadarChart: React.FC<AffinityRadarChartProps> = ({
               angle={90}
               domain={[0, 100]}
               tick={{
-                fill: theme === "dark" ? "#94A3B8" : "#555",
+                fill: "#6B7280",
                 fontSize: 10,
               }}
               tickCount={6}
               axisLine={false}
             />
             <Tooltip
-              content={<CustomTooltip theme={theme} />}
+              content={<CustomTooltip />}
               wrapperStyle={{ zIndex: 100 }}
             />
             {personasWithScores.map((persona, index) => (
@@ -217,13 +180,13 @@ const AffinityRadarChart: React.FC<AffinityRadarChartProps> = ({
                 dataKey={`persona${index}`}
                 stroke={colors[index]}
                 fill={colors[index]}
-                fillOpacity={0.13}
+                fillOpacity={0.1}
                 strokeWidth={2}
               />
             ))}
             <Legend
               wrapperStyle={{
-                color: theme === "dark" ? "#CBD5E1" : "#555",
+                color: "#374151",
                 fontSize: 12,
               }}
               iconType="line"
@@ -231,10 +194,7 @@ const AffinityRadarChart: React.FC<AffinityRadarChartProps> = ({
           </RadarChart>
         </ResponsiveContainer>
 
-        <div
-          className="mt-4 text-xs"
-          style={{ color: theme === "dark" ? "#94a3b8" : "#666" }}
-        >
+        <div className="mt-4 text-xs text-gray-600">
           <p>
             Values represent affinity strength (0-100%). Higher values indicate
             stronger cultural alignment.

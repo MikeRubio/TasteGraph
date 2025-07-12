@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,106 +6,104 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
 import { 
   Target, 
-  TrendingUp, 
   Users, 
-  DollarSign, 
-  BarChart3, 
+  TrendingUp, 
   Lightbulb,
-  AlertCircle,
-  CheckCircle,
+  Download,
+  RefreshCw,
   Clock,
+  DollarSign,
+  BarChart3,
+  Sparkles,
+  AlertTriangle,
+  CheckCircle,
+  Calendar,
   Globe,
-  Zap,
-  Star,
-  TrendingDown,
-  Shield,
-  Award,
-  Rocket,
-  Brain,
-  Eye,
-  Download
+  Zap
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface MarketSegment {
   name: string;
   match_percentage: number;
-  description: string;
-  audience_size: string;
-  key_characteristics: string[];
-  recommended_channels: string[];
-  price_sensitivity: 'Low' | 'Medium' | 'High';
-  competition_level: 'Low' | 'Medium' | 'High';
   engagement_potential: number;
   conversion_likelihood: number;
   market_maturity: 'Early' | 'Growing' | 'Mature' | 'Declining';
   cultural_alignment: number;
-}
-
-interface CompetitorAnalysis {
-  name: string;
-  market_share: number;
-  strengths: string[];
-  weaknesses: string[];
-  pricing_strategy: string;
-  target_segments: string[];
-  differentiation_opportunity: string;
+  size_estimate: string;
+  key_characteristics: string[];
+  recommended_approach: string;
 }
 
 interface MarketOpportunity {
   title: string;
   description: string;
-  market_size: string;
-  difficulty: 'Low' | 'Medium' | 'High';
-  time_to_market: string;
-  investment_required: string;
   success_probability: number;
+  investment_required: string;
+  time_to_market: string;
+  difficulty: 'Low' | 'Medium' | 'High';
 }
 
-interface LaunchStrategy {
+interface Competitor {
+  name: string;
+  market_share: number;
+  strengths: string[];
+  weaknesses: string[];
+  differentiation_opportunity: string;
+}
+
+interface LaunchPhase {
   phase: string;
   timeline: string;
+  budget_range: string;
   key_activities: string[];
   success_metrics: string[];
-  budget_allocation: string;
   risk_factors: string[];
 }
 
-interface MarketAnalysis {
+interface CulturalInsight {
+  theme: string;
+  relevance_score: number;
+  description: string;
+  timing_opportunity: string;
+}
+
+interface MarketFitResponse {
+  overall_fit_score: number;
   segments: MarketSegment[];
   market_size_estimate: {
-    tam: string;
-    sam: string;
-    som: string;
-    growth_rate: string;
+    total_addressable_market: string;
+    serviceable_addressable_market: string;
+    serviceable_obtainable_market: string;
+    growth_rate: number;
     market_trends: string[];
   };
   competitive_landscape: {
-    similar_products: string[];
+    market_saturation: 'Low' | 'Medium' | 'High';
+    key_competitors: Competitor[];
     market_gaps: string[];
     positioning_opportunities: string[];
-    competitive_analysis: CompetitorAnalysis[];
-  };
-  recommendations: {
-    primary_target: string;
-    launch_strategy: LaunchStrategy[];
-    pricing_insights: string;
-    content_strategy: string[];
-    go_to_market_timeline: string;
   };
   market_opportunities: MarketOpportunity[];
   risk_assessment: {
-    high_risk: string[];
-    medium_risk: string[];
-    low_risk: string[];
+    overall_risk: 'Low' | 'Medium' | 'High';
+    market_risks: string[];
+    competitive_risks: string[];
+    execution_risks: string[];
     mitigation_strategies: string[];
   };
+  launch_strategy: {
+    recommended_phases: LaunchPhase[];
+    go_to_market_approach: string;
+    key_partnerships: string[];
+    success_timeline: string;
+  };
   cultural_insights: {
-    trending_themes: string[];
+    trending_themes: CulturalInsight[];
     cultural_moments: string[];
     seasonal_opportunities: string[];
     demographic_shifts: string[];
@@ -114,1090 +111,864 @@ interface MarketAnalysis {
 }
 
 const MarketFit = () => {
-  const [productDescription, setProductDescription] = useState('');
-  const [category, setCategory] = useState('');
-  const [priceRange, setPriceRange] = useState('');
-  const [targetRegions, setTargetRegions] = useState<string[]>([]);
+  const [description, setDescription] = useState('');
+  const [industry, setIndustry] = useState('');
+  const [targetMarket, setTargetMarket] = useState('');
   const [businessModel, setBusinessModel] = useState('');
-  const [targetAudience, setTargetAudience] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysis, setAnalysis] = useState<MarketAnalysis | null>(null);
-  const [debouncedDescription, setDebouncedDescription] = useState('');
+  const [analysis, setAnalysis] = useState<MarketFitResponse | null>(null);
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
-  // Debounce the product description for real-time analysis
+  // Debounced analysis generation
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedDescription(productDescription);
-    }, 1000);
+    if (description.length > 30 && industry && targetMarket) {
+      const timer = setTimeout(() => {
+        generateMarketAnalysis();
+      }, 2000);
 
-    return () => clearTimeout(timer);
-  }, [productDescription]);
-
-  // Real-time analysis when description changes
-  useEffect(() => {
-    if (debouncedDescription.length > 20) {
-      handleAnalyze();
+      return () => clearTimeout(timer);
     }
-  }, [debouncedDescription]);
+  }, [description, industry, targetMarket, businessModel]);
 
-  const handleAnalyze = async () => {
-    if (!productDescription.trim()) {
-      toast.error('Please enter a product description');
-      return;
-    }
+  const generateMarketAnalysis = async () => {
+    if (!description.trim() || !industry || !targetMarket) return;
 
     setIsAnalyzing(true);
     
     try {
-      // Simulate API call - in real implementation, this would call your Edge Function
-      await new Promise(resolve => setTimeout(resolve, 2500));
+      // Simulate API call with realistic delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Enhanced mock analysis data
-      const mockAnalysis: MarketAnalysis = {
+      // Mock comprehensive market analysis
+      const mockAnalysis: MarketFitResponse = {
+        overall_fit_score: 78,
         segments: [
           {
-            name: 'Tech-Savvy Early Adopters',
-            match_percentage: 92,
-            description: 'Technology enthusiasts who embrace AI solutions and are willing to pay premium for cutting-edge tools',
-            audience_size: '2.5M potential users',
-            key_characteristics: [
-              'High disposable income ($75K+ annually)',
-              'Active on professional networks',
-              'Values innovation and efficiency',
-              'Influences purchasing decisions in organizations',
-              'Early adopters of SaaS tools'
-            ],
-            recommended_channels: ['LinkedIn', 'Product Hunt', 'Tech blogs', 'Developer communities'],
-            price_sensitivity: 'Low',
-            competition_level: 'Medium',
-            engagement_potential: 89,
-            conversion_likelihood: 76,
-            market_maturity: 'Growing',
-            cultural_alignment: 94
-          },
-          {
-            name: 'Small Business Owners',
-            match_percentage: 78,
-            description: 'Entrepreneurs and SMB owners seeking cost-effective automation solutions',
-            audience_size: '1.8M potential users',
-            key_characteristics: [
-              'Budget-conscious decision makers',
-              'Time-constrained operations',
-              'ROI-focused purchasing',
-              'Values customer support and training',
-              'Prefers proven solutions'
-            ],
-            recommended_channels: ['Google Ads', 'Business forums', 'Email marketing', 'Webinars'],
-            price_sensitivity: 'High',
-            competition_level: 'High',
-            engagement_potential: 72,
-            conversion_likelihood: 68,
-            market_maturity: 'Mature',
-            cultural_alignment: 81
-          },
-          {
-            name: 'Enterprise Decision Makers',
+            name: 'Early Adopters',
             match_percentage: 85,
-            description: 'Corporate leaders evaluating scalable AI solutions for customer service',
-            audience_size: '500K potential users',
-            key_characteristics: [
-              'Risk-averse evaluation process',
-              'Compliance and security focused',
-              'Long sales cycles (6-12 months)',
-              'Values vendor reliability and support',
-              'Requires integration capabilities'
-            ],
-            recommended_channels: ['Industry events', 'Sales outreach', 'Case studies', 'Analyst reports'],
-            price_sensitivity: 'Low',
-            competition_level: 'Low',
-            engagement_potential: 94,
+            engagement_potential: 92,
+            conversion_likelihood: 78,
+            market_maturity: 'Growing',
+            cultural_alignment: 88,
+            size_estimate: '2.5M users',
+            key_characteristics: ['Tech-savvy', 'High disposable income', 'Innovation-focused'],
+            recommended_approach: 'Direct digital marketing with emphasis on cutting-edge features'
+          },
+          {
+            name: 'Mainstream Professionals',
+            match_percentage: 72,
+            engagement_potential: 76,
             conversion_likelihood: 82,
-            market_maturity: 'Early',
-            cultural_alignment: 88
+            market_maturity: 'Mature',
+            cultural_alignment: 71,
+            size_estimate: '15M users',
+            key_characteristics: ['Efficiency-focused', 'ROI-driven', 'Brand-conscious'],
+            recommended_approach: 'B2B partnerships and enterprise sales channels'
+          },
+          {
+            name: 'Cost-Conscious Users',
+            match_percentage: 58,
+            engagement_potential: 64,
+            conversion_likelihood: 71,
+            market_maturity: 'Mature',
+            cultural_alignment: 62,
+            size_estimate: '8M users',
+            key_characteristics: ['Price-sensitive', 'Value-focused', 'Comparison shoppers'],
+            recommended_approach: 'Freemium model with clear value demonstration'
           }
         ],
         market_size_estimate: {
-          tam: '$12.5B',
-          sam: '$2.1B',
-          som: '$180M',
-          growth_rate: '23% CAGR',
-          market_trends: [
-            'AI adoption accelerating across industries',
-            'Customer service automation demand rising',
-            'No-code/low-code solutions gaining traction',
-            'Privacy-first AI becoming requirement'
-          ]
+          total_addressable_market: '$45B',
+          serviceable_addressable_market: '$12B',
+          serviceable_obtainable_market: '$850M',
+          growth_rate: 15.2,
+          market_trends: ['AI adoption acceleration', 'Remote work normalization', 'Digital transformation']
         },
         competitive_landscape: {
-          similar_products: ['Intercom', 'Zendesk Chat', 'Drift', 'Crisp', 'Freshchat'],
-          market_gaps: [
-            'AI-powered document training without technical setup',
-            'Industry-specific customization out-of-the-box',
-            'Privacy-first AI with transparent data handling',
-            'Seamless integration with existing documentation'
-          ],
-          positioning_opportunities: [
-            'Focus on zero-setup AI training',
-            'Emphasize privacy-first approach',
-            'Target specific industries with tailored solutions',
-            'Highlight superior AI accuracy and context understanding'
-          ],
-          competitive_analysis: [
+          market_saturation: 'Medium',
+          key_competitors: [
             {
-              name: 'Intercom',
-              market_share: 25,
-              strengths: ['Brand recognition', 'Feature completeness', 'Enterprise sales'],
-              weaknesses: ['Complex setup', 'High pricing', 'Limited AI customization'],
-              pricing_strategy: 'Premium enterprise pricing',
-              target_segments: ['Enterprise', 'Mid-market SaaS'],
-              differentiation_opportunity: 'Simpler setup and better AI training'
+              name: 'Market Leader A',
+              market_share: 35,
+              strengths: ['Brand recognition', 'Enterprise relationships', 'Feature completeness'],
+              weaknesses: ['High pricing', 'Complex onboarding', 'Limited customization'],
+              differentiation_opportunity: 'Simplified user experience with competitive pricing'
             },
             {
-              name: 'Zendesk Chat',
-              market_share: 20,
-              strengths: ['Market presence', 'Integration ecosystem', 'Support infrastructure'],
-              weaknesses: ['Legacy architecture', 'Limited AI capabilities', 'User experience'],
-              pricing_strategy: 'Tiered subscription model',
-              target_segments: ['Enterprise', 'Traditional businesses'],
-              differentiation_opportunity: 'Modern AI-first approach'
-            }
-          ]
-        },
-        recommendations: {
-          primary_target: 'Tech-Savvy Early Adopters',
-          launch_strategy: [
-            {
-              phase: 'Phase 1: Product Hunt Launch',
-              timeline: 'Month 1-2',
-              key_activities: [
-                'Product Hunt launch campaign',
-                'Tech community engagement',
-                'Influencer outreach',
-                'Content marketing launch'
-              ],
-              success_metrics: ['500+ Product Hunt votes', '1000+ signups', '50+ beta users'],
-              budget_allocation: '$15K marketing spend',
-              risk_factors: ['Competition timing', 'Feature readiness']
-            },
-            {
-              phase: 'Phase 2: Enterprise Validation',
-              timeline: 'Month 3-6',
-              key_activities: [
-                'Enterprise pilot programs',
-                'Case study development',
-                'Sales team hiring',
-                'Partnership development'
-              ],
-              success_metrics: ['5+ enterprise pilots', '2+ case studies', '$50K ARR'],
-              budget_allocation: '$50K sales & marketing',
-              risk_factors: ['Sales cycle length', 'Feature gaps']
+              name: 'Emerging Player B',
+              market_share: 12,
+              strengths: ['Modern UI', 'Fast implementation', 'Good customer support'],
+              weaknesses: ['Limited integrations', 'Smaller feature set', 'New brand'],
+              differentiation_opportunity: 'Comprehensive feature set with modern design'
             }
           ],
-          pricing_insights: 'Freemium model with $29/month starter tier, $99/month professional, $299/month enterprise',
-          content_strategy: [
-            'Technical blog posts about AI implementation',
-            'Customer success stories and ROI case studies',
-            'Video demos showing setup process',
-            'Comparison guides vs competitors',
-            'Industry-specific use case content'
-          ],
-          go_to_market_timeline: '6-month aggressive launch with enterprise focus by month 4'
+          market_gaps: ['Mid-market solutions', 'Industry-specific features', 'Mobile-first approach'],
+          positioning_opportunities: ['Premium but accessible', 'Industry specialist', 'Innovation leader']
         },
         market_opportunities: [
           {
-            title: 'Healthcare Documentation AI',
-            description: 'Specialized AI for medical documentation and patient communication',
-            market_size: '$2.3B addressable market',
-            difficulty: 'High',
+            title: 'International Expansion',
+            description: 'European and Asian markets show high demand',
+            success_probability: 75,
+            investment_required: '$2-5M',
             time_to_market: '12-18 months',
+            difficulty: 'Medium'
+          },
+          {
+            title: 'Enterprise Partnerships',
+            description: 'Strategic partnerships with consulting firms',
+            success_probability: 82,
             investment_required: '$500K-1M',
-            success_probability: 75
-          },
-          {
-            title: 'E-commerce Support Automation',
-            description: 'AI trained on product catalogs for shopping assistance',
-            market_size: '$1.8B addressable market',
-            difficulty: 'Medium',
             time_to_market: '6-9 months',
-            investment_required: '$200K-400K',
-            success_probability: 85
+            difficulty: 'Low'
           },
           {
-            title: 'Legal Document AI Assistant',
-            description: 'AI for legal document analysis and client communication',
-            market_size: '$3.1B addressable market',
-            difficulty: 'High',
-            time_to_market: '18-24 months',
-            investment_required: '$1M-2M',
-            success_probability: 65
+            title: 'Vertical Specialization',
+            description: 'Industry-specific solutions for healthcare/finance',
+            success_probability: 68,
+            investment_required: '$1-3M',
+            time_to_market: '9-15 months',
+            difficulty: 'High'
           }
         ],
         risk_assessment: {
-          high_risk: [
-            'Large competitors launching similar AI features',
-            'Regulatory changes affecting AI in customer service',
-            'Economic downturn reducing SaaS spending'
+          overall_risk: 'Medium',
+          market_risks: ['Economic downturn impact', 'Regulatory changes', 'Market saturation'],
+          competitive_risks: ['New entrants', 'Price wars', 'Feature commoditization'],
+          execution_risks: ['Talent acquisition', 'Technology scaling', 'Customer acquisition cost'],
+          mitigation_strategies: ['Diversified revenue streams', 'Strong IP protection', 'Agile development']
+        },
+        launch_strategy: {
+          recommended_phases: [
+            {
+              phase: 'Phase 1: MVP Launch',
+              timeline: '0-6 months',
+              budget_range: '$200K-500K',
+              key_activities: ['Product development', 'Beta testing', 'Initial marketing'],
+              success_metrics: ['100 beta users', '4.0+ app rating', '20% conversion rate'],
+              risk_factors: ['Technical delays', 'User feedback integration', 'Market timing']
+            },
+            {
+              phase: 'Phase 2: Market Expansion',
+              timeline: '6-18 months',
+              budget_range: '$1M-2.5M',
+              key_activities: ['Sales team hiring', 'Marketing campaigns', 'Feature expansion'],
+              success_metrics: ['1000+ customers', '$100K MRR', '15% market share'],
+              risk_factors: ['Competition response', 'Scaling challenges', 'Customer retention']
+            },
+            {
+              phase: 'Phase 3: Scale & Optimize',
+              timeline: '18-36 months',
+              budget_range: '$3M-8M',
+              key_activities: ['International expansion', 'Enterprise sales', 'Platform optimization'],
+              success_metrics: ['10K+ customers', '$1M+ MRR', 'Profitability'],
+              risk_factors: ['Market maturity', 'Operational complexity', 'Competitive pressure']
+            }
           ],
-          medium_risk: [
-            'Technical challenges with AI accuracy',
-            'Customer acquisition cost higher than expected',
-            'Integration complexity with existing systems'
-          ],
-          low_risk: [
-            'Market demand for AI solutions',
-            'Team technical capabilities',
-            'Initial product-market fit validation'
-          ],
-          mitigation_strategies: [
-            'Build strong IP and technical moats',
-            'Diversify across multiple market segments',
-            'Maintain lean operations and flexible pricing',
-            'Focus on customer success and retention'
-          ]
+          go_to_market_approach: 'Product-led growth with enterprise sales overlay',
+          key_partnerships: ['Technology integrators', 'Industry consultants', 'Channel partners'],
+          success_timeline: '24-36 months to market leadership'
         },
         cultural_insights: {
           trending_themes: [
-            'AI transparency and explainability',
-            'Privacy-first technology adoption',
-            'Remote work communication tools',
-            'Automation without job displacement'
+            {
+              theme: 'AI Productivity Revolution',
+              relevance_score: 94,
+              description: 'Growing cultural acceptance of AI as productivity enhancer',
+              timing_opportunity: 'Peak interest in Q2-Q3 2024'
+            },
+            {
+              theme: 'Remote Work Optimization',
+              relevance_score: 87,
+              description: 'Continued focus on distributed team efficiency',
+              timing_opportunity: 'Sustained demand through 2024-2025'
+            },
+            {
+              theme: 'Data Privacy Consciousness',
+              relevance_score: 79,
+              description: 'Increasing awareness of data security and privacy',
+              timing_opportunity: 'Regulatory compliance deadlines in 2024'
+            }
           ],
-          cultural_moments: [
-            'AI regulation discussions increasing awareness',
-            'Customer service quality becoming differentiator',
-            'Small business digital transformation acceleration'
-          ],
-          seasonal_opportunities: [
-            'Q4: Budget planning season for enterprise',
-            'Q1: New year digital transformation initiatives',
-            'Back-to-school: Educational institution adoption'
-          ],
-          demographic_shifts: [
-            'Gen Z entering workforce with AI expectations',
-            'Remote-first companies needing better tools',
-            'SMBs becoming more tech-savvy'
-          ]
+          cultural_moments: ['Back-to-work season', 'Budget planning cycles', 'Technology conferences'],
+          seasonal_opportunities: ['Q1 budget allocations', 'Q3 planning cycles', 'Year-end purchasing'],
+          demographic_shifts: ['Gen Z entering workforce', 'Remote work normalization', 'AI literacy growth']
         }
       };
 
       setAnalysis(mockAnalysis);
-      toast.success('Market analysis completed!');
+      setLastUpdate(new Date());
+      
     } catch (error) {
-      toast.error('Failed to analyze market fit');
+      toast.error('Failed to generate market analysis');
       console.error('Market analysis error:', error);
     } finally {
       setIsAnalyzing(false);
     }
   };
 
-  const handleExportReport = () => {
-    if (!analysis) return;
-    
-    const reportData = {
-      product_description: productDescription,
-      analysis_date: new Date().toISOString(),
-      ...analysis
-    };
-    
-    const blob = new Blob([JSON.stringify(reportData, null, 2)], {
+  const handleExportAnalysis = () => {
+    if (!analysis) {
+      toast.error('No analysis to export');
+      return;
+    }
+
+    const blob = new Blob([JSON.stringify(analysis, null, 2)], {
       type: 'application/json',
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `market_analysis_${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `market_fit_analysis_${Date.now()}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
-    toast.success('Market analysis report exported!');
+
+    toast.success('Market analysis exported successfully!');
   };
 
-  const getMatchColor = (percentage: number) => {
-    if (percentage >= 80) return 'text-green-400';
-    if (percentage >= 60) return 'text-yellow-400';
-    return 'text-red-400';
-  };
-
-  const getMatchIcon = (percentage: number) => {
-    if (percentage >= 80) return <CheckCircle className="w-5 h-5 text-green-400" />;
-    if (percentage >= 60) return <AlertCircle className="w-5 h-5 text-yellow-400" />;
-    return <AlertCircle className="w-5 h-5 text-red-400" />;
+  const getRiskColor = (risk: string) => {
+    switch (risk) {
+      case 'Low': return 'text-green-600';
+      case 'Medium': return 'text-yellow-600';
+      case 'High': return 'text-red-600';
+      default: return 'text-gray-600';
+    }
   };
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'Low': return 'bg-green-500/20 text-green-400';
-      case 'Medium': return 'bg-yellow-500/20 text-yellow-400';
-      case 'High': return 'bg-red-500/20 text-red-400';
-      default: return 'bg-gray-500/20 text-gray-400';
-    }
-  };
-
-  const getRiskColor = (riskLevel: string) => {
-    switch (riskLevel) {
-      case 'low_risk': return 'border-green-500/30 bg-green-500/10';
-      case 'medium_risk': return 'border-yellow-500/30 bg-yellow-500/10';
-      case 'high_risk': return 'border-red-500/30 bg-red-500/10';
-      default: return 'border-slate-600/30 bg-slate-700/30';
+      case 'Low': return 'bg-green-100 text-green-700';
+      case 'Medium': return 'bg-yellow-100 text-yellow-700';
+      case 'High': return 'bg-red-100 text-red-700';
+      default: return 'bg-gray-100 text-gray-700';
     }
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h2 className="text-3xl font-bold text-white">Market Fit Analyzer</h2>
-        <p className="text-slate-300 mt-1">
-          AI-powered product-to-market matching using Qloo's cultural intelligence
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold text-black">Market Fit Analyzer</h2>
+          <p className="text-gray-600 mt-1">
+            Comprehensive market validation with AI-powered cultural intelligence
+          </p>
+        </div>
+        {analysis && (
+          <Button
+            variant="outline"
+            onClick={handleExportAnalysis}
+            className="border-gray-300 text-gray-700 hover:bg-gray-50"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Export Analysis
+          </Button>
+        )}
       </div>
 
-      {/* Input Section */}
-      <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center">
-            <Target className="w-5 h-5 mr-2" />
-            Product Analysis
-          </CardTitle>
-          <CardDescription className="text-slate-300">
-            Describe your product to get comprehensive market fit analysis
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="product-description" className="text-slate-300">
-              Product Description
-            </Label>
-            <Textarea
-              id="product-description"
-              placeholder="e.g., AI-powered customer support chatbot that learns from your documentation..."
-              value={productDescription}
-              onChange={(e) => setProductDescription(e.target.value)}
-              className="bg-slate-700/50 border-slate-600 text-white placeholder-slate-400 min-h-20"
-            />
-            {productDescription.length > 0 && (
-              <div className="flex items-center text-xs text-slate-400">
-                <Clock className="w-3 h-3 mr-1" />
-                {isAnalyzing ? 'Analyzing...' : 'Analysis will update automatically'}
-              </div>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Input Panel */}
+        <Card className="bg-white border border-gray-200">
+          <CardHeader>
+            <CardTitle className="text-black flex items-center">
+              <Target className="w-5 h-5 mr-2" />
+              Market Analysis Input
+            </CardTitle>
+            <CardDescription className="text-gray-600">
+              Provide details for comprehensive market validation
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="category" className="text-slate-300">Category</Label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
-                  <SelectValue placeholder="Select category" />
+              <Label htmlFor="description" className="text-black">
+                Product/Service Description
+              </Label>
+              <Textarea
+                id="description"
+                placeholder="Describe your product, target problem, and unique value proposition..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="bg-white border-gray-300 text-black placeholder-gray-400 min-h-20"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="industry" className="text-black">Industry</Label>
+              <Select value={industry} onValueChange={setIndustry}>
+                <SelectTrigger className="bg-white border-gray-300 text-black">
+                  <SelectValue placeholder="Select industry" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="saas">SaaS</SelectItem>
-                  <SelectItem value="ecommerce">E-commerce</SelectItem>
-                  <SelectItem value="mobile-app">Mobile App</SelectItem>
-                  <SelectItem value="hardware">Hardware</SelectItem>
-                  <SelectItem value="service">Service</SelectItem>
+                  <SelectItem value="technology">Technology</SelectItem>
+                  <SelectItem value="healthcare">Healthcare</SelectItem>
+                  <SelectItem value="finance">Finance</SelectItem>
+                  <SelectItem value="retail">Retail</SelectItem>
+                  <SelectItem value="education">Education</SelectItem>
+                  <SelectItem value="entertainment">Entertainment</SelectItem>
+                  <SelectItem value="manufacturing">Manufacturing</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="price-range" className="text-slate-300">Price Range</Label>
-              <Select value={priceRange} onValueChange={setPriceRange}>
-                <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
-                  <SelectValue placeholder="Select range" />
+              <Label htmlFor="target-market" className="text-black">Target Market</Label>
+              <Select value={targetMarket} onValueChange={setTargetMarket}>
+                <SelectTrigger className="bg-white border-gray-300 text-black">
+                  <SelectValue placeholder="Select target market" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="free">Free</SelectItem>
-                  <SelectItem value="under-50">Under $50</SelectItem>
-                  <SelectItem value="50-200">$50 - $200</SelectItem>
-                  <SelectItem value="200-1000">$200 - $1,000</SelectItem>
-                  <SelectItem value="over-1000">Over $1,000</SelectItem>
+                  <SelectItem value="b2b-enterprise">B2B Enterprise</SelectItem>
+                  <SelectItem value="b2b-smb">B2B Small/Medium Business</SelectItem>
+                  <SelectItem value="b2c-consumer">B2C Consumer</SelectItem>
+                  <SelectItem value="b2c-prosumer">B2C Professional Consumer</SelectItem>
+                  <SelectItem value="marketplace">Marketplace/Platform</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="business-model" className="text-slate-300">Business Model</Label>
+              <Label htmlFor="business-model" className="text-black">Business Model</Label>
               <Select value={businessModel} onValueChange={setBusinessModel}>
-                <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
-                  <SelectValue placeholder="Select model" />
+                <SelectTrigger className="bg-white border-gray-300 text-black">
+                  <SelectValue placeholder="Select business model" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="subscription">Subscription</SelectItem>
+                  <SelectItem value="subscription">Subscription/SaaS</SelectItem>
                   <SelectItem value="one-time">One-time Purchase</SelectItem>
                   <SelectItem value="freemium">Freemium</SelectItem>
-                  <SelectItem value="marketplace">Marketplace</SelectItem>
+                  <SelectItem value="marketplace">Marketplace Commission</SelectItem>
                   <SelectItem value="advertising">Advertising</SelectItem>
+                  <SelectItem value="hybrid">Hybrid Model</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="target-audience" className="text-slate-300">Target Audience</Label>
-              <Select value={targetAudience} onValueChange={setTargetAudience}>
-                <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
-                  <SelectValue placeholder="Select audience" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="b2b">B2B</SelectItem>
-                  <SelectItem value="b2c">B2C</SelectItem>
-                  <SelectItem value="b2b2c">B2B2C</SelectItem>
-                  <SelectItem value="enterprise">Enterprise</SelectItem>
-                  <SelectItem value="smb">Small Business</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-slate-300">Target Regions</Label>
-            <div className="flex flex-wrap gap-2">
-              {['US', 'EU', 'APAC', 'LATAM', 'Global'].map((region) => (
-                <Badge
-                  key={region}
-                  className={`cursor-pointer px-3 py-1 rounded-lg transition-all ${
-                    targetRegions.includes(region)
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-slate-700 text-slate-300 hover:bg-blue-800/70'
-                  }`}
-                  onClick={() => {
-                    setTargetRegions(prev =>
-                      prev.includes(region)
-                        ? prev.filter(r => r !== region)
-                        : [...prev, region]
-                    );
-                  }}
-                >
-                  {region}
-                </Badge>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <Button
-              onClick={handleAnalyze}
-              disabled={isAnalyzing || !productDescription.trim()}
-              className="bg-blue-500 hover:bg-blue-600 text-white"
-            >
-              {isAnalyzing ? (
-                <>
-                  <Zap className="w-4 h-4 mr-2 animate-pulse" />
-                  Analyzing Market Fit...
-                </>
-              ) : (
-                <>
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  Analyze Market Fit
-                </>
-              )}
-            </Button>
-            
-            {analysis && (
-              <Button
-                onClick={handleExportReport}
-                variant="outline"
-                className="border-slate-600 text-slate-300 hover:bg-slate-700"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Export Report
-              </Button>
+            {description.length > 0 && (
+              <div className="flex items-center justify-between text-xs text-gray-600 pt-2">
+                <div className="flex items-center">
+                  <Clock className="w-3 h-3 mr-1" />
+                  {isAnalyzing ? 'Analyzing market...' : 'Real-time analysis active'}
+                </div>
+                <span>{description.length} characters</span>
+              </div>
             )}
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Results Section */}
-      {analysis && (
-        <Tabs defaultValue="segments" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-6 bg-slate-800/50">
-            <TabsTrigger value="segments">Market Segments</TabsTrigger>
-            <TabsTrigger value="sizing">Market Sizing</TabsTrigger>
-            <TabsTrigger value="competition">Competition</TabsTrigger>
-            <TabsTrigger value="opportunities">Opportunities</TabsTrigger>
-            <TabsTrigger value="strategy">Strategy</TabsTrigger>
-            <TabsTrigger value="insights">Cultural Insights</TabsTrigger>
-          </TabsList>
+        {/* Results Panel */}
+        <div className="lg:col-span-2">
+          {isAnalyzing ? (
+            <Card className="bg-white border border-gray-200">
+              <CardContent className="p-8 text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-3"></div>
+                <h3 className="text-xl font-semibold text-black mb-2">
+                  Analyzing Market Fit...
+                </h3>
+                <p className="text-gray-600 mb-3">
+                  Our AI is conducting comprehensive market analysis using Qloo's cultural intelligence and competitive data.
+                </p>
+                <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
+                  <Sparkles className="w-4 h-4 animate-pulse" />
+                  <span>This may take 30-60 seconds</span>
+                </div>
+              </CardContent>
+            </Card>
+          ) : analysis ? (
+            <div className="space-y-6">
+              {/* Overall Score */}
+              <Card className="bg-white border border-gray-200">
+                <CardHeader>
+                  <CardTitle className="text-black flex items-center justify-between">
+                    <div className="flex items-center">
+                      <BarChart3 className="w-5 h-5 mr-2" />
+                      Market Fit Analysis
+                    </div>
+                    {lastUpdate && (
+                      <div className="text-xs text-gray-600">
+                        Updated {lastUpdate.toLocaleTimeString()}
+                      </div>
+                    )}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center mb-6">
+                    <div className="text-4xl font-bold text-black mb-2">
+                      {analysis.overall_fit_score}%
+                    </div>
+                    <div className="text-gray-600">Overall Market Fit Score</div>
+                    <Progress value={analysis.overall_fit_score} className="mt-3" />
+                  </div>
+                  
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className="text-lg font-bold text-green-600">
+                        {analysis.market_size_estimate.serviceable_obtainable_market}
+                      </div>
+                      <div className="text-xs text-gray-600">Obtainable Market</div>
+                    </div>
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className="text-lg font-bold text-blue-600">
+                        {analysis.market_size_estimate.growth_rate}%
+                      </div>
+                      <div className="text-xs text-gray-600">Growth Rate</div>
+                    </div>
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className={`text-lg font-bold ${getRiskColor(analysis.risk_assessment.overall_risk)}`}>
+                        {analysis.risk_assessment.overall_risk}
+                      </div>
+                      <div className="text-xs text-gray-600">Overall Risk</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          <TabsContent value="segments" className="space-y-4">
-            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <Users className="w-5 h-5 mr-2" />
-                  Market Segment Analysis
-                </CardTitle>
-                <CardDescription className="text-slate-300">
-                  AI-identified audience segments ranked by market fit and cultural alignment
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {analysis.segments.map((segment, index) => (
-                    <div
-                      key={index}
-                      className="p-6 bg-gradient-to-r from-slate-700/30 to-slate-800/30 rounded-lg border border-slate-600/30"
-                    >
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center space-x-3">
-                          {getMatchIcon(segment.match_percentage)}
-                          <h3 className="text-xl font-semibold text-white">
-                            {segment.name}
-                          </h3>
-                          <Badge variant="secondary" className="text-xs">
-                            {segment.market_maturity} Market
+              {/* Detailed Analysis Tabs */}
+              <Tabs defaultValue="segments" className="space-y-4">
+                <TabsList className="grid w-full grid-cols-6 bg-gray-100">
+                  <TabsTrigger value="segments" className="data-[state=active]:bg-white">Segments</TabsTrigger>
+                  <TabsTrigger value="sizing" className="data-[state=active]:bg-white">Sizing</TabsTrigger>
+                  <TabsTrigger value="competition" className="data-[state=active]:bg-white">Competition</TabsTrigger>
+                  <TabsTrigger value="opportunities" className="data-[state=active]:bg-white">Opportunities</TabsTrigger>
+                  <TabsTrigger value="strategy" className="data-[state=active]:bg-white">Strategy</TabsTrigger>
+                  <TabsTrigger value="cultural" className="data-[state=active]:bg-white">Cultural</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="segments">
+                  <Card className="bg-white border border-gray-200">
+                    <CardHeader>
+                      <CardTitle className="text-black">Market Segments</CardTitle>
+                      <CardDescription className="text-gray-600">
+                        Detailed analysis of target market segments
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {analysis.segments.map((segment, index) => (
+                          <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="flex items-center justify-between mb-3">
+                              <h4 className="font-semibold text-black">{segment.name}</h4>
+                              <div className="flex items-center space-x-2">
+                                <Badge variant="secondary">{segment.size_estimate}</Badge>
+                                <Badge className={`${segment.market_maturity === 'Growing' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                                  {segment.market_maturity}
+                                </Badge>
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
+                              <div className="text-center">
+                                <div className="text-lg font-bold text-black">{segment.match_percentage}%</div>
+                                <div className="text-xs text-gray-600">Match</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-lg font-bold text-blue-600">{segment.engagement_potential}%</div>
+                                <div className="text-xs text-gray-600">Engagement</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-lg font-bold text-green-600">{segment.conversion_likelihood}%</div>
+                                <div className="text-xs text-gray-600">Conversion</div>
+                              </div>
+                              <div className="text-center">
+                                <div className="text-lg font-bold text-purple-600">{segment.cultural_alignment}%</div>
+                                <div className="text-xs text-gray-600">Cultural Fit</div>
+                              </div>
+                            </div>
+
+                            <div className="mb-3">
+                              <h5 className="text-sm font-medium text-gray-600 mb-2">Key Characteristics</h5>
+                              <div className="flex flex-wrap gap-1">
+                                {segment.key_characteristics.map((char, idx) => (
+                                  <Badge key={idx} variant="secondary" className="text-xs">
+                                    {char}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+
+                            <div>
+                              <h5 className="text-sm font-medium text-gray-600 mb-1">Recommended Approach</h5>
+                              <p className="text-sm text-gray-600">{segment.recommended_approach}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="sizing">
+                  <Card className="bg-white border border-gray-200">
+                    <CardHeader>
+                      <CardTitle className="text-black">Market Sizing</CardTitle>
+                      <CardDescription className="text-gray-600">
+                        Total addressable market and growth projections
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div className="text-center p-4 bg-gray-50 rounded-lg">
+                          <div className="text-2xl font-bold text-black mb-1">
+                            {analysis.market_size_estimate.total_addressable_market}
+                          </div>
+                          <div className="text-sm text-gray-600">Total Addressable Market</div>
+                        </div>
+                        <div className="text-center p-4 bg-gray-50 rounded-lg">
+                          <div className="text-2xl font-bold text-blue-600 mb-1">
+                            {analysis.market_size_estimate.serviceable_addressable_market}
+                          </div>
+                          <div className="text-sm text-gray-600">Serviceable Addressable Market</div>
+                        </div>
+                        <div className="text-center p-4 bg-gray-50 rounded-lg">
+                          <div className="text-2xl font-bold text-green-600 mb-1">
+                            {analysis.market_size_estimate.serviceable_obtainable_market}
+                          </div>
+                          <div className="text-sm text-gray-600">Serviceable Obtainable Market</div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="font-semibold text-black mb-2">Market Trends</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {analysis.market_size_estimate.market_trends.map((trend, index) => (
+                              <Badge key={index} variant="secondary" className="text-xs">
+                                {trend}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-semibold text-black mb-2">Growth Rate</h4>
+                          <div className="flex items-center space-x-3">
+                            <Progress value={analysis.market_size_estimate.growth_rate} className="flex-1" />
+                            <span className="text-lg font-bold text-green-600">
+                              {analysis.market_size_estimate.growth_rate}%
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="competition">
+                  <Card className="bg-white border border-gray-200">
+                    <CardHeader>
+                      <CardTitle className="text-black">Competitive Landscape</CardTitle>
+                      <CardDescription className="text-gray-600">
+                        Key competitors and market positioning opportunities
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="mb-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="font-semibold text-black">Market Saturation</h4>
+                          <Badge className={`${analysis.competitive_landscape.market_saturation === 'Medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-700'}`}>
+                            {analysis.competitive_landscape.market_saturation}
                           </Badge>
                         </div>
-                        <div className="text-right">
-                          <div className={`text-2xl font-bold ${getMatchColor(segment.match_percentage)}`}>
-                            {segment.match_percentage}%
+                      </div>
+
+                      <div className="space-y-4 mb-6">
+                        <h4 className="font-semibold text-black">Key Competitors</h4>
+                        {analysis.competitive_landscape.key_competitors.map((competitor, index) => (
+                          <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="flex items-center justify-between mb-3">
+                              <h5 className="font-semibold text-black">{competitor.name}</h5>
+                              <Badge variant="secondary">{competitor.market_share}% market share</Badge>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                              <div>
+                                <h6 className="text-sm font-medium text-gray-600 mb-2">Strengths</h6>
+                                <ul className="text-sm text-gray-600 space-y-1">
+                                  {competitor.strengths.map((strength, idx) => (
+                                    <li key={idx} className="flex items-center">
+                                      <CheckCircle className="w-3 h-3 mr-2 text-green-600" />
+                                      {strength}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                              <div>
+                                <h6 className="text-sm font-medium text-gray-600 mb-2">Weaknesses</h6>
+                                <ul className="text-sm text-gray-600 space-y-1">
+                                  {competitor.weaknesses.map((weakness, idx) => (
+                                    <li key={idx} className="flex items-center">
+                                      <AlertTriangle className="w-3 h-3 mr-2 text-red-600" />
+                                      {weakness}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
+
+                            <div>
+                              <h6 className="text-sm font-medium text-gray-600 mb-1">Differentiation Opportunity</h6>
+                              <p className="text-sm text-gray-600">{competitor.differentiation_opportunity}</p>
+                            </div>
                           </div>
-                          <div className="text-xs text-slate-400">Match Score</div>
-                        </div>
+                        ))}
                       </div>
 
-                      <p className="text-slate-300 mb-4">{segment.description}</p>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                        <div className="text-center p-3 bg-slate-700/30 rounded-lg">
-                          <div className="text-lg font-bold text-blue-400">{segment.audience_size}</div>
-                          <div className="text-xs text-slate-400">Audience Size</div>
-                        </div>
-                        <div className="text-center p-3 bg-slate-700/30 rounded-lg">
-                          <div className="text-lg font-bold text-green-400">{segment.engagement_potential}%</div>
-                          <div className="text-xs text-slate-400">Engagement Potential</div>
-                        </div>
-                        <div className="text-center p-3 bg-slate-700/30 rounded-lg">
-                          <div className="text-lg font-bold text-purple-400">{segment.conversion_likelihood}%</div>
-                          <div className="text-xs text-slate-400">Conversion Likelihood</div>
-                        </div>
-                        <div className="text-center p-3 bg-slate-700/30 rounded-lg">
-                          <div className="text-lg font-bold text-yellow-400">{segment.cultural_alignment}%</div>
-                          <div className="text-xs text-slate-400">Cultural Alignment</div>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                          <h4 className="text-sm font-medium text-slate-400 mb-2">Key Characteristics</h4>
-                          <ul className="space-y-1">
-                            {segment.key_characteristics.slice(0, 4).map((char, idx) => (
-                              <li key={idx} className="text-sm text-slate-300 flex items-start">
-                                <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                                {char}
+                          <h4 className="font-semibold text-black mb-3">Market Gaps</h4>
+                          <ul className="space-y-2">
+                            {analysis.competitive_landscape.market_gaps.map((gap, index) => (
+                              <li key={index} className="flex items-center text-sm text-gray-600">
+                                <Target className="w-3 h-3 mr-2 text-blue-600" />
+                                {gap}
                               </li>
                             ))}
                           </ul>
                         </div>
                         <div>
-                          <h4 className="text-sm font-medium text-slate-400 mb-2">Recommended Channels</h4>
-                          <div className="flex flex-wrap gap-1">
-                            {segment.recommended_channels.map((channel, idx) => (
-                              <Badge key={idx} variant="secondary" className="text-xs">
-                                {channel}
+                          <h4 className="font-semibold text-black mb-3">Positioning Opportunities</h4>
+                          <ul className="space-y-2">
+                            {analysis.competitive_landscape.positioning_opportunities.map((opportunity, index) => (
+                              <li key={index} className="flex items-center text-sm text-gray-600">
+                                <Lightbulb className="w-3 h-3 mr-2 text-yellow-600" />
+                                {opportunity}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="opportunities">
+                  <Card className="bg-white border border-gray-200">
+                    <CardHeader>
+                      <CardTitle className="text-black">Market Opportunities</CardTitle>
+                      <CardDescription className="text-gray-600">
+                        Expansion opportunities and investment requirements
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {analysis.market_opportunities.map((opportunity, index) => (
+                          <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="flex items-center justify-between mb-3">
+                              <h4 className="font-semibold text-black">{opportunity.title}</h4>
+                              <div className="flex items-center space-x-2">
+                                <Badge className={getDifficultyColor(opportunity.difficulty)}>
+                                  {opportunity.difficulty} Difficulty
+                                </Badge>
+                                <Badge variant="secondary">
+                                  {opportunity.success_probability}% Success Rate
+                                </Badge>
+                              </div>
+                            </div>
+                            
+                            <p className="text-sm text-gray-600 mb-4">{opportunity.description}</p>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div className="text-center p-3 bg-white rounded border border-gray-200">
+                                <DollarSign className="w-4 h-4 mx-auto mb-1 text-green-600" />
+                                <div className="text-sm font-medium text-black">{opportunity.investment_required}</div>
+                                <div className="text-xs text-gray-600">Investment Required</div>
+                              </div>
+                              <div className="text-center p-3 bg-white rounded border border-gray-200">
+                                <Clock className="w-4 h-4 mx-auto mb-1 text-blue-600" />
+                                <div className="text-sm font-medium text-black">{opportunity.time_to_market}</div>
+                                <div className="text-xs text-gray-600">Time to Market</div>
+                              </div>
+                              <div className="text-center p-3 bg-white rounded border border-gray-200">
+                                <Target className="w-4 h-4 mx-auto mb-1 text-purple-600" />
+                                <div className="text-sm font-medium text-black">{opportunity.success_probability}%</div>
+                                <div className="text-xs text-gray-600">Success Probability</div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="strategy">
+                  <Card className="bg-white border border-gray-200">
+                    <CardHeader>
+                      <CardTitle className="text-black">Launch Strategy</CardTitle>
+                      <CardDescription className="text-gray-600">
+                        Phased go-to-market approach with timelines and budgets
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="mb-6">
+                        <h4 className="font-semibold text-black mb-2">Go-to-Market Approach</h4>
+                        <p className="text-gray-600 mb-4">{analysis.launch_strategy.go_to_market_approach}</p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <h5 className="text-sm font-medium text-gray-600 mb-2">Key Partnerships</h5>
+                            <ul className="space-y-1">
+                              {analysis.launch_strategy.key_partnerships.map((partnership, index) => (
+                                <li key={index} className="text-sm text-gray-600 flex items-center">
+                                  <Users className="w-3 h-3 mr-2 text-blue-600" />
+                                  {partnership}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div>
+                            <h5 className="text-sm font-medium text-gray-600 mb-2">Success Timeline</h5>
+                            <p className="text-sm text-gray-600 flex items-center">
+                              <Calendar className="w-3 h-3 mr-2 text-green-600" />
+                              {analysis.launch_strategy.success_timeline}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <h4 className="font-semibold text-black">Recommended Phases</h4>
+                        {analysis.launch_strategy.recommended_phases.map((phase, index) => (
+                          <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="flex items-center justify-between mb-3">
+                              <h5 className="font-semibold text-black">{phase.phase}</h5>
+                              <div className="flex items-center space-x-2">
+                                <Badge variant="secondary">{phase.timeline}</Badge>
+                                <Badge className="bg-green-100 text-green-700">{phase.budget_range}</Badge>
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div>
+                                <h6 className="text-sm font-medium text-gray-600 mb-2">Key Activities</h6>
+                                <ul className="space-y-1">
+                                  {phase.key_activities.map((activity, idx) => (
+                                    <li key={idx} className="text-xs text-gray-600 flex items-center">
+                                      <Zap className="w-2 h-2 mr-2 text-blue-600" />
+                                      {activity}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                              <div>
+                                <h6 className="text-sm font-medium text-gray-600 mb-2">Success Metrics</h6>
+                                <ul className="space-y-1">
+                                  {phase.success_metrics.map((metric, idx) => (
+                                    <li key={idx} className="text-xs text-gray-600 flex items-center">
+                                      <CheckCircle className="w-2 h-2 mr-2 text-green-600" />
+                                      {metric}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                              <div>
+                                <h6 className="text-sm font-medium text-gray-600 mb-2">Risk Factors</h6>
+                                <ul className="space-y-1">
+                                  {phase.risk_factors.map((risk, idx) => (
+                                    <li key={idx} className="text-xs text-gray-600 flex items-center">
+                                      <AlertTriangle className="w-2 h-2 mr-2 text-red-600" />
+                                      {risk}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="cultural">
+                  <Card className="bg-white border border-gray-200">
+                    <CardHeader>
+                      <CardTitle className="text-black">Cultural Insights</CardTitle>
+                      <CardDescription className="text-gray-600">
+                        Qloo-powered cultural intelligence and timing opportunities
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-6">
+                        <div>
+                          <h4 className="font-semibold text-black mb-4">Trending Cultural Themes</h4>
+                          <div className="space-y-3">
+                            {analysis.cultural_insights.trending_themes.map((theme, index) => (
+                              <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <div className="flex items-center justify-between mb-2">
+                                  <h5 className="font-semibold text-black">{theme.theme}</h5>
+                                  <Badge className="bg-purple-100 text-purple-700">
+                                    {theme.relevance_score}% Relevance
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-gray-600 mb-2">{theme.description}</p>
+                                <div className="flex items-center text-xs text-gray-600">
+                                  <Clock className="w-3 h-3 mr-1" />
+                                  {theme.timing_opportunity}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <h4 className="font-semibold text-black mb-3">Cultural Moments</h4>
+                            <ul className="space-y-2">
+                              {analysis.cultural_insights.cultural_moments.map((moment, index) => (
+                                <li key={index} className="flex items-center text-sm text-gray-600">
+                                  <Globe className="w-3 h-3 mr-2 text-blue-600" />
+                                  {moment}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-black mb-3">Seasonal Opportunities</h4>
+                            <ul className="space-y-2">
+                              {analysis.cultural_insights.seasonal_opportunities.map((opportunity, index) => (
+                                <li key={index} className="flex items-center text-sm text-gray-600">
+                                  <Calendar className="w-3 h-3 mr-2 text-green-600" />
+                                  {opportunity}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+
+                        <div>
+                          <h4 className="font-semibold text-black mb-3">Demographic Shifts</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {analysis.cultural_insights.demographic_shifts.map((shift, index) => (
+                              <Badge key={index} variant="secondary" className="text-xs">
+                                {shift}
                               </Badge>
                             ))}
                           </div>
                         </div>
                       </div>
-
-                      <div className="grid grid-cols-3 gap-4">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-slate-400">Price Sensitivity</span>
-                          <Badge 
-                            variant="secondary" 
-                            className={`text-xs ${
-                              segment.price_sensitivity === 'Low' ? 'bg-green-500/20 text-green-400' :
-                              segment.price_sensitivity === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' :
-                              'bg-red-500/20 text-red-400'
-                            }`}
-                          >
-                            {segment.price_sensitivity}
-                          </Badge>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-slate-400">Competition</span>
-                          <Badge 
-                            variant="secondary" 
-                            className={`text-xs ${
-                              segment.competition_level === 'Low' ? 'bg-green-500/20 text-green-400' :
-                              segment.competition_level === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' :
-                              'bg-red-500/20 text-red-400'
-                            }`}
-                          >
-                            {segment.competition_level}
-                          </Badge>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-slate-400">Market Stage</span>
-                          <Badge variant="secondary" className="text-xs">
-                            {segment.market_maturity}
-                          </Badge>
-                        </div>
-                      </div>
-
-                      <div className="mt-4">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-sm text-slate-400">Overall Market Fit</span>
-                          <span className={`text-sm font-semibold ${getMatchColor(segment.match_percentage)}`}>
-                            {segment.match_percentage}%
-                          </span>
-                        </div>
-                        <Progress 
-                          value={segment.match_percentage} 
-                          className="h-2"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            </div>
+          ) : (
+            <Card className="bg-white border border-gray-200">
+              <CardContent className="p-8 text-center">
+                <Target className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-black mb-2">
+                  Ready for Market Analysis
+                </h3>
+                <p className="text-gray-600">
+                  Fill in the product details to start comprehensive market validation
+                </p>
               </CardContent>
             </Card>
-          </TabsContent>
-
-          <TabsContent value="sizing" className="space-y-4">
-            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <DollarSign className="w-5 h-5 mr-2" />
-                  Market Size & Growth Analysis
-                </CardTitle>
-                <CardDescription className="text-slate-300">
-                  Total addressable market with growth projections
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                  <div className="text-center p-6 bg-slate-700/30 rounded-lg">
-                    <div className="text-3xl font-bold text-blue-400 mb-2">
-                      {analysis.market_size_estimate.tam}
-                    </div>
-                    <div className="text-sm font-medium text-white mb-1">TAM</div>
-                    <div className="text-xs text-slate-400">Total Addressable Market</div>
-                  </div>
-                  <div className="text-center p-6 bg-slate-700/30 rounded-lg">
-                    <div className="text-3xl font-bold text-purple-400 mb-2">
-                      {analysis.market_size_estimate.sam}
-                    </div>
-                    <div className="text-sm font-medium text-white mb-1">SAM</div>
-                    <div className="text-xs text-slate-400">Serviceable Addressable Market</div>
-                  </div>
-                  <div className="text-center p-6 bg-slate-700/30 rounded-lg">
-                    <div className="text-3xl font-bold text-green-400 mb-2">
-                      {analysis.market_size_estimate.som}
-                    </div>
-                    <div className="text-sm font-medium text-white mb-1">SOM</div>
-                    <div className="text-xs text-slate-400">Serviceable Obtainable Market</div>
-                  </div>
-                  <div className="text-center p-6 bg-slate-700/30 rounded-lg">
-                    <div className="text-3xl font-bold text-yellow-400 mb-2">
-                      {analysis.market_size_estimate.growth_rate}
-                    </div>
-                    <div className="text-sm font-medium text-white mb-1">Growth Rate</div>
-                    <div className="text-xs text-slate-400">Compound Annual Growth</div>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-3">Market Trends</h4>
-                  <ul className="space-y-2">
-                    {analysis.market_size_estimate.market_trends.map((trend, index) => (
-                      <li key={index} className="text-slate-300 flex items-start">
-                        <TrendingUp className="w-4 h-4 text-green-400 mt-0.5 mr-2 flex-shrink-0" />
-                        {trend}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="competition" className="space-y-4">
-            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <TrendingUp className="w-5 h-5 mr-2" />
-                  Competitive Landscape Analysis
-                </CardTitle>
-                <CardDescription className="text-slate-300">
-                  Detailed competitor analysis and positioning opportunities
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-3">Similar Products</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {analysis.competitive_landscape.similar_products.map((product, index) => (
-                      <Badge key={index} variant="secondary" className="text-sm">
-                        {product}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-3">Detailed Competitor Analysis</h4>
-                  <div className="space-y-4">
-                    {analysis.competitive_landscape.competitive_analysis.map((competitor, index) => (
-                      <div key={index} className="p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
-                        <div className="flex items-center justify-between mb-3">
-                          <h5 className="text-lg font-semibold text-white">{competitor.name}</h5>
-                          <div className="text-right">
-                            <div className="text-lg font-bold text-blue-400">{competitor.market_share}%</div>
-                            <div className="text-xs text-slate-400">Market Share</div>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-                          <div>
-                            <h6 className="text-sm font-medium text-green-400 mb-2">Strengths</h6>
-                            <ul className="space-y-1">
-                              {competitor.strengths.map((strength, idx) => (
-                                <li key={idx} className="text-sm text-slate-300 flex items-start">
-                                  <CheckCircle className="w-3 h-3 text-green-400 mt-0.5 mr-2 flex-shrink-0" />
-                                  {strength}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                          <div>
-                            <h6 className="text-sm font-medium text-red-400 mb-2">Weaknesses</h6>
-                            <ul className="space-y-1">
-                              {competitor.weaknesses.map((weakness, idx) => (
-                                <li key={idx} className="text-sm text-slate-300 flex items-start">
-                                  <AlertCircle className="w-3 h-3 text-red-400 mt-0.5 mr-2 flex-shrink-0" />
-                                  {weakness}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                        
-                        <div className="p-3 bg-slate-800/50 rounded-lg">
-                          <h6 className="text-sm font-medium text-yellow-400 mb-1">Differentiation Opportunity</h6>
-                          <p className="text-sm text-slate-300">{competitor.differentiation_opportunity}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-3">Market Gaps</h4>
-                  <ul className="space-y-2">
-                    {analysis.competitive_landscape.market_gaps.map((gap, index) => (
-                      <li key={index} className="text-slate-300 flex items-start">
-                        <Lightbulb className="w-4 h-4 text-yellow-400 mt-0.5 mr-2 flex-shrink-0" />
-                        {gap}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-3">Positioning Opportunities</h4>
-                  <ul className="space-y-2">
-                    {analysis.competitive_landscape.positioning_opportunities.map((opportunity, index) => (
-                      <li key={index} className="text-slate-300 flex items-start">
-                        <Target className="w-4 h-4 text-green-400 mt-0.5 mr-2 flex-shrink-0" />
-                        {opportunity}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="opportunities" className="space-y-4">
-            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <Rocket className="w-5 h-5 mr-2" />
-                  Market Opportunities & Risk Assessment
-                </CardTitle>
-                <CardDescription className="text-slate-300">
-                  Expansion opportunities and risk mitigation strategies
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-4">Market Expansion Opportunities</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {analysis.market_opportunities.map((opportunity, index) => (
-                      <div key={index} className="p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
-                        <div className="flex items-center justify-between mb-3">
-                          <h5 className="font-semibold text-white">{opportunity.title}</h5>
-                          <div className="text-right">
-                            <div className="text-lg font-bold text-green-400">{opportunity.success_probability}%</div>
-                            <div className="text-xs text-slate-400">Success Rate</div>
-                          </div>
-                        </div>
-                        
-                        <p className="text-sm text-slate-300 mb-3">{opportunity.description}</p>
-                        
-                        <div className="space-y-2">
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs text-slate-400">Market Size</span>
-                            <span className="text-xs text-white font-medium">{opportunity.market_size}</span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs text-slate-400">Time to Market</span>
-                            <span className="text-xs text-white font-medium">{opportunity.time_to_market}</span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs text-slate-400">Investment</span>
-                            <span className="text-xs text-white font-medium">{opportunity.investment_required}</span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs text-slate-400">Difficulty</span>
-                            <Badge className={`text-xs ${getDifficultyColor(opportunity.difficulty)}`}>
-                              {opportunity.difficulty}
-                            </Badge>
-                          </div>
-                        </div>
-                        
-                        <div className="mt-3">
-                          <Progress value={opportunity.success_probability} className="h-2" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-4">Risk Assessment</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {Object.entries(analysis.risk_assessment).slice(0, 3).map(([riskLevel, risks]) => (
-                      <div key={riskLevel} className={`p-4 rounded-lg border ${getRiskColor(riskLevel)}`}>
-                        <h5 className="font-semibold text-white mb-3 capitalize">
-                          {riskLevel.replace('_', ' ')}
-                        </h5>
-                        <ul className="space-y-2">
-                          {(risks as string[]).map((risk, idx) => (
-                            <li key={idx} className="text-sm text-slate-300 flex items-start">
-                              <span className="w-1.5 h-1.5 bg-current rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                              {risk}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="mt-4 p-4 bg-slate-700/30 rounded-lg">
-                    <h5 className="font-semibold text-white mb-3 flex items-center">
-                      <Shield className="w-4 h-4 mr-2" />
-                      Mitigation Strategies
-                    </h5>
-                    <ul className="space-y-2">
-                      {analysis.risk_assessment.mitigation_strategies.map((strategy, index) => (
-                        <li key={index} className="text-sm text-slate-300 flex items-start">
-                          <CheckCircle className="w-4 h-4 text-green-400 mt-0.5 mr-2 flex-shrink-0" />
-                          {strategy}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="strategy" className="space-y-4">
-            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <Lightbulb className="w-5 h-5 mr-2" />
-                  Go-to-Market Strategy
-                </CardTitle>
-                <CardDescription className="text-slate-300">
-                  Comprehensive launch strategy and execution plan
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="p-4 bg-slate-700/30 rounded-lg">
-                    <h4 className="text-sm font-medium text-slate-400 mb-2">Primary Target</h4>
-                    <p className="text-white font-semibold">{analysis.recommendations.primary_target}</p>
-                  </div>
-                  <div className="p-4 bg-slate-700/30 rounded-lg">
-                    <h4 className="text-sm font-medium text-slate-400 mb-2">Timeline</h4>
-                    <p className="text-white">{analysis.recommendations.go_to_market_timeline}</p>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-4">Launch Strategy Phases</h4>
-                  <div className="space-y-4">
-                    {analysis.recommendations.launch_strategy.map((phase, index) => (
-                      <div key={index} className="p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
-                        <div className="flex items-center justify-between mb-3">
-                          <h5 className="text-lg font-semibold text-white">{phase.phase}</h5>
-                          <Badge variant="secondary" className="text-xs">
-                            {phase.timeline}
-                          </Badge>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-                          <div>
-                            <h6 className="text-sm font-medium text-blue-400 mb-2">Key Activities</h6>
-                            <ul className="space-y-1">
-                              {phase.key_activities.map((activity, idx) => (
-                                <li key={idx} className="text-sm text-slate-300 flex items-start">
-                                  <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                                  {activity}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                          <div>
-                            <h6 className="text-sm font-medium text-green-400 mb-2">Success Metrics</h6>
-                            <ul className="space-y-1">
-                              {phase.success_metrics.map((metric, idx) => (
-                                <li key={idx} className="text-sm text-slate-300 flex items-start">
-                                  <Star className="w-3 h-3 text-green-400 mt-0.5 mr-2 flex-shrink-0" />
-                                  {metric}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="p-3 bg-slate-800/50 rounded-lg">
-                            <h6 className="text-sm font-medium text-yellow-400 mb-1">Budget</h6>
-                            <p className="text-sm text-slate-300">{phase.budget_allocation}</p>
-                          </div>
-                          <div className="p-3 bg-slate-800/50 rounded-lg">
-                            <h6 className="text-sm font-medium text-red-400 mb-1">Risk Factors</h6>
-                            <ul className="space-y-1">
-                              {phase.risk_factors.map((risk, idx) => (
-                                <li key={idx} className="text-xs text-slate-300">• {risk}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="p-4 bg-slate-700/30 rounded-lg">
-                  <h4 className="text-sm font-medium text-slate-400 mb-2">Pricing Strategy</h4>
-                  <p className="text-white">{analysis.recommendations.pricing_insights}</p>
-                </div>
-
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-3">Content Strategy</h4>
-                  <ul className="space-y-2">
-                    {analysis.recommendations.content_strategy.map((strategy, index) => (
-                      <li key={index} className="text-slate-300 flex items-start">
-                        <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2 mr-2 flex-shrink-0"></span>
-                        {strategy}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="insights" className="space-y-4">
-            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <Brain className="w-5 h-5 mr-2" />
-                  Cultural Intelligence Insights
-                </CardTitle>
-                <CardDescription className="text-slate-300">
-                  Qloo-powered cultural trends and demographic insights
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-3 flex items-center">
-                    <TrendingUp className="w-5 h-5 mr-2" />
-                    Trending Cultural Themes
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {analysis.cultural_insights.trending_themes.map((theme, index) => (
-                      <div key={index} className="p-3 bg-slate-700/30 rounded-lg border border-slate-600/30">
-                        <div className="flex items-center">
-                          <TrendingUp className="w-4 h-4 text-green-400 mr-2" />
-                          <span className="text-slate-300">{theme}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-3 flex items-center">
-                    <Clock className="w-5 h-5 mr-2" />
-                    Cultural Moments
-                  </h4>
-                  <ul className="space-y-2">
-                    {analysis.cultural_insights.cultural_moments.map((moment, index) => (
-                      <li key={index} className="text-slate-300 flex items-start">
-                        <Eye className="w-4 h-4 text-blue-400 mt-0.5 mr-2 flex-shrink-0" />
-                        {moment}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-3 flex items-center">
-                    <Globe className="w-5 h-5 mr-2" />
-                    Seasonal Opportunities
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {analysis.cultural_insights.seasonal_opportunities.map((opportunity, index) => (
-                      <div key={index} className="p-3 bg-slate-700/30 rounded-lg text-center">
-                        <div className="text-sm text-slate-300">{opportunity}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-lg font-semibold text-white mb-3 flex items-center">
-                    <Users className="w-5 h-5 mr-2" />
-                    Demographic Shifts
-                  </h4>
-                  <ul className="space-y-2">
-                    {analysis.cultural_insights.demographic_shifts.map((shift, index) => (
-                      <li key={index} className="text-slate-300 flex items-start">
-                        <Award className="w-4 h-4 text-purple-400 mt-0.5 mr-2 flex-shrink-0" />
-                        {shift}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      )}
-
-      {/* Empty State */}
-      {!analysis && !isAnalyzing && (
-        <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
-          <CardContent className="p-12 text-center">
-            <Target className="w-16 h-16 text-slate-500 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">
-              Ready for Market Analysis
-            </h3>
-            <p className="text-slate-300">
-              Enter your product description above to get comprehensive market fit analysis powered by Qloo's cultural intelligence
-            </p>
-          </CardContent>
-        </Card>
-      )}
+          )}
+        </div>
+      </div>
     </div>
   );
 };
