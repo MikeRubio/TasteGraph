@@ -19,34 +19,36 @@ interface TasteIntersectionHeatmapProps {
 // Function to get color intensity based on overlap percentage
 const getHeatmapColor = (percentage: number) => {
   const intensity = percentage / 100;
-  const red = Math.round(59 + (255 - 59) * intensity); // From slate-600 to bright
-  const green = Math.round(130 + (125) * intensity);
-  const blue = Math.round(246 + (9) * intensity);
-  return `rgb(${red}, ${green}, ${blue})`;
+  // Use grayscale with black for highest intensity
+  if (intensity >= 0.8) return '#000000'; // Black
+  if (intensity >= 0.6) return '#374151'; // Gray-700
+  if (intensity >= 0.4) return '#6B7280'; // Gray-500
+  if (intensity >= 0.2) return '#9CA3AF'; // Gray-400
+  return '#E5E7EB'; // Gray-200
 };
 
 // Function to get text color based on background intensity
 const getTextColor = (percentage: number) => {
-  return percentage > 50 ? '#FFFFFF' : '#1E293B';
+  return percentage > 50 ? '#FFFFFF' : '#000000';
 };
 
 const TasteIntersectionHeatmap: React.FC<TasteIntersectionHeatmapProps> = ({ intersections }) => {
   if (!intersections || intersections.length === 0) {
     return (
-      <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
+      <Card className="bg-white border border-gray-200">
         <CardHeader>
-          <CardTitle className="text-white flex items-center">
+          <CardTitle className="text-black flex items-center">
             <Users className="w-5 h-5 mr-2" />
             Taste Intersection Heatmap
           </CardTitle>
-          <CardDescription className="text-slate-300">
+          <CardDescription className="text-gray-600">
             No intersection data available for visualization
           </CardDescription>
         </CardHeader>
         <CardContent className="flex items-center justify-center h-64">
           <div className="text-center">
-            <Users className="w-12 h-12 text-slate-500 mx-auto mb-3" />
-            <p className="text-slate-400">Generate insights to see taste intersection analysis</p>
+            <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+            <p className="text-gray-600">Generate insights to see taste intersection analysis</p>
           </div>
         </CardContent>
       </Card>
@@ -54,13 +56,13 @@ const TasteIntersectionHeatmap: React.FC<TasteIntersectionHeatmapProps> = ({ int
   }
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
+    <Card className="bg-white border border-gray-200">
       <CardHeader>
-        <CardTitle className="text-white flex items-center">
+        <CardTitle className="text-black flex items-center">
           <Users className="w-5 h-5 mr-2" />
           Taste Intersection Analysis
         </CardTitle>
-        <CardDescription className="text-slate-300">
+        <CardDescription className="text-gray-600">
           Overlap analysis between different audience segments
         </CardDescription>
       </CardHeader>
@@ -69,7 +71,7 @@ const TasteIntersectionHeatmap: React.FC<TasteIntersectionHeatmapProps> = ({ int
           {intersections.map((intersection, index) => (
             <div
               key={index}
-              className="relative p-4 rounded-lg border border-slate-600/30 overflow-hidden"
+              className="relative p-4 rounded-lg border border-gray-200 overflow-hidden"
               style={{
                 backgroundColor: getHeatmapColor(intersection.overlap_percentage),
                 color: getTextColor(intersection.overlap_percentage)
@@ -83,9 +85,8 @@ const TasteIntersectionHeatmap: React.FC<TasteIntersectionHeatmapProps> = ({ int
                 </h3>
                 <Badge 
                   variant="secondary" 
-                  className="text-xs font-bold"
+                  className="text-xs font-bold bg-white/20 border-white/20"
                   style={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
                     color: getTextColor(intersection.overlap_percentage)
                   }}
                 >
@@ -106,9 +107,8 @@ const TasteIntersectionHeatmap: React.FC<TasteIntersectionHeatmapProps> = ({ int
                     {intersection.personas_involved.map((persona, idx) => (
                       <span 
                         key={idx} 
-                        className="text-xs px-2 py-1 rounded"
+                        className="text-xs px-2 py-1 rounded bg-white/15 border border-white/20"
                         style={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.15)',
                           color: getTextColor(intersection.overlap_percentage)
                         }}
                       >
@@ -127,9 +127,8 @@ const TasteIntersectionHeatmap: React.FC<TasteIntersectionHeatmapProps> = ({ int
                     {intersection.common_interests.slice(0, 4).map((interest, idx) => (
                       <span 
                         key={idx} 
-                        className="text-xs px-2 py-1 rounded"
+                        className="text-xs px-2 py-1 rounded bg-white/10 border border-white/10"
                         style={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
                           color: getTextColor(intersection.overlap_percentage)
                         }}
                       >
@@ -138,9 +137,8 @@ const TasteIntersectionHeatmap: React.FC<TasteIntersectionHeatmapProps> = ({ int
                     ))}
                     {intersection.common_interests.length > 4 && (
                       <span 
-                        className="text-xs px-2 py-1 rounded"
+                        className="text-xs px-2 py-1 rounded bg-white/10 border border-white/10"
                         style={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
                           color: getTextColor(intersection.overlap_percentage)
                         }}
                       >
@@ -163,10 +161,9 @@ const TasteIntersectionHeatmap: React.FC<TasteIntersectionHeatmapProps> = ({ int
 
               {/* Overlap Percentage Indicator */}
               <div 
-                className="absolute bottom-0 left-0 h-1 transition-all duration-300"
+                className="absolute bottom-0 left-0 h-1 transition-all duration-300 bg-white/40"
                 style={{
                   width: `${intersection.overlap_percentage}%`,
-                  backgroundColor: 'rgba(255, 255, 255, 0.4)'
                 }}
               />
             </div>
@@ -174,23 +171,23 @@ const TasteIntersectionHeatmap: React.FC<TasteIntersectionHeatmapProps> = ({ int
         </div>
 
         {/* Legend */}
-        <div className="mt-6 p-4 bg-slate-700/30 rounded-lg">
-          <h4 className="text-sm font-medium text-white mb-3">Overlap Intensity Scale</h4>
+        <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <h4 className="text-sm font-medium text-black mb-3">Overlap Intensity Scale</h4>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: getHeatmapColor(20) }}></div>
-              <span className="text-xs text-slate-300">Low (0-30%)</span>
+              <div className="w-4 h-4 rounded bg-gray-200"></div>
+              <span className="text-xs text-gray-600">Low (0-30%)</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: getHeatmapColor(50) }}></div>
-              <span className="text-xs text-slate-300">Medium (30-70%)</span>
+              <div className="w-4 h-4 rounded bg-gray-500"></div>
+              <span className="text-xs text-gray-600">Medium (30-70%)</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: getHeatmapColor(80) }}></div>
-              <span className="text-xs text-slate-300">High (70%+)</span>
+              <div className="w-4 h-4 rounded bg-black"></div>
+              <span className="text-xs text-gray-600">High (70%+)</span>
             </div>
           </div>
-          <p className="text-xs text-slate-400 mt-2">
+          <p className="text-xs text-gray-500 mt-2">
             Higher overlap percentages indicate stronger shared characteristics between audience segments.
           </p>
         </div>
