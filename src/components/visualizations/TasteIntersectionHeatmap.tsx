@@ -16,20 +16,18 @@ interface TasteIntersectionHeatmapProps {
   intersections: TasteIntersection[];
 }
 
-// Function to get color intensity based on overlap percentage
+// Heatmap color based on overlap percentage
 const getHeatmapColor = (percentage: number) => {
-  const intensity = percentage / 100;
-  // Use grayscale with black for highest intensity
-  if (intensity >= 0.8) return '#000000'; // Black
-  if (intensity >= 0.6) return '#374151'; // Gray-700
-  if (intensity >= 0.4) return '#6B7280'; // Gray-500
-  if (intensity >= 0.2) return '#9CA3AF'; // Gray-400
-  return '#E5E7EB'; // Gray-200
+  if (percentage >= 80) return '#3c5570';   // Deep Brand Blue
+  if (percentage >= 60) return '#6366f1';   // Brand Purple
+  if (percentage >= 40) return '#22d3ee';   // Brand Teal
+  if (percentage >= 20) return '#a3bffa';   // Pastel Blue
+  return '#e0e7ef';                         // Light Gray-Blue
 };
 
-// Function to get text color based on background intensity
+// Text color for readability
 const getTextColor = (percentage: number) => {
-  return percentage > 50 ? '#FFFFFF' : '#000000';
+  return percentage >= 60 ? '#ffffff' : '#1a1a1a';
 };
 
 const TasteIntersectionHeatmap: React.FC<TasteIntersectionHeatmapProps> = ({ intersections }) => {
@@ -175,16 +173,24 @@ const TasteIntersectionHeatmap: React.FC<TasteIntersectionHeatmapProps> = ({ int
           <h4 className="text-sm font-medium text-black mb-3">Overlap Intensity Scale</h4>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 rounded bg-gray-200"></div>
-              <span className="text-xs text-gray-600">Low (0-30%)</span>
+              <div className="w-4 h-4 rounded" style={{ background: '#e0e7ef' }}></div>
+              <span className="text-xs text-gray-600">Very Low (0–19%)</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 rounded bg-gray-500"></div>
-              <span className="text-xs text-gray-600">Medium (30-70%)</span>
+              <div className="w-4 h-4 rounded" style={{ background: '#a3bffa' }}></div>
+              <span className="text-xs text-gray-600">Low (20–39%)</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 rounded bg-black"></div>
-              <span className="text-xs text-gray-600">High (70%+)</span>
+              <div className="w-4 h-4 rounded" style={{ background: '#22d3ee' }}></div>
+              <span className="text-xs text-gray-600">Medium (40–59%)</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 rounded" style={{ background: '#6366f1' }}></div>
+              <span className="text-xs text-gray-600">High (60–79%)</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 rounded" style={{ background: '#3c5570' }}></div>
+              <span className="text-xs text-gray-600">Very High (80–100%)</span>
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-2">

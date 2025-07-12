@@ -47,12 +47,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 const getColors = () => [
-  "#000000", // Black
-  "#6B7280", // Gray-500
-  "#374151", // Gray-700
-  "#9CA3AF", // Gray-400
-  "#1F2937", // Gray-800
-  "#4B5563"  // Gray-600
+  "#0ea5e9", // Vivid Blue
+  "#f43f5e", // Vivid Pink/Red
+  "#f59e42", // Bright Orange
+  "#a21caf", // Deep Purple
+  "#22d3ee", // Bright Teal
+  "#fde047", // Vivid Yellow
 ];
 
 const AffinityRadarChart: React.FC<AffinityRadarChartProps> = ({

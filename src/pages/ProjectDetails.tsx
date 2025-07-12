@@ -400,28 +400,28 @@ const ProjectDetails = () => {
           <TabsList className="grid w-full grid-cols-4 bg-white border border-gray-200">
             <TabsTrigger
               value="personas"
-              className="data-[state=active]:bg-black data-[state=active]:text-white text-gray-600 hover:text-black"
+              className="data-[state=active]:bg-black data-[state=active]:text-white "
             >
               <Users className="w-4 h-4 mr-2" />
               Personas ({latestInsight.audience_personas?.length || 0})
             </TabsTrigger>
             <TabsTrigger
               value="trends"
-              className="data-[state=active]:bg-black data-[state=active]:text-white text-gray-600 hover:text-black"
+              className="data-[state=active]:bg-black data-[state=active]:text-white "
             >
               <TrendingUp className="w-4 h-4 mr-2" />
               Trends ({latestInsight.cultural_trends?.length || 0})
             </TabsTrigger>
             <TabsTrigger
               value="content"
-              className="data-[state=active]:bg-black data-[state=active]:text-white text-gray-600 hover:text-black"
+              className="data-[state=active]:bg-black data-[state=active]:text-white "
             >
               <FileText className="w-4 h-4 mr-2" />
               Content ({latestInsight.content_suggestions?.length || 0})
             </TabsTrigger>
             <TabsTrigger
               value="visualizations"
-              className="data-[state=active]:bg-black data-[state=active]:text-white text-gray-600 hover:text-black"
+              className="data-[state=active]:bg-black data-[state=active]:text-white "
             >
               <BarChart className="w-4 h-4 mr-2" />
               Charts
@@ -653,7 +653,7 @@ const ProjectDetails = () => {
 
 // Persona Card Component
 const PersonaCard = ({ persona, index }: { persona: any; index: number }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   return (
     <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -671,10 +671,7 @@ const PersonaCard = ({ persona, index }: { persona: any; index: number }) => {
 
       <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
         <CollapsibleTrigger asChild>
-          <Button
-            variant="ghost"
-            className="w-full justify-between text-gray-600 hover:text-black p-2 h-auto"
-          >
+          <Button variant="ghost" className="w-full justify-between p-2 h-auto">
             <span className="text-sm font-medium">
               {isExpanded ? "Hide Details" : "Show Details"}
             </span>
@@ -830,7 +827,7 @@ const PersonaCard = ({ persona, index }: { persona: any; index: number }) => {
 
 // Trend Card Component
 const TrendCard = ({ trend, index }: { trend: any; index: number }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   return (
     <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -857,7 +854,7 @@ const TrendCard = ({ trend, index }: { trend: any; index: number }) => {
         <CollapsibleTrigger asChild>
           <Button
             variant="ghost"
-            className="w-full justify-between text-gray-600 hover:text-black p-2 h-auto"
+            className="w-full justify-between  p-2 h-auto"
           >
             <span className="text-sm font-medium">
               {isExpanded ? "Hide Details" : "Show Details"}
@@ -935,7 +932,7 @@ const ContentCard = ({
   suggestion: any;
   index: number;
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   return (
     <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -955,7 +952,7 @@ const ContentCard = ({
         <CollapsibleTrigger asChild>
           <Button
             variant="ghost"
-            className="w-full justify-between text-gray-600 hover:text-black p-2 h-auto"
+            className="w-full justify-between  p-2 h-auto"
           >
             <span className="text-sm font-medium">
               {isExpanded ? "Hide Details" : "Show Details"}
