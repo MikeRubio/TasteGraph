@@ -6,7 +6,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
   Cell
 } from 'recharts';
@@ -31,12 +30,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     const data = payload[0].payload;
     return (
       <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-lg max-w-xs">
-        <p className="text-black font-medium mb-2">{label}</p>
+        <p className="text-black font-medium mb-2">{data.fullName || label}</p>
         <p className="text-black font-semibold">
           Confidence: {payload[0].value}%
         </p>
         {data.description && (
-          <p className="text-gray-600 text-sm mt-2 line-clamp-3">
+          <p className="text-gray-600 text-sm mt-2">
             {data.description}
           </p>
         )}
@@ -65,7 +64,7 @@ const TrendConfidenceChart: React.FC<TrendConfidenceChartProps> = ({ trends }) =
         <CardHeader>
           <CardTitle className="text-black flex items-center">
             <TrendingUp className="w-5 h-5 mr-2" />
-            Trend Confidence Analysis
+            Cultural Trend Confidence
           </CardTitle>
           <CardDescription className="text-gray-600">
             No trend data available for visualization
@@ -83,9 +82,9 @@ const TrendConfidenceChart: React.FC<TrendConfidenceChartProps> = ({ trends }) =
 
   // Transform trends data for chart
   const chartData = trends.map((trend, index) => ({
-    name: trend.title.length > 20 ? `${trend.title.substring(0, 20)}...` : trend.title,
+    name: trend.title.length > 25 ? `${trend.title.substring(0, 25)}...` : trend.title,
     fullName: trend.title,
-    confidence: trend.confidence || 0,
+    confidence: Math.max(trend.confidence || 0, 5), // Ensure minimum height for visibility
     description: trend.description,
     impact: trend.impact,
     timeline: trend.timeline,
@@ -107,11 +106,11 @@ const TrendConfidenceChart: React.FC<TrendConfidenceChartProps> = ({ trends }) =
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" height={Math.max(400, chartData.length * 60)}>
           <BarChart
             data={chartData}
-            margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-            layout="horizontal"
+            margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+            layout="vertical"
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
             <XAxis 
@@ -119,15 +118,24 @@ const TrendConfidenceChart: React.FC<TrendConfidenceChartProps> = ({ trends }) =
               domain={[0, 100]}
               tick={{ fill: '#6B7280', fontSize: 12 }}
               tickFormatter={(value) => `${value}%`}
+              axisLine={{ stroke: '#E5E7EB' }}
+              tickLine={{ stroke: '#E5E7EB' }}
             />
             <YAxis 
               type="category"
               dataKey="name"
               tick={{ fill: '#6B7280', fontSize: 11 }}
-              width={120}
+              width={150}
+              axisLine={{ stroke: '#E5E7EB' }}
+              tickLine={{ stroke: '#E5E7EB' }}
             />
             <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="confidence" radius={[0, 4, 4, 0]}>
+            <Bar 
+              dataKey="confidence" 
+              radius={[0, 4, 4, 0]}
+              stroke="#E5E7EB"
+              strokeWidth={1}
+            >
               {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
@@ -135,7 +143,7 @@ const TrendConfidenceChart: React.FC<TrendConfidenceChartProps> = ({ trends }) =
           </BarChart>
         </ResponsiveContainer>
         
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 bg-black rounded"></div>
             <span className="text-gray-600">High Confidence (80%+)</span>

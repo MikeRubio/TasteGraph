@@ -400,32 +400,32 @@ const ProjectDetails = () => {
           </CardContent>
         </Card>
       ) : latestInsight ? (
-        <Tabs defaultValue="personas" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4 bg-gray-100">
+        <Tabs defaultValue="visualizations" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-4 bg-white border border-gray-200">
             <TabsTrigger
               value="personas"
-              className="data-[state=active]:bg-white"
+              className="data-[state=active]:bg-black data-[state=active]:text-white text-gray-600 hover:text-black"
             >
               <Users className="w-4 h-4 mr-2" />
               Personas ({latestInsight.audience_personas?.length || 0})
             </TabsTrigger>
             <TabsTrigger
               value="trends"
-              className="data-[state=active]:bg-white"
+              className="data-[state=active]:bg-black data-[state=active]:text-white text-gray-600 hover:text-black"
             >
               <TrendingUp className="w-4 h-4 mr-2" />
               Trends ({latestInsight.cultural_trends?.length || 0})
             </TabsTrigger>
             <TabsTrigger
               value="content"
-              className="data-[state=active]:bg-white"
+              className="data-[state=active]:bg-black data-[state=active]:text-white text-gray-600 hover:text-black"
             >
               <FileText className="w-4 h-4 mr-2" />
               Content ({latestInsight.content_suggestions?.length || 0})
             </TabsTrigger>
             <TabsTrigger
               value="visualizations"
-              className="data-[state=active]:bg-white"
+              className="data-[state=active]:bg-black data-[state=active]:text-white text-gray-600 hover:text-black"
             >
               <BarChart className="w-4 h-4 mr-2" />
               Charts
