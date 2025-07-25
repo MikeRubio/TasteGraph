@@ -1,38 +1,58 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { getUserProfile, updateUserProfile } from '@/lib/api';
-import { User, Mail, Briefcase, Building } from 'lucide-react';
-import { toast } from 'sonner';
+import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { getUserProfile, updateUserProfile } from "@/lib/api";
+import { User, Mail, Briefcase, Building } from "lucide-react";
+import { toast } from "sonner";
 
 const Profile = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [jobRole, setJobRole] = useState('');
-  const [industry, setIndustry] = useState('');
+  const [jobRole, setJobRole] = useState("");
+  const [industry, setIndustry] = useState("");
 
   const { data: profile, isLoading } = useQuery({
-    queryKey: ['profile'],
+    queryKey: ["profile"],
     queryFn: getUserProfile,
-    onSuccess: (data) => {
-      setJobRole(data.job_role || '');
-      setIndustry(data.industry || '');
-    },
   });
+
+  // Set jobRole and industry when profile data is loaded
+  useEffect(() => {
+    if (profile) {
+      setJobRole(profile.job_role || "");
+      setIndustry(profile.industry || "");
+    }
+  }, [profile]);
 
   const updateMutation = useMutation({
     mutationFn: updateUserProfile,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['profile'] });
-      toast.success('Profile updated successfully!');
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Profile updated successfully!");
     },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to update profile');
+    onError: (error: unknown) => {
+      const message =
+        error && typeof error === "object" && "message" in error
+          ? (error as { message?: string }).message
+          : undefined;
+      toast.error(message || "Failed to update profile");
     },
   });
 
@@ -49,7 +69,9 @@ const Profile = () => {
       <div className="space-y-8">
         <div>
           <h2 className="text-3xl font-bold text-black">Profile</h2>
-          <p className="text-gray-600 mt-1">Manage your account settings and preferences</p>
+          <p className="text-gray-600 mt-1">
+            Manage your account settings and preferences
+          </p>
         </div>
         <Card className="bg-white border border-gray-200">
           <CardHeader>
@@ -68,7 +90,9 @@ const Profile = () => {
       {/* Header */}
       <div>
         <h2 className="text-3xl font-bold text-black">Profile</h2>
-        <p className="text-gray-600 mt-1">Manage your account settings and preferences</p>
+        <p className="text-gray-600 mt-1">
+          Manage your account settings and preferences
+        </p>
       </div>
 
       {/* Profile Info */}
@@ -99,7 +123,9 @@ const Profile = () => {
               </div>
               <div>
                 <p className="text-sm text-gray-600 font-medium">Job Role</p>
-                <p className="text-black">{profile?.job_role || 'Not specified'}</p>
+                <p className="text-black">
+                  {profile?.job_role || "Not specified"}
+                </p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
@@ -108,7 +134,9 @@ const Profile = () => {
               </div>
               <div>
                 <p className="text-sm text-gray-600 font-medium">Industry</p>
-                <p className="text-black">{profile?.industry || 'Not specified'}</p>
+                <p className="text-black">
+                  {profile?.industry || "Not specified"}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -124,11 +152,13 @@ const Profile = () => {
           <CardContent className="p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-black font-medium">Email Address</Label>
+                <Label htmlFor="email" className="text-black font-medium">
+                  Email Address
+                </Label>
                 <Input
                   id="email"
                   type="email"
-                  value={user?.email || ''}
+                  value={user?.email || ""}
                   disabled
                   className="bg-gray-50 border-gray-300 text-gray-500"
                 />
@@ -136,17 +166,25 @@ const Profile = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="job-role" className="text-black font-medium">Job Role</Label>
+                <Label htmlFor="job-role" className="text-black font-medium">
+                  Job Role
+                </Label>
                 <Select value={jobRole} onValueChange={setJobRole}>
                   <SelectTrigger className="border-gray-300 focus:border-black focus:ring-black">
                     <SelectValue placeholder="Select your role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="marketing-manager">Marketing Manager</SelectItem>
-                    <SelectItem value="product-manager">Product Manager</SelectItem>
+                    <SelectItem value="marketing-manager">
+                      Marketing Manager
+                    </SelectItem>
+                    <SelectItem value="product-manager">
+                      Product Manager
+                    </SelectItem>
                     <SelectItem value="developer">Developer</SelectItem>
                     <SelectItem value="data-analyst">Data Analyst</SelectItem>
-                    <SelectItem value="business-owner">Business Owner</SelectItem>
+                    <SelectItem value="business-owner">
+                      Business Owner
+                    </SelectItem>
                     <SelectItem value="consultant">Consultant</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
@@ -154,7 +192,9 @@ const Profile = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="industry" className="text-black font-medium">Industry</Label>
+                <Label htmlFor="industry" className="text-black font-medium">
+                  Industry
+                </Label>
                 <Select value={industry} onValueChange={setIndustry}>
                   <SelectTrigger className="border-gray-300 focus:border-black focus:ring-black">
                     <SelectValue placeholder="Select your industry" />
@@ -165,7 +205,9 @@ const Profile = () => {
                     <SelectItem value="healthcare">Healthcare</SelectItem>
                     <SelectItem value="finance">Finance</SelectItem>
                     <SelectItem value="entertainment">Entertainment</SelectItem>
-                    <SelectItem value="food-beverage">Food & Beverage</SelectItem>
+                    <SelectItem value="food-beverage">
+                      Food & Beverage
+                    </SelectItem>
                     <SelectItem value="travel">Travel</SelectItem>
                     <SelectItem value="education">Education</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
@@ -179,7 +221,7 @@ const Profile = () => {
                   disabled={updateMutation.isPending}
                   className="bg-black hover:bg-gray-800 text-white"
                 >
-                  {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+                  {updateMutation.isPending ? "Saving..." : "Save Changes"}
                 </Button>
               </div>
             </form>

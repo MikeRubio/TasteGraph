@@ -22,8 +22,10 @@ const Login = () => {
       await signIn(email, password);
       navigate('/dashboard');
       toast.success('Welcome back!');
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to sign in');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to sign in';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

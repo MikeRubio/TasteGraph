@@ -58,8 +58,8 @@ const Projects = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [industry, setIndustry] = useState("");
-  const [culturalDomainTags, setCulturalDomainTags] = useState([]);
-  const [geoTargetTags, setGeoTargetTags] = useState([]);
+  const [culturalDomainTags, setCulturalDomainTags] = useState<string[]>([]);
+  const [geoTargetTags, setGeoTargetTags] = useState<string[]>([]);
 
   const queryClient = useQueryClient();
 
@@ -80,8 +80,12 @@ const Projects = () => {
       setGeoTargetTags([]);
       toast.success("Project created successfully!");
     },
-    onError: (error: any) => {
-      toast.error(error.message || "Failed to create project");
+    onError: (error: unknown) => {
+      const message =
+        error && typeof error === "object" && "message" in error
+          ? (error as { message?: string }).message
+          : "Failed to create project";
+      toast.error(message || "Failed to create project");
     },
   });
 
@@ -91,7 +95,7 @@ const Projects = () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       toast.success("Project deleted successfully!");
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast.error(error.message || "Failed to delete project");
     },
   });
@@ -163,14 +167,18 @@ const Projects = () => {
           </DialogTrigger>
           <DialogContent className="bg-white border border-gray-200 text-black max-w-lg">
             <DialogHeader>
-              <DialogTitle className="text-black">Create New Project</DialogTitle>
+              <DialogTitle className="text-black">
+                Create New Project
+              </DialogTitle>
               <DialogDescription className="text-gray-600">
                 Set up a new audience discovery project with AI-powered insights
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="title" className="text-black font-medium">Project Title</Label>
+                <Label htmlFor="title" className="text-black font-medium">
+                  Project Title
+                </Label>
                 <Input
                   id="title"
                   placeholder="Enter project title"
@@ -182,7 +190,9 @@ const Projects = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description" className="text-black font-medium">Description</Label>
+                <Label htmlFor="description" className="text-black font-medium">
+                  Description
+                </Label>
                 <Textarea
                   id="description"
                   placeholder="Describe your project goals and target audience..."
@@ -194,7 +204,9 @@ const Projects = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="industry" className="text-black font-medium">Industry (Optional)</Label>
+                <Label htmlFor="industry" className="text-black font-medium">
+                  Industry (Optional)
+                </Label>
                 <Select value={industry} onValueChange={setIndustry}>
                   <SelectTrigger className="border-gray-300 focus:border-black focus:ring-black">
                     <SelectValue placeholder="Select industry" />
@@ -205,7 +217,9 @@ const Projects = () => {
                     <SelectItem value="healthcare">Healthcare</SelectItem>
                     <SelectItem value="finance">Finance</SelectItem>
                     <SelectItem value="entertainment">Entertainment</SelectItem>
-                    <SelectItem value="food-beverage">Food & Beverage</SelectItem>
+                    <SelectItem value="food-beverage">
+                      Food & Beverage
+                    </SelectItem>
                     <SelectItem value="travel">Travel</SelectItem>
                     <SelectItem value="education">Education</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
@@ -214,7 +228,9 @@ const Projects = () => {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-black font-medium">Cultural Domains</Label>
+                <Label className="text-black font-medium">
+                  Cultural Domains
+                </Label>
                 <div className="flex flex-wrap gap-2">
                   {CULTURAL_DOMAIN_TAGS.map((tag) => (
                     <Badge
@@ -239,7 +255,9 @@ const Projects = () => {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-black font-medium">Geographical Targets</Label>
+                <Label className="text-black font-medium">
+                  Geographical Targets
+                </Label>
                 <div className="flex flex-wrap gap-2">
                   {GEOGRAPHY_TAGS.map((tag) => (
                     <Badge
@@ -296,7 +314,8 @@ const Projects = () => {
               No projects yet
             </h3>
             <p className="text-gray-600 mb-6">
-              Create your first project to start discovering audience insights with AI
+              Create your first project to start discovering audience insights
+              with AI
             </p>
             <Button
               onClick={() => setIsCreateOpen(true)}
@@ -361,7 +380,7 @@ const Projects = () => {
                     <div className="flex flex-wrap gap-1">
                       {project.cultural_domains
                         .slice(0, 3)
-                        .map((domain, index) => (
+                        .map((domain: string, index: number) => (
                           <Badge
                             key={index}
                             variant="secondary"
@@ -371,7 +390,10 @@ const Projects = () => {
                           </Badge>
                         ))}
                       {project.cultural_domains.length > 3 && (
-                        <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-700">
+                        <Badge
+                          variant="secondary"
+                          className="text-xs bg-gray-100 text-gray-700"
+                        >
                           +{project.cultural_domains.length - 3} more
                         </Badge>
                       )}

@@ -72,10 +72,14 @@ const ProjectDetails = () => {
       queryClient.invalidateQueries({ queryKey: ["insights", id] });
       toast.success("Insights generated successfully!");
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error("Insight generation error:", error);
+      const errorMessage =
+        typeof error === "object" && error !== null && "message" in error
+          ? (error as { message?: string }).message
+          : undefined;
       toast.error(
-        error.message || "Failed to generate insights. Please try again."
+        errorMessage || "Failed to generate insights. Please try again."
       );
     },
   });
@@ -295,11 +299,13 @@ const ProjectDetails = () => {
             <div>
               <p className="text-sm text-gray-600 mb-2">Cultural Domains:</p>
               <div className="flex flex-wrap gap-2">
-                {project.cultural_domains.map((domain, index) => (
-                  <Badge key={index} variant="secondary" className="text-xs">
-                    {domain}
-                  </Badge>
-                ))}
+                {project.cultural_domains.map(
+                  (domain: string, index: number) => (
+                    <Badge key={index} variant="secondary" className="text-xs">
+                      {domain}
+                    </Badge>
+                  )
+                )}
               </div>
             </div>
           )}
@@ -383,8 +389,14 @@ const ProjectDetails = () => {
               Generation Failed
             </h3>
             <p className="text-gray-600 mb-3">
-              {generateInsightsMutation.error?.message ||
-                "Failed to generate insights. Please try again."}
+              {typeof generateInsightsMutation.error === "object" &&
+              generateInsightsMutation.error !== null &&
+              "message" in generateInsightsMutation.error &&
+              typeof (generateInsightsMutation.error as { message?: string })
+                ?.message === "string"
+                ? (generateInsightsMutation.error as { message: string })
+                    .message
+                : "Failed to generate insights. Please try again."}
             </p>
             <Button
               onClick={handleGenerateInsights}
@@ -444,7 +456,7 @@ const ProjectDetails = () => {
                 {latestInsight.audience_personas?.length > 0 ? (
                   <div className="space-y-6">
                     {latestInsight.audience_personas.map(
-                      (persona: any, index: number) => (
+                      (persona: Persona, index: number) => (
                         <PersonaCard
                           key={index}
                           persona={persona}
@@ -479,7 +491,7 @@ const ProjectDetails = () => {
                 {latestInsight.cultural_trends?.length > 0 ? (
                   <div className="space-y-4">
                     {latestInsight.cultural_trends.map(
-                      (trend: any, index: number) => (
+                      (trend: Trend, index: number) => (
                         <TrendCard key={index} trend={trend} index={index} />
                       )
                     )}
@@ -510,7 +522,7 @@ const ProjectDetails = () => {
                 {latestInsight.content_suggestions?.length > 0 ? (
                   <div className="space-y-4">
                     {latestInsight.content_suggestions.map(
-                      (suggestion: any, index: number) => (
+                      (suggestion: ContentSuggestion, index: number) => (
                         <ContentCard
                           key={index}
                           suggestion={suggestion}
@@ -652,7 +664,26 @@ const ProjectDetails = () => {
 };
 
 // Persona Card Component
-const PersonaCard = ({ persona, index }: { persona: any; index: number }) => {
+interface Persona {
+  name?: string;
+  description?: string;
+  characteristics?: string[];
+  demographics?: {
+    age_range?: string;
+    interests?: string[];
+    platforms?: string[];
+  };
+  affinity_scores?: { [domain: string]: number };
+  behavioral_patterns?: string[];
+}
+
+const PersonaCard = ({
+  persona,
+  index,
+}: {
+  persona: Persona;
+  index: number;
+}) => {
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
@@ -774,7 +805,7 @@ const PersonaCard = ({ persona, index }: { persona: any; index: number }) => {
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {Object.entries(persona.affinity_scores).map(
-                    ([domain, score]: [string, any]) => (
+                    ([domain, score]: [string, number]) => (
                       <div
                         key={domain}
                         className="p-3 bg-white rounded-lg border border-gray-200"
@@ -825,8 +856,18 @@ const PersonaCard = ({ persona, index }: { persona: any; index: number }) => {
   );
 };
 
-// Trend Card Component
-const TrendCard = ({ trend, index }: { trend: any; index: number }) => {
+// Trend type definition
+interface Trend {
+  title?: string;
+  description?: string;
+  confidence?: number;
+  impact?: string;
+  timeline?: string;
+  qloo_connection?: string;
+  affinity_score?: number;
+}
+
+const TrendCard = ({ trend, index }: { trend: Trend; index: number }) => {
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
@@ -925,11 +966,22 @@ const TrendCard = ({ trend, index }: { trend: any; index: number }) => {
 };
 
 // Content Card Component
+interface ContentSuggestion {
+  title?: string;
+  description?: string;
+  platforms?: string[];
+  content_type?: string;
+  engagement_potential?: string;
+  copy?: string;
+  cultural_timing?: string;
+  affinity_score?: number;
+}
+
 const ContentCard = ({
   suggestion,
   index,
 }: {
-  suggestion: any;
+  suggestion: ContentSuggestion;
   index: number;
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -1054,7 +1106,7 @@ const EmptyState = ({
   title,
   description,
 }: {
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   title: string;
   description: string;
 }) => (

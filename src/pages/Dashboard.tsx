@@ -1,10 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Button } from "@/components/ui/button";
 import { getProjects, getDashboardStats } from '@/lib/api';
-import { Plus, FolderOpen, TrendingUp, Users, Zap, Calendar, Activity, Target, Brain } from 'lucide-react';
+import {
+  Plus,
+  FolderOpen,
+  Users,
+  Zap,
+  Calendar,
+  Activity,
+  Target,
+  Brain,
+} from "lucide-react";
 import { format } from 'date-fns';
 
 const Dashboard = () => {

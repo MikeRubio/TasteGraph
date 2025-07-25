@@ -1,20 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from "@/components/ui/button";
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Target, 
-  Users, 
-  TrendingUp, 
+import {
+  Target,
+  Users,
   Lightbulb,
   Download,
-  RefreshCw,
   Clock,
   DollarSign,
   BarChart3,
@@ -23,8 +20,8 @@ import {
   CheckCircle,
   Calendar,
   Globe,
-  Zap
-} from 'lucide-react';
+  Zap,
+} from "lucide-react";
 import { toast } from 'sonner';
 
 interface MarketSegment {

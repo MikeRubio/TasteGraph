@@ -3,31 +3,37 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Send, 
-  Download, 
-  MessageCircle, 
-  Sparkles, 
-  Users, 
-  TrendingUp, 
+import {
+  Send,
+  Download,
+  MessageCircle,
+  Sparkles,
+  Users,
+  TrendingUp,
   Lightbulb,
   Brain,
-  Target,
-  Calendar,
-  BarChart3,
   Copy,
-  Check
-} from 'lucide-react';
-import { toast } from 'sonner';
+  Check,
+} from "lucide-react";
+import { toast } from "sonner";
 
 interface Message {
   id: string;
-  type: 'user' | 'ai';
+  type: "user" | "ai";
   content: string;
   timestamp: Date;
   metadata?: {
-    type?: 'audience_analysis' | 'content_plan' | 'trend_insight' | 'general';
-    data?: any;
+    type?: "audience_analysis" | "content_plan" | "trend_insight" | "general";
+    data?: {
+      segments?: string[];
+      confidence?: number;
+      phases?: number;
+      platforms?: string[];
+      duration?: string;
+      trends?: number;
+      avgConfidence?: number;
+      // Add more fields as needed for future metadata types
+    };
   };
 }
 
@@ -35,28 +41,29 @@ interface ConversationalPlanningProps {
   chatSessionId?: string;
 }
 
-const ConversationalPlanning: React.FC<ConversationalPlanningProps> = ({ 
-  chatSessionId 
+const ConversationalPlanning: React.FC<ConversationalPlanningProps> = ({
+  chatSessionId,
 }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: '1',
-      type: 'ai',
-      content: "Hi! I'm your AI audience discovery assistant powered by Qloo's cultural intelligence. I can help you discover audience segments, create content plans, analyze trends, and develop marketing strategies. What would you like to explore today?",
+      id: "1",
+      type: "ai",
+      content:
+        "Hi! I'm your AI audience discovery assistant powered by Qloo's cultural intelligence. I can help you discover audience segments, create content plans, analyze trends, and develop marketing strategies. What would you like to explore today?",
       timestamp: new Date(),
-      metadata: { type: 'general' }
-    }
+      metadata: { type: "general" },
+    },
   ]);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showExportButton, setShowExportButton] = useState(false);
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -68,30 +75,29 @@ const ConversationalPlanning: React.FC<ConversationalPlanningProps> = ({
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      type: 'user',
+      type: "user",
       content: inputValue,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
+    setMessages((prev) => [...prev, userMessage]);
+    setInputValue("");
     setIsLoading(true);
 
     try {
       // Simulate AI response with realistic delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       const aiResponse = generateAIResponse(inputValue);
-      
-      setMessages(prev => [...prev, aiResponse]);
-      
+
+      setMessages((prev) => [...prev, aiResponse]);
+
       // Show export button if it's a content plan
-      if (aiResponse.metadata?.type === 'content_plan') {
+      if (aiResponse.metadata?.type === "content_plan") {
         setShowExportButton(true);
       }
-      
-    } catch (error) {
-      toast.error('Failed to get AI response');
+    } catch {
+      toast.error("Failed to get AI response");
     } finally {
       setIsLoading(false);
     }
@@ -99,11 +105,11 @@ const ConversationalPlanning: React.FC<ConversationalPlanningProps> = ({
 
   const generateAIResponse = (userInput: string): Message => {
     const input = userInput.toLowerCase();
-    
-    if (input.includes('audience') || input.includes('segment')) {
+
+    if (input.includes("audience") || input.includes("segment")) {
       return {
         id: Date.now().toString(),
-        type: 'ai',
+        type: "ai",
         content: `Based on Qloo's cultural intelligence, I've identified several emerging audience segments in your target market:
 
 **🎯 Digital Natives (25-35)**
@@ -126,20 +132,24 @@ const ConversationalPlanning: React.FC<ConversationalPlanningProps> = ({
 
 These segments show 78% cultural alignment with current market trends. Would you like me to create a content strategy for any specific segment?`,
         timestamp: new Date(),
-        metadata: { 
-          type: 'audience_analysis',
+        metadata: {
+          type: "audience_analysis",
           data: {
-            segments: ['Digital Natives', 'Conscious Consumers', 'Efficiency Seekers'],
-            confidence: 78
-          }
-        }
+            segments: [
+              "Digital Natives",
+              "Conscious Consumers",
+              "Efficiency Seekers",
+            ],
+            confidence: 78,
+          },
+        },
       };
     }
-    
-    if (input.includes('content plan') || input.includes('content strategy')) {
+
+    if (input.includes("content plan") || input.includes("content strategy")) {
       return {
         id: Date.now().toString(),
-        type: 'ai',
+        type: "ai",
         content: `Here's a comprehensive content plan for Gen Z music lovers based on Qloo's taste data:
 
 **📱 Content Strategy Overview**
@@ -175,21 +185,21 @@ These segments show 78% cultural alignment with current market trends. Would you
 
 Would you like me to detail specific content pieces or posting schedules?`,
         timestamp: new Date(),
-        metadata: { 
-          type: 'content_plan',
+        metadata: {
+          type: "content_plan",
           data: {
             phases: 3,
-            platforms: ['TikTok', 'Instagram', 'YouTube'],
-            duration: '6 weeks'
-          }
-        }
+            platforms: ["TikTok", "Instagram", "YouTube"],
+            duration: "6 weeks",
+          },
+        },
       };
     }
-    
-    if (input.includes('trend') || input.includes('emerging')) {
+
+    if (input.includes("trend") || input.includes("emerging")) {
       return {
         id: Date.now().toString(),
-        type: 'ai',
+        type: "ai",
         content: `🔮 **Emerging Cultural Trends (Qloo Intelligence)**
 
 **1. AI-First Mindset** (Confidence: 91%)
@@ -214,20 +224,20 @@ Would you like me to detail specific content pieces or posting schedules?`,
 
 These trends show strong correlation with your target demographics. Would you like me to analyze how these trends could impact your marketing strategy?`,
         timestamp: new Date(),
-        metadata: { 
-          type: 'trend_insight',
+        metadata: {
+          type: "trend_insight",
           data: {
             trends: 4,
-            avgConfidence: 84.5
-          }
-        }
+            avgConfidence: 84.5,
+          },
+        },
       };
     }
-    
+
     // Default response
     return {
       id: Date.now().toString(),
-      type: 'ai',
+      type: "ai",
       content: `I can help you with various audience discovery and planning tasks:
 
 **🎯 Audience Analysis**
@@ -255,34 +265,36 @@ What specific area would you like to explore? You can ask me questions like:
 - "Help me create a content plan for Gen Z music lovers"
 - "What trends should I watch in the tech industry?"`,
       timestamp: new Date(),
-      metadata: { type: 'general' }
+      metadata: { type: "general" },
     };
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
 
   const handleExportPlan = () => {
-    const contentMessages = messages.filter(m => 
-      m.metadata?.type === 'content_plan' || m.metadata?.type === 'audience_analysis'
+    const contentMessages = messages.filter(
+      (m) =>
+        m.metadata?.type === "content_plan" ||
+        m.metadata?.type === "audience_analysis"
     );
-    
+
     const exportData = {
       session_id: chatSessionId,
       generated_at: new Date().toISOString(),
       messages: contentMessages,
-      summary: "AI-generated audience insights and content strategy"
+      summary: "AI-generated audience insights and content strategy",
     };
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-      type: 'application/json',
+      type: "application/json",
     });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = `conversational_plan_${Date.now()}.json`;
     document.body.appendChild(a);
@@ -290,35 +302,43 @@ What specific area would you like to explore? You can ask me questions like:
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    toast.success('Plan exported successfully!');
+    toast.success("Plan exported successfully!");
   };
 
   const copyMessage = async (messageId: string, content: string) => {
     try {
       await navigator.clipboard.writeText(content);
       setCopiedMessageId(messageId);
-      toast.success('Message copied to clipboard');
+      toast.success("Message copied to clipboard");
       setTimeout(() => setCopiedMessageId(null), 2000);
-    } catch (error) {
-      toast.error('Failed to copy message');
+    } catch  {
+      toast.error("Failed to copy message");
     }
   };
 
   const getMessageIcon = (type?: string) => {
     switch (type) {
-      case 'audience_analysis': return <Users className="w-4 h-4" />;
-      case 'content_plan': return <Lightbulb className="w-4 h-4" />;
-      case 'trend_insight': return <TrendingUp className="w-4 h-4" />;
-      default: return <Brain className="w-4 h-4" />;
+      case "audience_analysis":
+        return <Users className="w-4 h-4" />;
+      case "content_plan":
+        return <Lightbulb className="w-4 h-4" />;
+      case "trend_insight":
+        return <TrendingUp className="w-4 h-4" />;
+      default:
+        return <Brain className="w-4 h-4" />;
     }
   };
 
   const getMessageBadge = (type?: string) => {
     switch (type) {
-      case 'audience_analysis': return 'Audience Analysis';
-      case 'content_plan': return 'Content Strategy';
-      case 'trend_insight': return 'Trend Insight';
-      default: return 'AI Assistant';
+      case "audience_analysis":
+        return "Audience Analysis";
+      case "content_plan":
+        return "Content Strategy";
+      case "trend_insight":
+        return "Trend Insight";
+      default:
+        return "AI Assistant";
     }
   };
 
@@ -340,7 +360,7 @@ What specific area would you like to explore? You can ask me questions like:
               </p>
             </div>
           </div>
-          
+
           {showExportButton && (
             <Button
               onClick={handleExportPlan}
@@ -358,11 +378,17 @@ What specific area would you like to explore? You can ask me questions like:
         {messages.map((message, index) => (
           <div
             key={message.id}
-            className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 duration-300`}
+            className={`flex ${
+              message.type === "user" ? "justify-end" : "justify-start"
+            } animate-in slide-in-from-bottom-2 duration-300`}
             style={{ animationDelay: `${index * 100}ms` }}
           >
-            <div className={`max-w-3xl ${message.type === 'user' ? 'ml-12' : 'mr-12'}`}>
-              {message.type === 'ai' && (
+            <div
+              className={`max-w-3xl ${
+                message.type === "user" ? "ml-12" : "mr-12"
+              }`}
+            >
+              {message.type === "ai" && (
                 <div className="flex items-center space-x-2 mb-2">
                   <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center">
                     {getMessageIcon(message.metadata?.type)}
@@ -375,14 +401,16 @@ What specific area would you like to explore? You can ask me questions like:
                   </span>
                 </div>
               )}
-              
-              <Card className={`${
-                message.type === 'user' 
-                  ? 'bg-black text-white border-black' 
-                  : 'bg-white border-gray-200'
-              } relative group`}>
+
+              <Card
+                className={`${
+                  message.type === "user"
+                    ? "bg-black text-white border-black"
+                    : "bg-white border-gray-200"
+                } relative group`}
+              >
                 <CardContent className="p-4">
-                  {message.type === 'user' && (
+                  {message.type === "user" && (
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs text-gray-300">You</span>
                       <span className="text-xs text-gray-300">
@@ -390,16 +418,18 @@ What specific area would you like to explore? You can ask me questions like:
                       </span>
                     </div>
                   )}
-                  
+
                   <div className="prose prose-sm max-w-none">
-                    <div className={`whitespace-pre-wrap ${
-                      message.type === 'user' ? 'text-white' : 'text-black'
-                    }`}>
+                    <div
+                      className={`whitespace-pre-wrap ${
+                        message.type === "user" ? "text-white" : "text-black"
+                      }`}
+                    >
                       {message.content}
                     </div>
                   </div>
-                  
-                  {message.type === 'ai' && (
+
+                  {message.type === "ai" && (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -418,7 +448,7 @@ What specific area would you like to explore? You can ask me questions like:
             </div>
           </div>
         ))}
-        
+
         {isLoading && (
           <div className="flex justify-start animate-in slide-in-from-bottom-2">
             <div className="max-w-3xl mr-12">
@@ -430,23 +460,31 @@ What specific area would you like to explore? You can ask me questions like:
                   AI Assistant
                 </Badge>
               </div>
-              
+
               <Card className="bg-white border-gray-200">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-2">
                     <div className="flex space-x-1">
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      <div
+                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.1s" }}
+                      ></div>
+                      <div
+                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.2s" }}
+                      ></div>
                     </div>
-                    <span className="text-sm text-gray-600">AI is thinking...</span>
+                    <span className="text-sm text-gray-600">
+                      AI is thinking...
+                    </span>
                   </div>
                 </CardContent>
               </Card>
             </div>
           </div>
         )}
-        
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -476,13 +514,13 @@ What specific area would you like to explore? You can ask me questions like:
             )}
           </Button>
         </div>
-        
+
         <div className="mt-2 flex flex-wrap gap-2">
           {[
             "What audience segments are emerging in eco-fashion?",
             "Help me create a content plan for Gen Z music lovers",
             "What trends should I watch in the tech industry?",
-            "Analyze the gaming audience for my app"
+            "Analyze the gaming audience for my app",
           ].map((suggestion, index) => (
             <Button
               key={index}

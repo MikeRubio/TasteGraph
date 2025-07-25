@@ -34,8 +34,12 @@ const Signup = () => {
       });
       navigate("/dashboard");
       toast.success("Account created successfully!");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to create account");
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to create account";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
