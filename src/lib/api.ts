@@ -172,54 +172,32 @@ export const deleteProject = async (id: string) => {
 
 // Insights API
 export const generateInsights = async (projectId: string) => {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) throw new Error('Not authenticated');
+ const { data: { session } } = await supabase.auth.getSession();
+ if (!session) throw new Error('Not authenticated');
 
-  const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-insights`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${session.access_token}`,
-export const sendConversationalQuery = async (
-  message: string,
-  chatHistory: ConversationalMessage[] = [],
-  projectId?: string
-): Promise<ConversationalMessage> => {
-  const { data, error } = await supabase.functions.invoke('conversational-planning', {
-    body: {
-      message,
-      chatHistory: chatHistory.map(msg => ({
-        ...msg,
-        timestamp: msg.timestamp.toISOString()
-      })),
-      projectId
-    }
-  });
+ const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-insights`, {
+  method: 'POST',
+  headers: {
+   'Authorization': `Bearer ${session.access_token}`,
+   'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ project_id: projectId }),
+ });
 
-  if (error) throw error;
-  
-  // Convert timestamp back to Date object
-  return {
-    ...data,
-    timestamp: new Date(data.timestamp)
-  };
-};
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ project_id: projectId }),
-  });
+ if (!response.ok) {
+  const errorData = await response.json().catch(() => ({}));
+  throw new Error(errorData.error || `Failed to generate insights: ${response.status}`);
+ }
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || `Failed to generate insights: ${response.status}`);
-  }
+ const result = await response.json();
+ if (!result.success) {
+  throw new Error(result.error || 'Failed to generate insights');
+ }
 
-  const result = await response.json();
-  if (!result.success) {
-    throw new Error(result.error || 'Failed to generate insights');
-  }
-  
-  return result.data;
-};
+ return result.data;
+}; // <-- this bracket closes the function!
+
+
 
 export const getInsights = async (projectId: string) => {
   const { data, error } = await supabase
