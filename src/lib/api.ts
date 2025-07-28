@@ -12,6 +12,19 @@ export interface Project {
   user_id: string;
 }
 
+// Conversational Planning API
+export interface ConversationalMessage {
+  id: string;
+  type: 'user' | 'ai';
+  content: string;
+  timestamp: Date;
+  metadata?: {
+    type?: 'general' | 'audience_analysis' | 'content_plan' | 'trend_insight';
+    confidence?: number;
+    sources?: string[];
+  };
+}
+
 export interface Insight {
   id: string;
   project_id: string;
@@ -166,19 +179,6 @@ export const generateInsights = async (projectId: string) => {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${session.access_token}`,
-
-// Conversational Planning API
-export interface ConversationalMessage {
-  id: string;
-  type: 'user' | 'ai';
-  content: string;
-  timestamp: Date;
-  metadata?: {
-    type?: 'audience_analysis' | 'content_plan' | 'trend_insight' | 'general';
-    data?: any;
-  };
-}
-
 export const sendConversationalQuery = async (
   message: string,
   chatHistory: ConversationalMessage[] = [],
