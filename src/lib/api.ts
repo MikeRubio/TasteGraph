@@ -315,3 +315,28 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
     total_api_queries: (insights?.length || 0) * 2, // Rough estimate: 1 Qloo + 1 OpenAI call per insight
   };
 }
+
+export const sendConversationalQuery = async (
+  currentInput: string,
+  chatHistory: ConversationalMessage[],
+  chatSessionId?: string
+): Promise<ConversationalMessage> => {
+  const { data, error } = await supabase.functions.invoke('conversational-planning', {
+    body: {
+      message: currentInput,
+      chat_history: chatHistory,
+      session_id: chatSessionId,
+    },
+  });
+
+  if (error) {
+    console.error('Conversational AI error:', error);
+    throw new Error(error.message || 'Failed to get AI response');
+  }
+
+  // Convert timestamp string back to Date object
+  return {
+    ...data,
+    timestamp: new Date(data.timestamp),
+  };
+};
