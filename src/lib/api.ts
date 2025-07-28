@@ -166,6 +166,43 @@ export const generateInsights = async (projectId: string) => {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${session.access_token}`,
+
+// Conversational Planning API
+export interface ConversationalMessage {
+  id: string;
+  type: 'user' | 'ai';
+  content: string;
+  timestamp: Date;
+  metadata?: {
+    type?: 'audience_analysis' | 'content_plan' | 'trend_insight' | 'general';
+    data?: any;
+  };
+}
+
+export const sendConversationalQuery = async (
+  message: string,
+  chatHistory: ConversationalMessage[] = [],
+  projectId?: string
+): Promise<ConversationalMessage> => {
+  const { data, error } = await supabase.functions.invoke('conversational-planning', {
+    body: {
+      message,
+      chatHistory: chatHistory.map(msg => ({
+        ...msg,
+        timestamp: msg.timestamp.toISOString()
+      })),
+      projectId
+    }
+  });
+
+  if (error) throw error;
+  
+  // Convert timestamp back to Date object
+  return {
+    ...data,
+    timestamp: new Date(data.timestamp)
+  };
+};
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ project_id: projectId }),

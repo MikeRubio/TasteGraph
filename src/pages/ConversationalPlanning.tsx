@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { sendConversationalQuery, ConversationalMessage } from '@/lib/api';
 import {
   Send,
   Download,
@@ -17,25 +18,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-interface Message {
-  id: string;
-  type: "user" | "ai";
-  content: string;
-  timestamp: Date;
-  metadata?: {
-    type?: "audience_analysis" | "content_plan" | "trend_insight" | "general";
-    data?: {
-      segments?: string[];
-      confidence?: number;
-      phases?: number;
-      platforms?: string[];
-      duration?: string;
-      trends?: number;
-      avgConfidence?: number;
-      // Add more fields as needed for future metadata types
-    };
-  };
-}
+// Use the interface from api.ts
+type Message = ConversationalMessage;
 
 interface ConversationalPlanningProps {
   chatSessionId?: string;
@@ -85,10 +69,15 @@ const ConversationalPlanning: React.FC<ConversationalPlanningProps> = ({
     setIsLoading(true);
 
     try {
-      // Simulate AI response with realistic delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      const aiResponse = generateAIResponse(inputValue);
+      // Get chat history (excluding the message we just added)
+      const chatHistory = messages;
+      
+      // Call the real AI API
+      const aiResponse = await sendConversationalQuery(
+        currentInput,
+        chatHistory,
+        chatSessionId
+      );
 
       setMessages((prev) => [...prev, aiResponse]);
 
@@ -96,177 +85,24 @@ const ConversationalPlanning: React.FC<ConversationalPlanningProps> = ({
       if (aiResponse.metadata?.type === "content_plan") {
         setShowExportButton(true);
       }
+      
     } catch {
-      toast.error("Failed to get AI response");
+      console.error('Conversational AI error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to get AI response';
+      toast.error(errorMessage);
+      
+      // Add error message to chat
+      const errorResponse: Message = {
+        id: Date.now().toString(),
+        type: "ai",
+        content: "I apologize, but I'm having trouble processing your request right now. Please try again in a moment.",
+        timestamp: new Date(),
+        metadata: { type: "general" },
+      };
+      setMessages((prev) => [...prev, errorResponse]);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const generateAIResponse = (userInput: string): Message => {
-    const input = userInput.toLowerCase();
-
-    if (input.includes("audience") || input.includes("segment")) {
-      return {
-        id: Date.now().toString(),
-        type: "ai",
-        content: `Based on Qloo's cultural intelligence, I've identified several emerging audience segments in your target market:
-
-**🎯 Digital Natives (25-35)**
-- High affinity for sustainable brands (89%)
-- Active on Instagram, TikTok, LinkedIn
-- Values authenticity and transparency
-- Influenced by peer recommendations
-
-**🌱 Conscious Consumers (28-42)**
-- Prioritizes environmental impact (92%)
-- Research-driven purchasing decisions
-- Prefers brands with clear values
-- Active on Pinterest, YouTube
-
-**⚡ Efficiency Seekers (30-45)**
-- Time-conscious professionals (85%)
-- Mobile-first interactions
-- Values convenience and ROI
-- Engages via LinkedIn, Email, Podcasts
-
-These segments show 78% cultural alignment with current market trends. Would you like me to create a content strategy for any specific segment?`,
-        timestamp: new Date(),
-        metadata: {
-          type: "audience_analysis",
-          data: {
-            segments: [
-              "Digital Natives",
-              "Conscious Consumers",
-              "Efficiency Seekers",
-            ],
-            confidence: 78,
-          },
-        },
-      };
-    }
-
-    if (input.includes("content plan") || input.includes("content strategy")) {
-      return {
-        id: Date.now().toString(),
-        type: "ai",
-        content: `Here's a comprehensive content plan for Gen Z music lovers based on Qloo's taste data:
-
-**📱 Content Strategy Overview**
-
-**Phase 1: Discovery (Weeks 1-2)**
-- Behind-the-scenes artist collaborations
-- Music discovery playlists with emerging artists
-- Interactive polls about music preferences
-- Platform: TikTok, Instagram Stories
-
-**Phase 2: Engagement (Weeks 3-4)**
-- User-generated content challenges
-- Live music sessions and Q&As
-- Trend-based music content
-- Platform: TikTok, Instagram Reels, YouTube Shorts
-
-**Phase 3: Community (Weeks 5-6)**
-- Music festival coverage and reviews
-- Artist interview series
-- Fan community spotlights
-- Platform: YouTube, Instagram, Twitter
-
-**🎵 Content Themes:**
-- Emerging genres (Hyperpop, Bedroom Pop)
-- Music production tutorials
-- Artist lifestyle content
-- Festival and concert experiences
-
-**📊 Expected Performance:**
-- 85% engagement rate with music content
-- 92% affinity with Gen Z music culture
-- Peak posting: 6-9 PM weekdays, 2-5 PM weekends
-
-Would you like me to detail specific content pieces or posting schedules?`,
-        timestamp: new Date(),
-        metadata: {
-          type: "content_plan",
-          data: {
-            phases: 3,
-            platforms: ["TikTok", "Instagram", "YouTube"],
-            duration: "6 weeks",
-          },
-        },
-      };
-    }
-
-    if (input.includes("trend") || input.includes("emerging")) {
-      return {
-        id: Date.now().toString(),
-        type: "ai",
-        content: `🔮 **Emerging Cultural Trends (Qloo Intelligence)**
-
-**1. AI-First Mindset** (Confidence: 91%)
-- Growing acceptance of AI in daily workflows
-- 67% increase in AI tool adoption
-- Timeline: Next 6-12 months
-
-**2. Privacy-Conscious Adoption** (Confidence: 86%)
-- Increased demand for transparent data handling
-- 54% prefer brands with clear privacy policies
-- Timeline: Current trend
-
-**3. Micro-Community Culture** (Confidence: 82%)
-- Shift from mass social to niche communities
-- 43% growth in specialized interest groups
-- Timeline: Next 12-18 months
-
-**4. Sustainable Tech Integration** (Confidence: 79%)
-- Eco-friendly technology preferences
-- 38% willing to pay premium for sustainable tech
-- Timeline: Next 18-24 months
-
-These trends show strong correlation with your target demographics. Would you like me to analyze how these trends could impact your marketing strategy?`,
-        timestamp: new Date(),
-        metadata: {
-          type: "trend_insight",
-          data: {
-            trends: 4,
-            avgConfidence: 84.5,
-          },
-        },
-      };
-    }
-
-    // Default response
-    return {
-      id: Date.now().toString(),
-      type: "ai",
-      content: `I can help you with various audience discovery and planning tasks:
-
-**🎯 Audience Analysis**
-- Discover emerging segments
-- Analyze cultural affinities
-- Map demographic patterns
-
-**📝 Content Planning**
-- Create content strategies
-- Generate campaign ideas
-- Optimize posting schedules
-
-**📈 Trend Insights**
-- Identify emerging trends
-- Predict cultural shifts
-- Analyze market opportunities
-
-**🚀 Strategy Development**
-- Market fit analysis
-- Competitive positioning
-- Growth recommendations
-
-What specific area would you like to explore? You can ask me questions like:
-- "What audience segments are emerging in eco-fashion?"
-- "Help me create a content plan for Gen Z music lovers"
-- "What trends should I watch in the tech industry?"`,
-      timestamp: new Date(),
-      metadata: { type: "general" },
-    };
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
