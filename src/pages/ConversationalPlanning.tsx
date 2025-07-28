@@ -74,7 +74,7 @@ const ConversationalPlanning: React.FC<ConversationalPlanningProps> = ({
       
       // Call the real AI API
       const aiResponse = await sendConversationalQuery(
-        currentInput,
+        inputValue,
         chatHistory,
         chatSessionId
       );
@@ -86,7 +86,7 @@ const ConversationalPlanning: React.FC<ConversationalPlanningProps> = ({
         setShowExportButton(true);
       }
       
-    } catch {
+    } catch (error) {
       console.error('Conversational AI error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to get AI response';
       toast.error(errorMessage);
