@@ -8,8 +8,8 @@ import { Brain, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('qloo@hackathon.ai');
+  const [password, setPassword] = useState('qloo@hackathon.ai');
   const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
   const navigate = useNavigate();
