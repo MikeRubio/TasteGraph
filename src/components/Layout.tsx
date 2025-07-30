@@ -44,7 +44,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     },
     { path: "/market-fit", label: "Market Fit", icon: Target },
     { path: "/profile", label: "Profile", icon: User },
-    { path: "/api-access", label: "API Access", icon: Code },
+    // { path: "/api-access", label: "API Access", icon: Code },
   ];
 
   return (

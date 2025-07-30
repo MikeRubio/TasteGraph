@@ -346,7 +346,7 @@ const Projects = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleDelete(project.id)}
-                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                    className="text-white hover:text-red-600 hover:bg-red-50"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
