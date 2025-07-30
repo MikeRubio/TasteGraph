@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { supabase } from '@/lib/supabase';
 import {
   Target,
   Users,
@@ -133,167 +134,25 @@ const MarketFit = () => {
     setIsAnalyzing(true);
     
     try {
-      // Simulate API call with realistic delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock comprehensive market analysis
-      const mockAnalysis: MarketFitResponse = {
-        overall_fit_score: 78,
-        segments: [
-          {
-            name: 'Early Adopters',
-            match_percentage: 85,
-            engagement_potential: 92,
-            conversion_likelihood: 78,
-            market_maturity: 'Growing',
-            cultural_alignment: 88,
-            size_estimate: '2.5M users',
-            key_characteristics: ['Tech-savvy', 'High disposable income', 'Innovation-focused'],
-            recommended_approach: 'Direct digital marketing with emphasis on cutting-edge features'
-          },
-          {
-            name: 'Mainstream Professionals',
-            match_percentage: 72,
-            engagement_potential: 76,
-            conversion_likelihood: 82,
-            market_maturity: 'Mature',
-            cultural_alignment: 71,
-            size_estimate: '15M users',
-            key_characteristics: ['Efficiency-focused', 'ROI-driven', 'Brand-conscious'],
-            recommended_approach: 'B2B partnerships and enterprise sales channels'
-          },
-          {
-            name: 'Cost-Conscious Users',
-            match_percentage: 58,
-            engagement_potential: 64,
-            conversion_likelihood: 71,
-            market_maturity: 'Mature',
-            cultural_alignment: 62,
-            size_estimate: '8M users',
-            key_characteristics: ['Price-sensitive', 'Value-focused', 'Comparison shoppers'],
-            recommended_approach: 'Freemium model with clear value demonstration'
-          }
-        ],
-        market_size_estimate: {
-          total_addressable_market: '$45B',
-          serviceable_addressable_market: '$12B',
-          serviceable_obtainable_market: '$850M',
-          growth_rate: 15.2,
-          market_trends: ['AI adoption acceleration', 'Remote work normalization', 'Digital transformation']
-        },
-        competitive_landscape: {
-          market_saturation: 'Medium',
-          key_competitors: [
-            {
-              name: 'Market Leader A',
-              market_share: 35,
-              strengths: ['Brand recognition', 'Enterprise relationships', 'Feature completeness'],
-              weaknesses: ['High pricing', 'Complex onboarding', 'Limited customization'],
-              differentiation_opportunity: 'Simplified user experience with competitive pricing'
-            },
-            {
-              name: 'Emerging Player B',
-              market_share: 12,
-              strengths: ['Modern UI', 'Fast implementation', 'Good customer support'],
-              weaknesses: ['Limited integrations', 'Smaller feature set', 'New brand'],
-              differentiation_opportunity: 'Comprehensive feature set with modern design'
-            }
-          ],
-          market_gaps: ['Mid-market solutions', 'Industry-specific features', 'Mobile-first approach'],
-          positioning_opportunities: ['Premium but accessible', 'Industry specialist', 'Innovation leader']
-        },
-        market_opportunities: [
-          {
-            title: 'International Expansion',
-            description: 'European and Asian markets show high demand',
-            success_probability: 75,
-            investment_required: '$2-5M',
-            time_to_market: '12-18 months',
-            difficulty: 'Medium'
-          },
-          {
-            title: 'Enterprise Partnerships',
-            description: 'Strategic partnerships with consulting firms',
-            success_probability: 82,
-            investment_required: '$500K-1M',
-            time_to_market: '6-9 months',
-            difficulty: 'Low'
-          },
-          {
-            title: 'Vertical Specialization',
-            description: 'Industry-specific solutions for healthcare/finance',
-            success_probability: 68,
-            investment_required: '$1-3M',
-            time_to_market: '9-15 months',
-            difficulty: 'High'
-          }
-        ],
-        risk_assessment: {
-          overall_risk: 'Medium',
-          market_risks: ['Economic downturn impact', 'Regulatory changes', 'Market saturation'],
-          competitive_risks: ['New entrants', 'Price wars', 'Feature commoditization'],
-          execution_risks: ['Talent acquisition', 'Technology scaling', 'Customer acquisition cost'],
-          mitigation_strategies: ['Diversified revenue streams', 'Strong IP protection', 'Agile development']
-        },
-        launch_strategy: {
-          recommended_phases: [
-            {
-              phase: 'Phase 1: MVP Launch',
-              timeline: '0-6 months',
-              budget_range: '$200K-500K',
-              key_activities: ['Product development', 'Beta testing', 'Initial marketing'],
-              success_metrics: ['100 beta users', '4.0+ app rating', '20% conversion rate'],
-              risk_factors: ['Technical delays', 'User feedback integration', 'Market timing']
-            },
-            {
-              phase: 'Phase 2: Market Expansion',
-              timeline: '6-18 months',
-              budget_range: '$1M-2.5M',
-              key_activities: ['Sales team hiring', 'Marketing campaigns', 'Feature expansion'],
-              success_metrics: ['1000+ customers', '$100K MRR', '15% market share'],
-              risk_factors: ['Competition response', 'Scaling challenges', 'Customer retention']
-            },
-            {
-              phase: 'Phase 3: Scale & Optimize',
-              timeline: '18-36 months',
-              budget_range: '$3M-8M',
-              key_activities: ['International expansion', 'Enterprise sales', 'Platform optimization'],
-              success_metrics: ['10K+ customers', '$1M+ MRR', 'Profitability'],
-              risk_factors: ['Market maturity', 'Operational complexity', 'Competitive pressure']
-            }
-          ],
-          go_to_market_approach: 'Product-led growth with enterprise sales overlay',
-          key_partnerships: ['Technology integrators', 'Industry consultants', 'Channel partners'],
-          success_timeline: '24-36 months to market leadership'
-        },
-        cultural_insights: {
-          trending_themes: [
-            {
-              theme: 'AI Productivity Revolution',
-              relevance_score: 94,
-              description: 'Growing cultural acceptance of AI as productivity enhancer',
-              timing_opportunity: 'Peak interest in Q2-Q3 2024'
-            },
-            {
-              theme: 'Remote Work Optimization',
-              relevance_score: 87,
-              description: 'Continued focus on distributed team efficiency',
-              timing_opportunity: 'Sustained demand through 2024-2025'
-            },
-            {
-              theme: 'Data Privacy Consciousness',
-              relevance_score: 79,
-              description: 'Increasing awareness of data security and privacy',
-              timing_opportunity: 'Regulatory compliance deadlines in 2024'
-            }
-          ],
-          cultural_moments: ['Back-to-work season', 'Budget planning cycles', 'Technology conferences'],
-          seasonal_opportunities: ['Q1 budget allocations', 'Q3 planning cycles', 'Year-end purchasing'],
-          demographic_shifts: ['Gen Z entering workforce', 'Remote work normalization', 'AI literacy growth']
+      // Call the Supabase Edge Function for market fit analysis
+      const { data, error } = await supabase.functions.invoke('market-fit-analysis', {
+        body: {
+          description,
+          industry,
+          targetMarket,
+          businessModel
         }
-      };
+      });
 
-      setAnalysis(mockAnalysis);
+      if (error) {
+        throw new Error(error.message || 'Failed to generate market analysis');
+      }
+
+      if (!data) {
+        throw new Error('No data received from market analysis');
+      }
+
+      setAnalysis(data as MarketFitResponse);
       setLastUpdate(new Date());
       
     } catch (error) {
