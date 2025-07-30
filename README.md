@@ -1,327 +1,180 @@
 # Libitum - AI-Powered Audience Discovery Platform
 
-Libitum is a comprehensive audience discovery and content prediction engine that combines Qloo's Taste AI™ with OpenAI's GPT to deliver personalized audience insights, predictive cultural trendspotting, and creative content suggestions.
+Libitum is an advanced audience discovery platform that combines Qloo's cultural intelligence with OpenAI's language models to provide deep insights into audience segments, cultural trends, and content strategies. Built for marketers, product managers, and business strategists who need to understand and reach their target audiences effectively.
 
-## 🚀 Features
+## 🚀 Getting Started
 
-### Core Functionality
-- **AI-Powered Audience Insights**: Discover hidden audience segments using Qloo's Taste AI™
-- **Cultural Trend Prediction**: Identify emerging trends before they become mainstream
-- **Content Generation**: AI-generated content strategies tailored to your audience
-- **Persona Development**: Detailed audience personas with behavioral insights
-- **Developer-Friendly API**: RESTful API for seamless integration
+### Access the Application
+Visit the live application at: [https://libitum-hackaton.netlify.app](https://libitum-hackaton.netlify.app)
 
-### Technical Features
-- **Real-time Insights**: Generate insights on-demand with live API integration
-- **Secure Authentication**: Supabase Auth with email/password login
-- **Responsive Design**: Modern UI that works on all devices
-- **Data Export**: Export insights in structured JSON format
-- **Project Management**: Organize insights by project with full CRUD operations
+### Login Credentials
+For judges and testers, use the pre-filled credentials:
+- **Email**: `qloo@hackathon.ai`
+- **Password**: `qloo@hackathon.ai`
 
-## 🛠️ Tech Stack
+Simply click "Sign in" to access the full application.
 
-### Frontend
-- **React 18** with TypeScript
-- **Vite** for fast development and building
-- **Tailwind CSS** for styling
-- **shadcn/ui** for UI components
-- **React Query** for state management and caching
-- **React Router** for navigation
+## 📱 Application Overview
 
-### Backend
-- **Supabase** for authentication, database, and serverless functions
-- **PostgreSQL** with Row Level Security (RLS)
-- **Edge Functions** for secure API integrations
+Libitum provides six main sections accessible through the sidebar navigation:
 
-### Third-Party Integrations
-- **Qloo's Taste AI™** for cultural intelligence
-- **OpenAI GPT** for content generation
-- **Date-fns** for date handling
+### 🏠 Dashboard
+Your central hub displaying:
+- Project overview and statistics
+- Recent projects with quick access
+- Quick action buttons for key features
+- Performance metrics (total projects, insights generated, personas created)
 
-## 🏁 Quick Start
+### 📁 Projects
+The core project management system where you can:
+- **Create New Projects**: Define your product/service with detailed descriptions
+- **Manage Existing Projects**: View, edit, and organize your audience discovery projects
+- **Generate AI Insights**: Create comprehensive audience analysis reports
+- **Export Results**: Download insights as PDF reports or JSON data
 
-### Prerequisites
-- Node.js 18+ and npm
-- Supabase account
-- Qloo API key (optional for demo)
-- OpenAI API key (optional for demo)
+### ⚡ Live Discovery
+Real-time audience exploration tool featuring:
+- **Interactive Parameter Adjustment**: Modify inputs and see instant results
+- **Live Insights Generation**: Real-time personas, trends, and content ideas
+- **Dynamic Visualization**: Watch insights update as you refine your parameters
+- **Save Functionality**: Convert live discoveries into full projects
 
-### Installation
+### 💬 Conversational Planning
+AI-powered chat interface for:
+- **Natural Language Queries**: Ask questions about audiences and trends
+- **Interactive Strategy Development**: Build content plans through conversation
+- **Export Conversations**: Save chat sessions as structured plans
+- **Contextual Insights**: Get culturally-informed responses powered by Qloo data
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd tastegraph-ai
-   ```
+### 🎯 Market Fit Analyzer
+Comprehensive market validation tool providing:
+- **Market Sizing Analysis**: TAM, SAM, and SOM calculations
+- **Competitive Landscape**: Competitor analysis and positioning opportunities
+- **Risk Assessment**: Market, competitive, and execution risk evaluation
+- **Launch Strategy**: Phased go-to-market recommendations
+- **Cultural Intelligence**: Qloo-powered cultural insights and timing opportunities
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+### 👤 Profile
+Personal account management for:
+- **Account Information**: View and update your profile details
+- **Professional Context**: Set job role and industry for personalized insights
+- **Preferences**: Customize your experience based on your professional background
 
-3. **Set up environment variables**
-   ```bash
-   cp .env.example .env
-   ```
-   
-   Update `.env` with your Supabase credentials:
-   ```
-   VITE_SUPABASE_URL=your-supabase-url
-   VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
-   ```
+## 🎯 How to Use Key Features
 
-4. **Set up Supabase database**
-   
-   Run the migration file in your Supabase SQL editor:
-   ```sql
-   -- Copy and paste the content from supabase/migrations/create_tables.sql
-   ```
+### Creating Your First Project
 
-5. **Deploy Edge Functions**
-   
-   Deploy the insights generation function to Supabase:
-   ```bash
-   # Copy the function code from supabase/functions/generate-insights/index.ts
-   # to your Supabase project's Edge Functions
-   ```
+1. **Navigate to Projects** → Click "New Project"
+2. **Fill in Project Details**:
+   - **Title**: Give your project a descriptive name
+   - **Description**: Provide detailed information about your product/service, target problem, and unique value proposition
+   - **Industry**: Select the most relevant industry category
+   - **Cultural Domains**: Choose relevant cultural areas (Music, Fashion, Gaming, Sports, Technology, Food, Film, Art)
+   - **Geographical Targets**: Select your target markets (US, UK, France, Germany, Japan, Canada)
+3. **Create Project** → Click "Create Project" to save
 
-6. **Start the development server**
-   ```bash
-   npm run dev
-   ```
+### Generating AI Insights
 
-## 📊 Database Schema
+1. **Open Project Details** → Click "View Details" on any project
+2. **Generate Insights** → Click "Generate Insights" button
+3. **Wait for Analysis** → AI processes your project (30-60 seconds)
+4. **Explore Results** → Navigate through different insight tabs:
+   - **Personas**: Detailed audience segments with characteristics and behaviors
+   - **Trends**: Cultural trends with confidence scores and impact analysis
+   - **Content**: AI-generated content suggestions with platform recommendations
+   - **Charts**: Interactive visualizations of cultural affinities and trends
 
-### Tables
+### Using Live Discovery
 
-#### `user_profiles`
-- `id` (uuid, primary key, references auth.users)
-- `email` (text, unique)
-- `job_role` (text)
-- `industry` (text)
-- `created_at` (timestamp)
-- `updated_at` (timestamp)
+1. **Navigate to Live Discovery**
+2. **Enter Product Description** → Provide detailed product/service information
+3. **Set Parameters**:
+   - Select industry and target market
+   - Choose cultural domains and geographic targets
+   - Adjust age range slider
+4. **Watch Real-Time Results** → Insights update automatically as you type
+5. **Save as Project** → Convert promising discoveries into full projects
 
-#### `projects`
-- `id` (uuid, primary key)
-- `title` (text)
-- `description` (text)
-- `cultural_domains` (text array)
-- `geographical_targets` (text array)
-- `industry` (text)
-- `created_at` (timestamp)
-- `updated_at` (timestamp)
-- `user_id` (uuid, references auth.users)
+### Conversational Planning
 
-#### `insights`
-- `id` (uuid, primary key)
-- `project_id` (uuid, references projects)
-- `audience_personas` (jsonb)
-- `cultural_trends` (jsonb)
-- `content_suggestions` (jsonb)
-- `qloo_data` (jsonb)
-- `created_at` (timestamp)
+1. **Navigate to Conversational Planning**
+2. **Start Chatting** → Ask questions about your audience or market
+3. **Example Questions**:
+   - "What audience segments are emerging in eco-fashion?"
+   - "Help me create a content plan for Gen Z music lovers"
+   - "What trends should I watch in the tech industry?"
+   - "Analyze the gaming audience for my app"
+4. **Export Results** → Save valuable conversations as structured plans
 
-## 🔑 API Integration
+### Market Fit Analysis
 
-### Qloo's Taste AI™ Integration
+1. **Navigate to Market Fit Analyzer**
+2. **Input Details**:
+   - Describe your product/service and value proposition
+   - Select industry and target market
+   - Choose business model
+3. **Review Analysis Tabs**:
+   - **Segments**: Target market segments with match percentages
+   - **Sizing**: Market size estimates and growth projections
+   - **Competition**: Competitive landscape and positioning opportunities
+   - **Opportunities**: Market opportunities with success probabilities
+   - **Strategy**: Phased launch strategy with timelines and budgets
+   - **Cultural**: Qloo-powered cultural insights and timing opportunities
 
-The application integrates with Qloo's Taste AI™ to provide:
-- Cultural intelligence and taste analysis
-- Audience preference mapping
-- Cross-domain recommendation insights
+## 📊 Understanding Your Results
 
-**Setup:**
-1. Get your API key from [Qloo](https://www.qloo.com/)
-2. Add to Supabase Edge Function environment variables
-3. Update the `simulateQlooAPI` function with actual API calls
+### Audience Personas
+Each persona includes:
+- **Demographics**: Age range, interests, and platform preferences
+- **Cultural Affinities**: Strength of connection to different cultural domains
+- **Behavioral Patterns**: How they discover, engage, and convert
+- **Recommended Approaches**: Tailored strategies for reaching each segment
 
-### OpenAI GPT Integration
+### Cultural Trends
+Trend analysis provides:
+- **Confidence Scores**: AI certainty in trend predictions (0-100%)
+- **Impact Assessment**: Potential effect on your market
+- **Timeline**: When trends are expected to peak
+- **Qloo Connection**: How cultural intelligence informs the prediction
 
-OpenAI is used for:
-- Generating narrative audience personas
-- Creating content suggestions
-- Enhancing cultural trend insights
+### Content Suggestions
+Content recommendations include:
+- **Platform Targeting**: Best channels for each content type
+- **Engagement Potential**: Expected audience response rates
+- **Sample Copy**: AI-generated content examples
+- **Cultural Timing**: Optimal timing based on cultural moments
 
-**Setup:**
-1. Get your API key from [OpenAI](https://platform.openai.com/)
-2. Add to Supabase Edge Function environment variables
-3. Update the `generateInsightsWithOpenAI` function with actual API calls
+## 💡 Tips for Best Results
 
-## 🚀 API Usage
+1. **Be Specific**: Provide detailed descriptions of your product, target problem, and unique value proposition
+2. **Use Multiple Cultural Domains**: Select 2-4 relevant cultural areas for richer insights
+3. **Geographic Focus**: Choose specific markets rather than "Global" for more targeted analysis
+4. **Iterate and Refine**: Use Live Discovery to test different approaches before creating full projects
+5. **Export and Share**: Download insights as PDFs for presentations or JSON for further analysis
 
-### Authentication
-All API requests require authentication via Supabase Auth:
-```javascript
-const { data: { session } } = await supabase.auth.getSession();
-const token = session.access_token;
-```
+## 🔧 Technical Features
 
-### Generate Insights
-```javascript
-const response = await fetch(`${SUPABASE_URL}/functions/v1/generate-insights`, {
-  method: 'POST',
-  headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({
-    project_id: 'your-project-id'
-  })
-});
-```
+- **Real-time Analysis**: Live insights that update as you type
+- **Interactive Visualizations**: Radar charts, confidence bars, and heatmaps
+- **Export Capabilities**: PDF reports and JSON data export
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
+- **Cultural Intelligence**: Powered by Qloo's Taste AI™ for deep cultural insights
 
-### Response Format
-```json
-{
-  "success": true,
-  "data": {
-    "audience_personas": [...],
-    "cultural_trends": [...],
-    "content_suggestions": [...],
-    "qloo_data": {...}
-  }
-}
-```
+## 🎨 Built With
 
-## 🎨 UI/UX Features
+- **Frontend**: React, TypeScript, Tailwind CSS, shadcn/ui
+- **Backend**: Supabase (Database, Authentication, Edge Functions)
+- **AI Integration**: OpenAI GPT models
+- **Cultural Intelligence**: Qloo's Taste AI™
+- **Deployment**: Netlify
+- **Visualizations**: Recharts for interactive data visualization
 
-### Design System
-- **Modern Dark Theme**: Professional gradient design with blue and purple accents
-- **Responsive Layout**: Mobile-first design with Tailwind CSS
-- **Interactive Components**: Hover states, transitions, and micro-interactions
-- **Loading States**: Skeleton components and progress indicators
-- **Error Handling**: Toast notifications and user feedback
+## 🚀 Live Demo
 
-### Navigation
-- **Sidebar Navigation**: Collapsible sidebar with active state indicators
-- **Dashboard**: Overview of projects and quick actions
-- **Project Management**: Create, view, and manage projects
-- **Insights Display**: Tabbed interface for personas, trends, and content
-- **Profile Management**: User settings and preferences
-- **API Documentation**: Built-in API reference and examples
+Experience Libitum at: [https://libitum-hackaton.netlify.app](https://libitum-hackaton.netlify.app)
 
-## 🔒 Security Features
-
-### Authentication
-- Email/password authentication via Supabase Auth
-- JWT token-based API authentication
-- Secure session management
-
-### Data Protection
-- Row Level Security (RLS) on all database tables
-- User data isolation
-- Secure API key management in Edge Functions
-
-### Best Practices
-- Environment variable management
-- CORS configuration for Edge Functions
-- Input validation and sanitization
-- Error handling and logging
-
-## 📱 Responsive Design
-
-The application is fully responsive with breakpoints for:
-- **Mobile**: < 768px
-- **Tablet**: 768px - 1024px
-- **Desktop**: > 1024px
-
-### Mobile Features
-- Touch-friendly interface
-- Collapsible navigation
-- Optimized content layout
-- Gesture support
-
-## 🧪 Development
-
-### Available Scripts
-```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run preview      # Preview production build
-npm run lint         # Run ESLint
-```
-
-### Project Structure
-```
-src/
-├── components/           # Reusable UI components
-├── contexts/            # React contexts (Auth, etc.)
-├── lib/                 # Utilities and API functions
-├── pages/              # Page components
-├── hooks/              # Custom hooks
-└── App.tsx             # Main application component
-
-supabase/
-├── migrations/         # Database migrations
-└── functions/          # Edge Functions
-```
-
-## 🚀 Deployment
-
-### Frontend Deployment
-The frontend can be deployed to any static hosting service:
-- Netlify
-- Vercel
-- AWS S3 + CloudFront
-- GitHub Pages
-
-### Backend Deployment
-The backend is fully managed by Supabase:
-- Database hosting
-- Authentication service
-- Edge Functions runtime
-- Real-time subscriptions
-
-## 📈 Analytics and Monitoring
-
-### Built-in Analytics
-- Project creation tracking
-- Insight generation metrics
-- User engagement analytics
-- API usage statistics
-
-### Error Monitoring
-- Error boundary implementation
-- Toast notification system
-- Console logging for debugging
-- Supabase error tracking
-
-## 🤝 Contributing
-
-### Development Setup
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-### Code Style
-- Use TypeScript for type safety
-- Follow ESLint configuration
-- Use Prettier for code formatting
-- Write meaningful commit messages
-
-## 📄 License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
-## 🆘 Support
-
-For support and questions:
-- Create an issue in the GitHub repository
-- Check the API documentation in the app
-- Review the Supabase documentation
-- Consult the Qloo and OpenAI API documentation
-
-## 🙏 Acknowledgments
-
-- **Qloo** for their Taste AI™ technology
-- **OpenAI** for GPT API capabilities
-- **Supabase** for the backend infrastructure
-- **shadcn/ui** for the beautiful UI components
-- **Tailwind CSS** for the styling system
+Use the credentials `qloo@hackathon.ai` for both email and password to explore all features.
 
 ---
 
-Built with ❤️ for the modern marketer and developer.
+*Libitum combines the power of cultural intelligence with advanced AI to help you discover, understand, and reach your ideal audience.*
